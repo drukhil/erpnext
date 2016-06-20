@@ -22,5 +22,5 @@ frappe.help.youtube_id["Item"] = "qXaEwld4_Ps";
 
 frappe.provide("frappe.ui");
 
-frappe.listview_settings['File'] = {
+frappe.listview_settings['Item'] = {
 hide_name_column: true}
