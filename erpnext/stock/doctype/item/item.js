@@ -86,8 +86,9 @@ frappe.ui.form.on("Item", {
 	page_name: frappe.utils.warn_page_name_change,
 
 	item_code: function(frm) {
-		if(!frm.doc.item_name)
-			frm.set_value("item_name", frm.doc.item_code);
+		// Ver 20160620.1 by SSK, Disabled auto populate feature of material code into material name field
+		//if(!frm.doc.item_name)
+		//	frm.set_value("item_name", frm.doc.item_code);
 		if(!frm.doc.description)
 			frm.set_value("description", frm.doc.item_code);
 	},
