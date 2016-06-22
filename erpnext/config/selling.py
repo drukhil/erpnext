@@ -50,11 +50,12 @@ def get_data():
 			]
 		},
 		{
-			"label": _("Items and Pricing"),
+			"label": _("Materials and Pricing"),
 			"items": [
 				{
 					"type": "doctype",
 					"name": "Item",
+					"label": "Materials",
 					"description": _("All Products or Services."),
 				},
 				{
@@ -71,14 +72,14 @@ def get_data():
 					"type": "page",
 					"name": "Sales Browser",
 					"icon": "icon-sitemap",
-					"label": _("Item Group"),
+					"label": _("Material Group"),
 					"link": "Sales Browser/Item Group",
 					"description": _("Tree of Item Groups."),
 					"doctype": "Item Group",
 				},
 				{
 					"type": "doctype",
-					"name": "Item Price",
+					"name": "Material Price",
 					"description": _("Multiple Item prices."),
 					"route": "Report/Item Price"
 				},

@@ -15,6 +15,7 @@ def get_data():
 				{
 					"type": "doctype",
 					"name": "Supplier Quotation",
+					"label": "Vendor Quotation",
 					"description": _("Quotations received from Suppliers."),
 				},
 				{
@@ -25,16 +26,18 @@ def get_data():
 			]
 		},
 		{
-			"label": _("Supplier"),
+			"label": _("Vendors"),
 			"items": [
 				{
 					"type": "doctype",
 					"name": "Supplier",
+					"label": "Vendor",
 					"description": _("Supplier database."),
 				},
 				{
 					"type": "doctype",
 					"name": "Supplier Type",
+					"label": "Vendor Type",
 					"description": _("Supplier Type master.")
 				},
 				{
@@ -73,11 +76,12 @@ def get_data():
 			]
 		},
 		{
-			"label": _("Items and Pricing"),
+			"label": _("Materials and Pricing"),
 			"items": [
 				{
 					"type": "doctype",
 					"name": "Item",
+					"label": "Materials",
 					"description": _("All Products or Services."),
 				},
 				{
@@ -94,7 +98,7 @@ def get_data():
 					"type": "page",
 					"name": "Sales Browser",
 					"icon": "icon-sitemap",
-					"label": _("Item Group"),
+					"label": _("Material Group"),
 					"link": "Sales Browser/Item Group",
 					"description": _("Tree of Item Groups."),
 					"doctype": "Item Group",
@@ -102,6 +106,7 @@ def get_data():
 				{
 					"type": "doctype",
 					"name": "Item Price",
+					"label": "Material Price",
 					"description": _("Multiple Item prices."),
 					"route": "Report/Item Price"
 				},

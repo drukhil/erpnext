@@ -11,4 +11,3 @@ Support
 Utilities
 Shopping Cart
 Hub Node
-CustomDocs

@@ -23,7 +23,8 @@ class JournalEntry(AccountsController):
 		self.clearance_date = None
 
 		self.validate_party()
-		self.validate_cheque_info()
+		# Ver 20160617.1, following line is commented
+		#self.validate_cheque_info()
 		self.validate_entries_for_advance()
 		self.validate_multi_currency()
 		self.set_amounts_in_company_currency()
@@ -71,7 +72,7 @@ class JournalEntry(AccountsController):
 	def validate_party(self):
 		for d in self.get("accounts"):
 			account_type = frappe.db.get_value("Account", d.account, "account_type")
-			if account_type in ["Receivable", "Payable"]:
+			if account_type in ["Receivable", "Payable", "Expense Account", "Income Account"]:
 				if not (d.party_type and d.party):
 					frappe.throw(_("Row {0}: Party Type and Party is required for Receivable / Payable account {1}").format(d.idx, d.account))
 			elif d.party_type and d.party:
@@ -359,7 +360,7 @@ class JournalEntry(AccountsController):
 			if d.party_type and d.party:
 				if not pay_to_recd_from:
 					pay_to_recd_from = frappe.db.get_value(d.party_type, d.party,
-						"customer_name" if d.party_type=="Customer" else "supplier_name")
+						"customer_name" if d.party_type=="Customer" else "supplier_name" if d.party_type=="Supplier" else "employee_name")
 
 				party_amount += (d.debit_in_account_currency or d.credit_in_account_currency)
 				party_account_currency = d.account_currency

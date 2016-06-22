@@ -107,3 +107,13 @@
 .pos .discount-amount-area .input-group {
   margin-top: 2px;
 }
+/******************************************
+ *        CUSTOM CSS STARTS HERE          *
+ ******************************************/
+
+/*get items from button in material request & quotation*/
+#page-Form\2f Quotation > div.container.page-body > div.page-wrapper > div > div.row.layout-main > div.col-md-10.layout-main-section-wrapper > div.layout-main-section > div.form-inner-toolbar > div,
+#page-Form\2f Material\20 Request > div.container.page-body > div.page-wrapper > div > div.row.layout-main > div.col-md-10.layout-main-section-wrapper > div.layout-main-section > div.form-inner-toolbar > button {
+	display: none;
+}
+

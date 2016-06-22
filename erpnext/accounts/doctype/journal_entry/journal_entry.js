@@ -252,6 +252,28 @@ cur_frm.cscript.select_print_heading = function(doc,cdt,cdn){
 }
 
 cur_frm.cscript.voucher_type = function(doc, cdt, cdn) {
+	
+	// Ver 20160617.1 by SSK on 17/06/2016, following two lines commented and the subsequent if condition added
+	//cur_frm.set_df_property("cheque_no", "reqd", doc.voucher_type=="Bank Entry");
+	//cur_frm.set_df_property("cheque_date", "reqd", doc.voucher_type=="Bank Entry");
+
+	// Ver 20160617.1 by SSK on 17/06/2016, following if condition is added
+	if(doc.docstatus == 1){
+		if(doc.cheque_no){
+			frappe.meta.get_docfield(doc.doctype, "cheque_no", this.frm.doc.name).read_only=1;
+		}
+		else {
+			cur_frm.set_df_property("cheque_no", "reqd", doc.voucher_type=="Bank Entry");
+		}
+		
+		if(doc.cheque_date){
+			frappe.meta.get_docfield(doc.doctype, "cheque_date", this.frm.doc.name).read_only=1;
+		}
+		else {
+			cur_frm.set_df_property("cheque_date", "reqd", doc.voucher_type=="Bank Entry");
+		}		
+	}
+	
 	cur_frm.set_df_property("cheque_no", "reqd", doc.voucher_type=="Bank Entry");
 	cur_frm.set_df_property("cheque_date", "reqd", doc.voucher_type=="Bank Entry");
 
