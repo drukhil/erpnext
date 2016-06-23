@@ -117,3 +117,10 @@
 	display: none;
 }
 
+#page-desktop {
+	background-size: 70% !important;
+	background-image: url("/files/smcl_logo_background.png");
+	background-repeat: no-repeat !important;
+	background-position: center !important;
+}
+

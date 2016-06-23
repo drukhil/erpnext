@@ -1,7 +1,7 @@
 // Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 // License: GNU General Public License v3. See license.txt
 
-frappe.query_reports["Itemwise Recommended Reorder Level Report"] = {
+frappe.query_reports["Materialwise Recommended Reorder Level Report"] = {
 	"filters": [
 		{
 			"fieldname":"from_date",

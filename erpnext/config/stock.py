@@ -62,86 +62,87 @@ def get_data():
 			]
 		},
 		{
-			"label": _("Items and Pricing"),
+			"label": _("Materials and Pricing"),
 			"items": [
 				{
 					"type": "doctype",
 					"name": "Item",
+					"label": "Material",
 					"description": _("All Products or Services."),
 				},
-				{
-					"type": "doctype",
-					"name": "Product Bundle",
-					"description": _("Bundle items at time of sale."),
-				},
-				{
-					"type": "doctype",
-					"name": "Price List",
-					"description": _("Price List master.")
-				},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Product Bundle",
+			#		"description": _("Bundle items at time of sale."),
+			#	},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Price List",
+			#		"description": _("Price List master.")
+			#	},
 				{
 					"type": "page",
 					"name": "Sales Browser",
 					"icon": "icon-sitemap",
-					"label": _("Item Group"),
+					"label": _("Material Group"),
 					"link": "Sales Browser/Item Group",
 					"description": _("Tree of Item Groups."),
 					"doctype": "Item Group",
 				},
-				{
-					"type": "doctype",
-					"name": "Item Price",
-					"description": _("Multiple Item prices."),
-					"route": "Report/Item Price"
-				},
-				{
-					"type": "doctype",
-					"name": "Shipping Rule",
-					"description": _("Rules for adding shipping costs.")
-				},
-				{
-					"type": "doctype",
-					"name": "Pricing Rule",
-					"description": _("Rules for applying pricing and discount.")
-				},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Item Price",
+			#		"description": _("Multiple Item prices."),
+			#		"route": "Report/Item Price"
+			#	},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Shipping Rule",
+			#		"description": _("Rules for adding shipping costs.")
+			#	},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Pricing Rule",
+			#		"description": _("Rules for applying pricing and discount.")
+			#	},
 
 			]
 		},
-		{
-			"label": _("Serial No and Batch"),
-			"items": [
-				{
-					"type": "doctype",
-					"name": "Serial No",
-					"description": _("Single unit of an Item."),
-				},
-				{
-					"type": "doctype",
-					"name": "Batch",
-					"description": _("Batch (lot) of an Item."),
-				},
-				{
-					"type": "doctype",
-					"name": "Installation Note",
-					"description": _("Installation record for a Serial No.")
-				},
-				{
-					"type": "report",
-					"name": "Serial No Service Contract Expiry",
-					"doctype": "Serial No"
-				},
-				{
-					"type": "report",
-					"name": "Serial No Status",
-					"doctype": "Serial No"
-				},
-				{
-					"type": "report",
-					"name": "Serial No Warranty Expiry",
-					"doctype": "Serial No"
-				},
-			]
-		},
+		#{
+		#	"label": _("Serial No and Batch"),
+		#	"items": [
+		#		{
+		#			"type": "doctype",
+		#			"name": "Serial No",
+		#			"description": _("Single unit of an Item."),
+		#		},
+		#		{
+		#			"type": "doctype",
+		#			"name": "Batch",
+		#			"description": _("Batch (lot) of an Item."),
+		#		},
+		#		{
+		#			"type": "doctype",
+		#			"name": "Installation Note",
+		#			"description": _("Installation record for a Serial No.")
+		#		},
+		#		{
+		#			"type": "report",
+		#			"name": "Serial No Service Contract Expiry",
+		#			"doctype": "Serial No"
+		#		},
+		#		{
+		#			"type": "report",
+		#			"name": "Serial No Status",
+		#			"doctype": "Serial No"
+		#		},
+		#		{
+		#			"type": "report",
+		#			"name": "Serial No Warranty Expiry",
+		#			"doctype": "Serial No"
+		#		},
+		#	]
+		#},
 		{
 			"label": _("Tools"),
 			"icon": "icon-wrench",
@@ -151,21 +152,21 @@ def get_data():
 					"name": "Stock Reconciliation",
 					"description": _("Upload stock balance via csv.")
 				},
-				{
-					"type": "doctype",
-					"name": "Packing Slip",
-					"description": _("Split Delivery Note into packages.")
-				},
+		#		{
+		#			"type": "doctype",
+		#			"name": "Packing Slip",
+		#			"description": _("Split Delivery Note into packages.")
+		#		},
 				{
 					"type": "doctype",
 					"name": "Quality Inspection",
 					"description": _("Incoming quality inspection.")
 				},
-				{
-					"type": "doctype",
-					"name": "Landed Cost Voucher",
-					"description": _("Update additional costs to calculate landed cost of items"),
-				}
+		#		{
+		#			"type": "doctype",
+		#			"name": "Landed Cost Voucher",
+		#			"description": _("Update additional costs to calculate landed cost of items"),
+		#		}
 			]
 		},
 		{
@@ -188,16 +189,16 @@ def get_data():
 					"label": _("Unit of Measure") + " (UOM)",
 					"description": _("e.g. Kg, Unit, Nos, m")
 				},
-				{
-					"type": "doctype",
-					"name": "Item Attribute",
-					"description": _("Attributes for Item Variants. e.g Size, Color etc."),
-				},
-				{
-					"type": "doctype",
-					"name": "Brand",
-					"description": _("Brand master.")
-				},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Item Attribute",
+			#		"description": _("Attributes for Item Variants. e.g Size, Color etc."),
+			#	},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Brand",
+			#		"description": _("Brand master.")
+			#	},
 			]
 		},
 		{
@@ -207,7 +208,7 @@ def get_data():
 				{
 					"type": "report",
 					"is_query_report": False,
-					"name": "Item-wise Price List Rate",
+					"name": "Material-wise Price List Rate",
 					"doctype": "Item Price",
 				},
 				{
@@ -250,7 +251,7 @@ def get_data():
 				{
 					"type": "report",
 					"name": "Material Shortage Report",
-					"route": "Report/Bin/Item Shortage Report",
+					"route": "Report/Bin/Material Shortage Report",
 					"doctype": "Purchase Receipt"
 				},
 				{
@@ -275,9 +276,8 @@ def get_data():
 				{
 					"type": "report",
 					"is_query_report": True,
-					"name": "Itemwise Recommended Reorder Level Report",
+					"name": "Materialwise Recommended Reorder Level Report",
 					"doctype": "Item",
-					"label": _("Materialwise Recommended Reorder Level"),
 				},
 			]
 		},
@@ -287,12 +287,12 @@ def get_data():
 			"items": [
 				{
 					"type": "help",
-					"label": _("Items and Pricing"),
+					"label": _("Materials and Pricing"),
 					"youtube_id": "qXaEwld4_Ps"
 				},
 				{
 					"type": "help",
-					"label": _("Item Variants"),
+					"label": _("Material Variants"),
 					"youtube_id": "OGBETlCzU5o"
 				},
 				{

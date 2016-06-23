@@ -130,23 +130,23 @@ def get_data():
 		{
 			"label": _("Banking and Payments"),
 			"items": [
-				{
-					"type": "doctype",
-					"name": "Payment Tool",
-					"description": _("Create Payment Entries against Orders or Invoices.")
-				},
+		#		{
+		#			"type": "doctype",
+		#			"name": "Payment Tool",
+		#			"description": _("Create Payment Entries against Orders or Invoices.")
+		#		},
 				{
 					"type": "doctype",
 					"label": _("Update Bank Transaction Dates"),
 					"name": "Bank Reconciliation",
 					"description": _("Update bank payment dates with journals.")
 				},
-				{
-					"type": "doctype",
-					"label": _("Match Payments with Invoices"),
-					"name": "Payment Reconciliation",
-					"description": _("Match non-linked Invoices and Payments.")
-				},
+		#		{
+		#			"type": "doctype",
+		#			"label": _("Match Payments with Invoices"),
+		#			"name": "Payment Reconciliation",
+		#			"description": _("Match non-linked Invoices and Payments.")
+		#		},
 				{
 					"type": "report",
 					"name": "Bank Reconciliation Statement",
@@ -164,21 +164,21 @@ def get_data():
 		{
 			"label": _("Taxes"),
 			"items": [
-				{
-					"type": "doctype",
-					"name": "Sales Taxes and Charges Template",
-					"description": _("Tax template for selling transactions.")
-				},
-				{
-					"type": "doctype",
-					"name": "Purchase Taxes and Charges Template",
-					"description": _("Tax template for buying transactions.")
-				},
-				{
-					"type": "doctype",
-					"name": "Tax Rule",
-					"description": _("Tax Rule for transactions.")
-				},
+		#		{
+		#			"type": "doctype",
+		#			"name": "Sales Taxes and Charges Template",
+		#			"description": _("Tax template for selling transactions.")
+		#		},
+		#		{
+		#			"type": "doctype",
+		#			"name": "Purchase Taxes and Charges Template",
+		#			"description": _("Tax template for buying transactions.")
+		#		},
+		#		{
+		#			"type": "doctype",
+		#			"name": "Tax Rule",
+		#			"description": _("Tax Rule for transactions.")
+		#		},
 				{
 					"type": "report",
 					"name": "Sales Register",
@@ -218,16 +218,16 @@ def get_data():
 				},
 			]
 		},
-		{
-			"label": _("Tools"),
-			"items": [
-				{
-					"type": "doctype",
-					"name": "Period Closing Voucher",
-					"description": _("Close Balance Sheet and book Profit or Loss.")
-				},
-			]
-		},
+		#{
+		#	"label": _("Tools"),
+		#	"items": [
+		#		{
+		#			"type": "doctype",
+		#			"name": "Period Closing Voucher",
+		#			"description": _("Close Balance Sheet and book Profit or Loss.")
+		#		},
+		#	]
+		#},
 		{
 			"label": _("Setup"),
 			"icon": "icon-cog",
@@ -252,66 +252,66 @@ def get_data():
 					"name": "Currency Exchange",
 					"description": _("Currency exchange rate master.")
 				},
-				{
-					"type": "doctype",
-					"name": "Payment Gateway Account",
-					"description": _("Setup Gateway accounts.")
-				},
-				{
-					"type": "doctype",
-					"name": "POS Profile",
-					"label": _("Point-of-Sale Profile"),
-					"description": _("Rules to calculate shipping amount for a sale")
-				},
-				{
-					"type": "doctype",
-					"name":"Terms and Conditions",
-					"label": _("Terms and Conditions Template"),
-					"description": _("Template of terms or contract.")
-				},
+		#		{
+		#			"type": "doctype",
+		#			"name": "Payment Gateway Account",
+		#			"description": _("Setup Gateway accounts.")
+		#		},
+		#		{
+		#			"type": "doctype",
+		#			"name": "POS Profile",
+		#			"label": _("Point-of-Sale Profile"),
+		#			"description": _("Rules to calculate shipping amount for a sale")
+		#		},
+		#		{
+		#			"type": "doctype",
+		#			"name":"Terms and Conditions",
+		#			"label": _("Terms and Conditions Template"),
+		#			"description": _("Template of terms or contract.")
+		#		},
 				{
 					"type": "doctype",
 					"name":"Mode of Payment",
 					"description": _("e.g. Bank, Cash, Credit Card")
 				},
-				{
-					"type": "doctype",
-					"name":"C-Form",
-					"description": _("C-Form records"),
-					"country": "India"
-				}
+		#		{
+		#			"type": "doctype",
+		#			"name":"C-Form",
+		#			"description": _("C-Form records"),
+		#			"country": "India"
+		#		}
 			]
 		},
-		{
-			"label": _("To Bill"),
-			"items": [
-				{
-					"type": "report",
-					"name": "Ordered Items To Be Billed",
-					"is_query_report": True,
-					"doctype": "Sales Invoice"
-				},
-				{
-					"type": "report",
-					"name": "Delivered Items To Be Billed",
-					"is_query_report": True,
-					"doctype": "Sales Invoice"
-				},
-				{
-					"type": "report",
-					"name": "Purchase Order Items To Be Billed",
-					"is_query_report": True,
-					"doctype": "Purchase Invoice"
-				},
-				{
-					"type": "report",
-					"name": "Received Items To Be Billed",
-					"is_query_report": True,
-					"doctype": "Purchase Invoice"
-				},
-			]
+		#{
+		#	"label": _("To Bill"),
+		#	"items": [
+		#		{
+		#			"type": "report",
+		#			"name": "Ordered Items To Be Billed",
+		#			"is_query_report": True,
+		#			"doctype": "Sales Invoice"
+		#		},
+		#		{
+		#			"type": "report",
+		#			"name": "Delivered Items To Be Billed",
+		#			"is_query_report": True,
+		#			"doctype": "Sales Invoice"
+		#		},
+		#		{
+		#			"type": "report",
+		#			"name": "Purchase Order Items To Be Billed",
+		#			"is_query_report": True,
+		#			"doctype": "Purchase Invoice"
+		#		},
+		#		{
+		#			"type": "report",
+		#			"name": "Received Items To Be Billed",
+		#			"is_query_report": True,
+		#			"doctype": "Purchase Invoice"
+		#		},
+		#	]
 
-		},
+		#},
 		{
 			"label": _("Analytics"),
 			"items": [

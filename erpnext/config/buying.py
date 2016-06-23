@@ -84,16 +84,16 @@ def get_data():
 					"label": "Materials",
 					"description": _("All Products or Services."),
 				},
-				{
-					"type": "doctype",
-					"name": "Product Bundle",
-					"description": _("Bundle items at time of sale."),
-				},
-				{
-					"type": "doctype",
-					"name": "Price List",
-					"description": _("Price List master.")
-				},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Product Bundle",
+			#		"description": _("Bundle items at time of sale."),
+			#	},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Price List",
+			#		"description": _("Price List master.")
+			#	},
 				{
 					"type": "page",
 					"name": "Sales Browser",
@@ -110,11 +110,11 @@ def get_data():
 					"description": _("Multiple Item prices."),
 					"route": "Report/Item Price"
 				},
-				{
-					"type": "doctype",
-					"name": "Pricing Rule",
-					"description": _("Rules for applying pricing and discount.")
-				},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Pricing Rule",
+			#		"description": _("Rules for applying pricing and discount.")
+			#	},
 
 			]
 		},

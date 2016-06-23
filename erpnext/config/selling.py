@@ -58,16 +58,16 @@ def get_data():
 					"label": "Materials",
 					"description": _("All Products or Services."),
 				},
-				{
-					"type": "doctype",
-					"name": "Product Bundle",
-					"description": _("Bundle items at time of sale."),
-				},
-				{
-					"type": "doctype",
-					"name": "Price List",
-					"description": _("Price List master.")
-				},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Product Bundle",
+			#		"description": _("Bundle items at time of sale."),
+			#	},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Price List",
+			#		"description": _("Price List master.")
+			#	},
 				{
 					"type": "page",
 					"name": "Sales Browser",
@@ -83,61 +83,61 @@ def get_data():
 					"description": _("Multiple Item prices."),
 					"route": "Report/Item Price"
 				},
-				{
-					"type": "doctype",
-					"name": "Shipping Rule",
-					"description": _("Rules for adding shipping costs.")
-				},
-				{
-					"type": "doctype",
-					"name": "Pricing Rule",
-					"description": _("Rules for applying pricing and discount.")
-				},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Shipping Rule",
+			#		"description": _("Rules for adding shipping costs.")
+			#	},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Pricing Rule",
+			#		"description": _("Rules for applying pricing and discount.")
+			#	},
 
 			]
 		},
-		{
-			"label": _("Sales Partners and Territory"),
-			"items": [
-				{
-					"type": "page",
-					"label": _("Territory"),
-					"name": "Sales Browser",
-					"icon": "icon-sitemap",
-					"link": "Sales Browser/Territory",
-					"description": _("Manage Territory Tree."),
-					"doctype": "Territory",
-				},
-				{
-					"type": "doctype",
-					"name": "Sales Partner",
-					"description": _("Manage Sales Partners."),
-				},
-				{
-					"type": "page",
-					"label": _("Sales Person"),
-					"name": "Sales Browser",
-					"icon": "icon-sitemap",
-					"link": "Sales Browser/Sales Person",
-					"description": _("Manage Sales Person Tree."),
-					"doctype": "Sales Person",
-				},
-				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "Territory Target Variance (Item Group-Wise)",
-					"route": "query-report/Territory Target Variance Item Group-Wise",
-					"doctype": "Territory"
-				},
-				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "Sales Person Target Variance (Item Group-Wise)",
-					"route": "query-report/Sales Person Target Variance Item Group-Wise",
-					"doctype": "Sales Person",
-				},
-			]
-		},
+		#{
+		#	"label": _("Sales Partners and Territory"),
+		#	"items": [
+		#		{
+		#			"type": "page",
+		#			"label": _("Territory"),
+		#			"name": "Sales Browser",
+		#			"icon": "icon-sitemap",
+		#			"link": "Sales Browser/Territory",
+		#			"description": _("Manage Territory Tree."),
+		#			"doctype": "Territory",
+		#		},
+		#		{
+		#			"type": "doctype",
+		#			"name": "Sales Partner",
+		#			"description": _("Manage Sales Partners."),
+		#		},
+		#		{
+		#			"type": "page",
+		#			"label": _("Sales Person"),
+		#			"name": "Sales Browser",
+		#			"icon": "icon-sitemap",
+		#			"link": "Sales Browser/Sales Person",
+		#			"description": _("Manage Sales Person Tree."),
+		#			"doctype": "Sales Person",
+		#		},
+		#		{
+		#			"type": "report",
+		#			"is_query_report": True,
+		#			"name": "Territory Target Variance (Item Group-Wise)",
+		#			"route": "query-report/Territory Target Variance Item Group-Wise",
+		#			"doctype": "Territory"
+		#		},
+		#		{
+		#			"type": "report",
+		#			"is_query_report": True,
+		#			"name": "Sales Person Target Variance (Item Group-Wise)",
+		#			"route": "query-report/Sales Person Target Variance Item Group-Wise",
+		#			"doctype": "Sales Person",
+		#		},
+		#	]
+		#},
 		{
 			"label": _("Setup"),
 			"icon": "icon-cog",
@@ -147,11 +147,11 @@ def get_data():
 					"name": "Selling Settings",
 					"description": _("Default settings for selling transactions.")
 				},
-				{
-					"type": "doctype",
-					"name": "Campaign",
-					"description": _("Sales campaigns."),
-				},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Campaign",
+			#		"description": _("Sales campaigns."),
+			#	},
 				{
 					"type": "doctype",
 					"name":"Terms and Conditions",
@@ -163,11 +163,11 @@ def get_data():
 					"name": "Sales Taxes and Charges Template",
 					"description": _("Tax template for selling transactions.")
 				},
-				{
-					"type": "doctype",
-					"name": "Industry Type",
-					"description": _("Track Leads by Industry Type.")
-				},
+			#	{
+			#		"type": "doctype",
+			#		"name": "Industry Type",
+			#		"description": _("Track Leads by Industry Type.")
+			#	},
 			]
 		},
 		{
@@ -186,13 +186,13 @@ def get_data():
 					"label": _("Sales Funnel"),
 					"icon": "icon-bar-chart",
 				},
-				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "Customer Acquisition and Loyalty",
-					"doctype": "Customer",
-					"icon": "icon-bar-chart",
-				},
+			#	{
+			#		"type": "report",
+			#		"is_query_report": True,
+			#		"name": "Customer Acquisition and Loyalty",
+			#		"doctype": "Customer",
+			#		"icon": "icon-bar-chart",
+			#	},
 				{
 					"type": "report",
 					"is_query_report": True,
@@ -211,12 +211,12 @@ def get_data():
 			"label": _("Other Reports"),
 			"icon": "icon-list",
 			"items": [
-				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "Lead Details",
-					"doctype": "Lead"
-				},
+			#	{
+			#		"type": "report",
+			#		"is_query_report": True,
+			#		"name": "Lead Details",
+			#		"doctype": "Lead"
+			#	},
 				{
 					"type": "report",
 					"is_query_report": True,
@@ -242,12 +242,12 @@ def get_data():
 					"doctype": "Item",
 					"label": "Materialwise Sales History"
 				},
-				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "BOM Search",
-					"doctype": "BOM"
-				},
+			#	{
+			#		"type": "report",
+			#		"is_query_report": True,
+			#		"name": "BOM Search",
+			#		"doctype": "BOM"
+			#	},
 				{
 					"type": "report",
 					"is_query_report": True,

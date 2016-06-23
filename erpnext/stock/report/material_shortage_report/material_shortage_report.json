@@ -1,0 +1,20 @@
+{
+ "add_total_row": 0, 
+ "apply_user_permissions": 1, 
+ "creation": "2016-05-26 14:25:02.854742", 
+ "disabled": 0, 
+ "docstatus": 0, 
+ "doctype": "Report", 
+ "idx": 0, 
+ "is_standard": "Yes", 
+ "json": "{\"filters\":[[\"Bin\",\"projected_qty\",\"<\",\"0\"]],\"columns\":[[\"warehouse\",\"Bin\"],[\"item_code\",\"Bin\"],[\"actual_qty\",\"Bin\"],[\"ordered_qty\",\"Bin\"],[\"planned_qty\",\"Bin\"],[\"reserved_qty\",\"Bin\"],[\"projected_qty\",\"Bin\"]],\"sort_by\":\"Bin.projected_qty\",\"sort_order\":\"asc\",\"sort_by_next\":\"\",\"sort_order_next\":\"desc\"}", 
+ "modified": "2016-06-22 13:14:24.981625", 
+ "modified_by": "Administrator", 
+ "module": "Stock", 
+ "name": "Material Shortage Report", 
+ "owner": "Administrator", 
+ "query": "SELECT warehouse AS \"Warehouse:Data:200\", item_code AS \"Material Code:Data:120\", actual_qty AS \"Actual Quantity:Data:120\", ordered_qty AS \"Ordered Quantity:Data:120\", planned_qty AS \"Planned Quantity:Data:120\", reserved_qty AS \"Reserved Quantity:Data:120\", projected_qty AS \"Projected Quantity:Data:120\"\nFROM tabBin\nORDER BY projected_qty ASC;", 
+ "ref_doctype": "Bin", 
+ "report_name": "Material Shortage Report", 
+ "report_type": "Query Report"
+}
