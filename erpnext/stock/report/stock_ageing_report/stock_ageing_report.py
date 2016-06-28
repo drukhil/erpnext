@@ -21,8 +21,8 @@ def execute(filters=None):
 		earliest_age = date_diff(to_date, fifo_queue[0][1])
 		latest_age = date_diff(to_date, fifo_queue[-1][1])
 
-		data.append([item, details.item_name, details.description, details.item_group,
-			average_age, earliest_age, latest_age, details.stock_uom])
+		data.append([item, details.item_name, details.item_group,
+			average_age, earliest_age, latest_age])
 
 	return columns, data
 
@@ -36,9 +36,9 @@ def get_average_age(fifo_queue, to_date):
 	return (age_qty / total_qty) if total_qty else 0.0
 
 def get_columns():
-	return [_("Material Code") + ":Link/Item:100", _("Material Name") + "::100", _("Material Description") + "::200",
+	return [_("Material Code") + ":Link/Item:100", _("Material Name") + "::100", 
 		_("Material Group") + ":Link/Item Group:100", _("Average Age") + ":Float:100",
-		_("Earliest") + ":Int:80", _("Latest") + ":Int:80", _("UOM") + ":Link/UOM:100"]
+		_("Earliest (Days)") + ":Int:100", _("Latest (Days)") + ":Int:100" ]
 
 def get_fifo_queue(filters):
 	item_details = {}

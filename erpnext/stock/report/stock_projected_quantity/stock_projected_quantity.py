@@ -11,11 +11,11 @@ def execute(filters=None):
 	return get_columns(), get_data(filters)
 
 def get_columns():
-	return [_("Material Code") + ":Link/Item:140", _("Material Name") + "::100", _("Material Description") + "::200",
-		_("Material Group") + ":Link/Item Group:100", _("Warehouse") + ":Link/Warehouse:120",
+	return [_("Material Code") + ":Link/Item:100", _("Material Name") + "::140", 
+		_("Material Group") + ":Link/Item Group:100", _("Warehouse") + ":Link/Warehouse:140",
 		_("UOM") + ":Link/UOM:100", _("Actual Qty") + ":Float:100", 
-		_("Receipt Qty") + ":Float:110", _("Ordered Qty") + ":Float:100", _("Reserved Qty") + ":Float:100",
-		_("Projected Qty") + ":Float:100", _("Reorder Level") + ":Float:100", _("Reorder Qty") + ":Float:100",
+		_("Requested Qty") + ":Float:110", _("Ordered Qty") + ":Float:100", 
+		_("Reserved Qty") + ":Float:100", _("Projected Qty") + ":Float:100", 
 		_("Shortage Qty") + ":Float:100"]
 
 def get_data(filters):
@@ -49,9 +49,9 @@ def get_data(filters):
 
 		shortage_qty = re_order_level - flt(bin.projected_qty) if (re_order_level or re_order_qty) else 0
 
-		data.append([item.name, item.item_name, item.description, item.item_group, item.brand, bin.warehouse,
-			item.stock_uom, bin.actual_qty, bin.planned_qty, bin.indented_qty, bin.ordered_qty,
-			bin.reserved_qty, bin.projected_qty, re_order_level, re_order_qty, shortage_qty])
+		data.append([item.name, item.item_name, item.item_group, bin.warehouse,
+			item.stock_uom, bin.actual_qty, bin.indented_qty, bin.ordered_qty,
+			bin.reserved_qty, bin.projected_qty, shortage_qty])
 
 	return data
 

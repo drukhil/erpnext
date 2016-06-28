@@ -20,7 +20,7 @@ def execute(filters=None):
 		item_detail = item_details[sle.item_code]
 
 		data.append([sle.date, sle.item_code, item_detail.item_name, item_detail.item_group,
-			item_detail.description, sle.warehouse,
+			sle.warehouse,
 			item_detail.stock_uom, sle.actual_qty, sle.qty_after_transaction,
 			(sle.incoming_rate if sle.actual_qty > 0 else 0.0),
 			sle.valuation_rate, sle.stock_value, sle.voucher_type, sle.voucher_no,
@@ -30,10 +30,10 @@ def execute(filters=None):
 
 def get_columns():
 	return [_("Date") + ":Datetime:95", _("Material Code") + ":Link/Item:130", _("Material Name") + "::120", _("Material Group") + ":Link/Item Group:100",
-		_("Material Description") + "::200", _("Warehouse") + ":Link/Warehouse:100",
+		_("Warehouse") + ":Link/Warehouse:100",
 		_("Stock UOM") + ":Link/UOM:100", _("Qty") + ":Float:50", _("Balance Qty") + ":Float:100",
 		_("Incoming Rate") + ":Currency:110", _("MAP") + ":Currency:110", _("Balance Value") + ":Currency:110",
-		_("Voucher Type") + "::110", _("Voucher #") + ":Dynamic Link/"+_("Voucher Type")+":100", _("Company") + ":Link/Company:100"
+		_("Transaction Type") + "::110", _("Transaction No.") + ":Dynamic Link/"+_("Voucher Type")+":100", _("Company") + ":Link/Company:100"
 	]
 
 def get_stock_ledger_entries(filters):

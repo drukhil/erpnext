@@ -250,9 +250,9 @@ def get_data():
 				},
 				{
 					"type": "report",
+					"is_query_report": True,
 					"name": "Material Shortage Report",
-					"route": "Report/Bin/Material Shortage Report",
-					"doctype": "Purchase Receipt"
+					"doctype": "Bin",
 				},
 				{
 					"type": "report",

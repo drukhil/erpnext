@@ -20,7 +20,7 @@ def execute(filters=None):
 		qty_dict = iwb_map[(company, item, warehouse)]
 		data.append([item, item_map[item]["item_name"],
 			item_map[item]["item_group"],
-			item_map[item]["description"], warehouse,
+			warehouse,
 			item_map[item]["stock_uom"], qty_dict.opening_qty,
 			qty_dict.opening_val, qty_dict.in_qty,
 			qty_dict.in_val, qty_dict.out_qty,
@@ -38,7 +38,6 @@ def get_columns():
 		_("Material Code")+":Link/Item:100",
 		_("Material Name")+"::150",
 		_("Material Group")+"::100",
-		_("Material Description")+"::150",
 		_("Warehouse")+":Link/Warehouse:100",
 		_("Stock UOM")+":Link/UOM:90",
 		_("Opening Qty")+":Float:100",

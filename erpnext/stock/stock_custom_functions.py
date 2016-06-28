@@ -9,6 +9,18 @@ import frappe
 @frappe.whitelist()
 def get_current_item_code(item_group): 
 	item_code = frappe.db.sql("""select item_code from tabItem where item_group=%s order by item_code desc limit 1;""", item_group);
-	return (int(item_code[0][0]) + 1);
+	if item_code:
+		return (int(item_code[0][0]) + 1);
+	else:
+		return getItemCode(item_group);
 
+
+def getItemCode(item_group):
+	return {
+		"Consumable": 100000,
+		"Capital Inventory": 200000,
+		"Finished Goods": 300000,
+		"Services (miscellaneous)": 400000,
+		"Services (works)": 500000,
+	}.get(item_group, 000000)
 
