@@ -19,6 +19,11 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "DFG Housing",
+					"description": _("DFG Housing."),
+				},
+				{
+					"type": "doctype",
 					"name": "RBA Project",
 					"description": _("RBA Project."),
 				},

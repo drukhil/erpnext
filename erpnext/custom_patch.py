@@ -91,7 +91,7 @@ def update_aa():
 		print a.name
 
 def update_impp():
-	for a in frappe.db.sql(""" select name from `tabImprest Recoup` where name = 'IMPP2022000180'""", as_dict =1):
+	for a in frappe.db.sql(""" select name from `tabImprest Recoup` where name = 'IMPP2022000211-1'""", as_dict =1):
 		doc = frappe.get_doc("Imprest Recoup", a.name)
 		#doc.post_receipt_entry()
 		#update_dependencies(doc.branch, doc.imprest_type, doc.entry_date)
@@ -332,12 +332,12 @@ def update_asset_details():
 		print a.name, count
 
 def ipol():
-	doc = frappe.get_doc("Issue POL", 'IPOL220800226')
-	doc.cancel()
+	doc = frappe.get_doc("Issue POL", 'IPOL220900081-1')
+	doc.submit()
 	print doc.name
 
 def submit_imprest():
-	doc = frappe.get_doc("Imprest Recoup", 'IMPP2022000051')
+	doc = frappe.get_doc("Imprest Recoup", 'IMPP2022000191-1')
 	doc.submit()
 	print doc.name
 
@@ -367,7 +367,7 @@ def ss():
 		print (a)
 
 def submit_se():
-	doc = frappe.get_doc("Stock Entry", "SEMI22080019")
+	doc = frappe.get_doc("Stock Entry", "SEMI22090240")
 	doc.submit()
 	print doc.name
 
@@ -377,19 +377,19 @@ def submit_ca():
 	print doc.name
 
 def cancel_se():
-	doc = frappe.get_doc("Stock Entry", "SEMI22081546")
+	doc = frappe.get_doc("Stock Entry", "SEMI22090240")
 	doc.cancel()
 	print doc.name
 
 def submit_je():
-	doc = frappe.get_doc("Journal Entry", "JEJV220800022")
+	doc = frappe.get_doc("Journal Entry", "JEJV220900015")
 	doc.submit()
 	print doc.name
 
 def submit_pr():
-	doc = frappe.get_doc("Purchase Receipt", "PRCO22040019")
+	doc = frappe.get_doc("Purchase Receipt", "PRCO22090383")
 	doc.cancel()
-	print doc.name\
+	print doc.name
 
 def save_sm():
 	doc = frappe.get_doc("Supplier Monitoring", "SMT220001")
