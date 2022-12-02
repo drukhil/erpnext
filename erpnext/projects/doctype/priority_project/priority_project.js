@@ -24,4 +24,10 @@ frappe.ui.form.on('Priority Project', {
 		});
 
 	},
+	setup: function(frm) {
+		frm.get_docfield("items").allow_bulk_edit = 1;		
+			
+		
+			
+	},	
 });

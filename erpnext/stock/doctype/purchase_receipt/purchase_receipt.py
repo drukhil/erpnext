@@ -226,7 +226,7 @@ class PurchaseReceipt(BuyingController):
 		if a_list:
 			subject = "Asset Procurement Notice"
 			message = " Dear Sir, Assets '{0}' are/is received. Kindly proceed further actions"
-			email = 'dorjitshering@gyalsunginfra.bt'
+			email = 'sherabdhendup20@gmail.com'
 			frappe.sendmail(recipients=email, sender=None, subject=subject, message=message)
 		
 	##

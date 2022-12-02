@@ -337,7 +337,7 @@ def ipol():
 	print doc.name
 
 def submit_imprest():
-	doc = frappe.get_doc("Imprest Recoup", 'IMPP2022000191-1')
+	doc = frappe.get_doc("Imprest Recoup", 'IMPP2022000232')
 	doc.submit()
 	print doc.name
 
@@ -353,10 +353,10 @@ def ipol1():
 			print doc.name
 
 def rpol():
-	pol = ["POL220800332"]
+	pol = ["POL221100232"]
 	for a in pol:
 		doc = frappe.get_doc("POL", a)
-		doc.submit()
+		doc.cancel()
 		print (a)
 
 def ss():
@@ -367,7 +367,7 @@ def ss():
 		print (a)
 
 def submit_se():
-	doc = frappe.get_doc("Stock Entry", "SEMI22090240")
+	doc = frappe.get_doc("Stock Entry", "SEMI22101199")
 	doc.submit()
 	print doc.name
 
@@ -377,17 +377,17 @@ def submit_ca():
 	print doc.name
 
 def cancel_se():
-	doc = frappe.get_doc("Stock Entry", "SEMI22090240")
+	doc = frappe.get_doc("Stock Entry", "SEMI22090321")
 	doc.cancel()
 	print doc.name
 
 def submit_je():
-	doc = frappe.get_doc("Journal Entry", "JEJV220900015")
+	doc = frappe.get_doc("Journal Entry", "JEJV221100097")
 	doc.submit()
 	print doc.name
 
 def submit_pr():
-	doc = frappe.get_doc("Purchase Receipt", "PRCO22090383")
+	doc = frappe.get_doc("Purchase Receipt", "PRCO22100009")
 	doc.cancel()
 	print doc.name
 

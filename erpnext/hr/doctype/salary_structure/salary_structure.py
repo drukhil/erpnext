@@ -562,7 +562,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
                 #[target.append('deductions',m) for m in calc_map['deductions']]
 		for m in calc_map['earnings']:
 			#frappe.msgprint("hhh {0} {1}".format(m['salary_component'], source.employment_type))
-			if source.employment_type == 'Deputation' and m['salary_component'] not in ['Deputation Allowance','Communication Allowance', 'Salary Arrears', 'Contract Allowance CDCL']:
+			if source.employment_type == 'Deputation' and m['salary_component'] not in ['Deputation Allowance','Communication Allowance', 'Salary Arrears', 'Contract Allowance CDCL', 'PSA']:
 				continue 
 			else:
 				target.append('earnings', m)

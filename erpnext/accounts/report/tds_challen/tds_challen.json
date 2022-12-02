@@ -7,7 +7,7 @@
  "doctype": "Report", 
  "idx": 0, 
  "is_standard": "Yes", 
- "modified": "2017-11-22 16:05:59.977583", 
+ "modified": "2022-11-07 16:31:45.038692", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "TDS Challen", 
@@ -21,6 +21,9 @@
   }, 
   {
    "role": "Accounts User"
+  }, 
+  {
+   "role": "Asset Manager"
   }
  ]
 }

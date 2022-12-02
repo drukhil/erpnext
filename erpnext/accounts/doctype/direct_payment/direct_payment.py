@@ -114,6 +114,8 @@ class DirectPayment(AccountsController):
 						"voucher_no": self.name,
 						"voucher_type": self.doctype,
 						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,
 						"company": self.company,
 						"remarks": self.remarks
 						})
@@ -127,6 +129,8 @@ class DirectPayment(AccountsController):
 						"voucher_no": self.name,
 						"voucher_type": self.doctype,
 						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,
 						"company": self.company,
 						"remarks": self.remarks
 						})
@@ -141,6 +145,8 @@ class DirectPayment(AccountsController):
 													"voucher_no": self.name,
 													"voucher_type": self.doctype,
 													"cost_center": self.cost_center,
+													'party': self.party,
+						'party_type': self.party_type,
 													"company": self.company,
 													"remarks": self.remarks
 													})
@@ -170,6 +176,8 @@ class DirectPayment(AccountsController):
 						"voucher_no": self.name,
 						"voucher_type": self.doctype,
 						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,
 						"company": self.company,
 						"remarks": self.remarks
 						})
@@ -199,7 +207,9 @@ class DirectPayment(AccountsController):
 						"debit_in_account_currency": self.amount,
 						"voucher_no": self.name,
 						"voucher_type": self.doctype,
-						"cost_center": self.cost_center,						
+						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,						
 						"company": self.company,
 						"remarks": self.remarks
 						})
@@ -213,6 +223,8 @@ class DirectPayment(AccountsController):
 						"voucher_no": self.name,
 						"voucher_type": self.doctype,
 						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,
 						"company": self.company,
 						"remarks": self.remarks
 						})
@@ -227,6 +239,8 @@ class DirectPayment(AccountsController):
 													"voucher_no": self.name,
 													"voucher_type": self.doctype,
 													"cost_center": self.cost_center,
+													'party': self.party,
+						'party_type': self.party_type,
 													"company": self.company,
 													"remarks": self.remarks
 													})
@@ -256,6 +270,8 @@ class DirectPayment(AccountsController):
 						"voucher_no": self.name,
 						"voucher_type": self.doctype,
 						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,
 						"company": self.company,
 						"remarks": self.remarks
 						})
