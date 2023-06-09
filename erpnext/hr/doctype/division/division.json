@@ -1,7 +1,7 @@
 {
  "allow_copy": 0, 
  "allow_import": 1, 
- "allow_rename": 0, 
+ "allow_rename": 1, 
  "autoname": "field:d_name", 
  "beta": 0, 
  "creation": "2016-06-17 12:50:29.667150", 
@@ -96,8 +96,8 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2018-08-30 07:47:43.091877", 
- "modified_by": "jigme@bt.bt", 
+ "modified": "2023-06-09 15:00:41.291987", 
+ "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Division", 
  "name_case": "", 
@@ -210,6 +210,6 @@
  "sort_field": "modified", 
  "sort_order": "DESC", 
  "title_field": "d_name", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }
