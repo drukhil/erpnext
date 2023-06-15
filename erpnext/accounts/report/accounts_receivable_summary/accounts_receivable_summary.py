@@ -91,7 +91,8 @@ class AccountsReceivableSummary(ReceivablePayableReport):
 	def get_voucherwise_data(self, party_naming_by, args):
 		voucherwise_data = ReceivablePayableReport(self.filters).run(args)[1]
 
-		cols = ["posting_date", "party"]
+		# cols = ["posting_date", "party"] #below added by Jai, account missing in cols, but it is present in voucherwise_data
+		cols = ["posting_date", "party", "account"]
 
 		if party_naming_by == "Naming Series":
 			cols += ["party_name"]
