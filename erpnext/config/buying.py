@@ -56,6 +56,12 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Contact",
+					"label": "Contact",
+					"description": _("Supplier contact person."),
+				},
+				{
+					"type": "doctype",
 					"name": "Supplier Type",
 					"label": "Vendor Type",
 					"description": _("Supplier Type master.")
