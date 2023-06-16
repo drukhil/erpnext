@@ -134,6 +134,41 @@ def get_files_waiting_ack():
 	frappe.db.commit()
 	return waiting_ack_formatted
 
+''' download the bank statement files from bank and make BRS Entry accordingly '''
+'''
+@frappe.whitelist()
+def download_bank_statement(bank='BOBL'):
+	
+	print("#"*80)
+	print("# Method : {}".format(__name__))
+	print("# Info : Press Ctrl+C to terminate the process")
+	print("# PID: {}".format(os.getpid()))
+	print("#"*80)
+	remote_base = frappe.db.get_value('Bank Payment Settings', bank, 'report_path')
+	try:
+		while True:
+			logging.info("*** update_file_status started ***")
+			waiting_list = get_files_waiting_ack()
+			if not waiting_list:
+				logging.info("No files found waiting for acknowledgement")
+				sleep(60)
+				continue
+			try:
+				sftp = SftpClient(bank)
+			except Exception as e:
+				logging.critical("CONNECTION_FAILURE {}".format(traceback.format_exc()))
+				logging.info("Re-trying to connect ...")
+				sleep(10)
+				continue
+			logging.info("Files waiting for acknowledgement: {}".format(waiting_list))
+
+			sftp.close()
+			sleep(60)
+	except KeyboardInterrupt:
+		print("INFO : Press Ctrl+C to terminate the process")
+		if sftp: sftp.close()
+'''
+
 @frappe.whitelist()
 def process_files(bank='BOBL'):
 	''' download the acknowledgement files from bank and process and update the status accordingly '''

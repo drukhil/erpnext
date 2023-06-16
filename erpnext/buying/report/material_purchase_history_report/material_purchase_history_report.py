@@ -21,6 +21,7 @@ def get_column():
         ("Amount") + ":Currency:100",
         ("Purchase Order") + ":Link/Purchase Order:120",
         ("PO Date") + ":Date:100",
+	("Delivery Date") + ":Date:100",
         ("Vendor") + ":Link/Supplier:120",
         ("Vendor Name") + "::120",
         ("Project Name") + "::120",
@@ -44,6 +45,7 @@ def get_data(filters):
                              sum(po_item.base_amount) as base_amount,
                              po.name,
                              po.transaction_date,
+			     po.schedule_date,		
                              po.supplier,
                              sup.supplier_name,
                              (select p.project_name from `tabProject` as p where p.name=po_item.project),
@@ -53,7 +55,7 @@ def get_data(filters):
                              where po.name=po_item.parent and po.supplier=sup.name and po.docstatus=1 and po.transaction_date between '{from_date}' and '{to_date}' {condition}
                              
                              """.format(from_date=filters.from_date, to_date=filters.to_date, condition=cond))
-    else:
+    else:                   #removed po.schedule_date in line 55
         data = frappe.db.sql("""
                 SELECT
                     po_item.item_code, 
@@ -66,6 +68,7 @@ def get_data(filters):
                     po_item.base_amount,
                     po.name,
                     po.transaction_date,
+		    po.schedule_date,	
                     po.supplier,
                     sup.supplier_name,
                     (select p.project_name from `tabProject` as p where p.name=po_item.project),
@@ -76,7 +79,7 @@ def get_data(filters):
                 {condition}
                 """.format(from_date=filters.from_date, to_date=filters.to_date, condition=cond))
     return data
-
+    #po.schedule_date removed in line 78
 def get_condition(filters):
     conds = ""
     if filters.branch:
@@ -104,6 +107,7 @@ def get_condition(filters):
 #         ("Amount") + ":Currency:100",
 #         ("Purchase Order") + ":Link/Purchase Order:120",
 #         ("PO Date") + ":Date:100",
+
 #         ("Vendor") + ":Link/Supplier:120",
 #         ("Vendor Name") + "::120",
 #         ("Project Name") + "::120",
@@ -125,7 +129,8 @@ def get_condition(filters):
 #                     po_item.base_rate,
 #                     po_item.base_amount,
 #                     po.name,
-#                     po.transaction_date,
+#                    
+		      
 #                     po.supplier,
 #                     sup.supplier_name,
 #                     (select p.project_name from `tabProject` as p where p.name=po_item.project),

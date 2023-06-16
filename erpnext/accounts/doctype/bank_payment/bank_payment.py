@@ -95,7 +95,7 @@ class BankPayment(Document):
 			if now_time >= from_time and now_time <= to_time:
 				pass
 			else:
-				frappe.throw("<b>Inter Bank Transaction</b> are only allowed between from <b>{}</b> till <b>{} </b>!".format(start_time, end_time), title="Transaction Restricted!")
+				frappe.throw("<b>Inter Bank Transaction</b> are only allowed between from <b>{}</b> till <b>{} </b>!".format(from_time, to_time), title="Transaction Restricted!")
 		
 	def get_bank_available_balance(self):
 		''' get paying bank balance '''
@@ -178,7 +178,7 @@ class BankPayment(Document):
 				status = 'Payment Failed'
 			else:
 				status = 'Payment Under Process'
-    
+	
 			if self.transaction_type in ['Direct Payment','Process MR Payment']:
 				doc = frappe.get_doc(self.transaction_type, i.transaction_id)
 				doc.payment_status = status
@@ -324,8 +324,8 @@ class BankPayment(Document):
 			data = self.get_mechanical_payments()
 		elif self.transaction_type == "Salary":
 			data = self.get_salary()
-		elif self.transaction_type in ("Bonus", "PBVA"):
-			frappe.msgprint(_("Under development"))
+		elif self.transaction_type in ("PBVA"):
+			data = self.get_pbva()
 		elif self.transaction_type == "LTC":
 			data = self.get_ltc_payment()
 		elif self.transaction_type == "Payment Entry":
@@ -341,6 +341,39 @@ class BankPayment(Document):
 		elif self.transaction_type == "Employee Loan Payment":
 			data = self.get_loan_detail()
 		return data
+	def get_pbva(self):
+		cond = ""
+		if not self.fiscal_year:
+			frappe.throw(_("Please select Fiscal Year"))
+		if self.transaction_no:
+			cond = "and p.name = '{}'".format(self.transaction_no)
+		if self.branch:
+			cond = "and p.branch='{}'".format(self.branch)
+		if self.fiscal_year:
+			cond += "and p.fiscal_year='{}'".format(self.fiscal_year)
+		return frappe.db.sql("""SELECT 
+							"PBVA" as transaction_type, p.name as transaction_id, p.name as transaction_reference,
+							p.posting_date as transaction_date,
+							pd.employee as employee, 
+							pd.employee_name as beneficiary_name,
+							(select bank_name from `tabEmployee` where name=pd.employee) as bank_name, 
+							(select bank_branch from `tabEmployee` where name=pd.employee) as bank_branch,
+							(select bank_account_type from `tabEmployee` where name=pd.employee) as bank_account_type, 
+							(select bank_ac_no from `tabEmployee` where name=pd.employee)as bank_account_no, 
+							pd.balance_amount as amount
+							FROM `tabPBVA` p, `tabPBVA Details` pd
+							WHERE p.docstatus = 1
+							{cond} 
+							AND p.name = pd.parent
+							AND NOT EXISTS(select 1 
+										FROM `tabBank Payment Item` bpi
+										WHERE bpi.transaction_type = 'PBVA'
+										AND bpi.transaction_id = p.name
+										AND bpi.parent != '{bank_payment}'
+										AND bpi.docstatus != 2
+										AND bpi.status NOT IN ('Cancelled', 'Failed')
+							)
+							""".format( cond = cond, bank_payment = self.name), as_dict=1)
 
 	"""
 	# Fetch Employee Loan Details
@@ -450,7 +483,7 @@ class BankPayment(Document):
 				frappe.throw("Please select PF Service Provider/Vendor")
 			ven_doc = frappe.get_doc("Supplier", self.pf_vendor)
 			for a in frappe.db.sql("""select je.name transaction_id, jea.name transaction_reference, 
-                          		je.posting_date transaction_date, round(jea.credit_in_account_currency,2) as credit
+						  		je.posting_date transaction_date, round(jea.credit_in_account_currency,2) as credit
 								from `tabJournal Entry` je join `tabJournal Entry Account` jea
 								on je.name = jea.parent
 								left join `tabAccount` a on a.name = jea.account
@@ -568,7 +601,7 @@ class BankPayment(Document):
 								if reference_type in ['Travel Authorization','Travel Claim','Overtime Application','Leave Encashment','Employee Benefits']:
 									party_type = "Employee"
 									party      = frappe.db.get_value(reference_type, reference_name, "employee")
-								else:
+								elif reference_type not in ["Process MR Payment"]:
 									party_type = "Supplier"
 									party      = frappe.db.get_value(reference_type, reference_name, "supplier")
 							if not party:
@@ -729,7 +762,7 @@ class BankPayment(Document):
 						 (case when ir.final_settlement=1 then (select bank_branch from `tabEmployee` where name=ir.party) else (select bank_branch from `tabEmployee` where name=ir.pay_to_recd_from) end) as bank_branch,
 						 (case when ir.final_settlement=1 then (select bank_account_type from `tabEmployee` where name=ir.party) else (select bank_account_type from `tabEmployee` where name=ir.pay_to_recd_from) end) as bank_account_type,
 						 (case when ir.final_settlement=1 then (select bank_ac_no from `tabEmployee` where name=ir.party) else (select bank_ac_no from `tabEmployee` where name=ir.pay_to_recd_from) end) as bank_account_no,
-                         ir.purchase_amount as amount
+						 ir.purchase_amount as amount
 					FROM `tabImprest Recoup` ir
 					WHERE ir.branch = '{branch}'
 					{cond}
@@ -1114,59 +1147,59 @@ def get_intra_bank_file(doc, filename, posting_date, account_type="01"):
 	return filepath, noof_transactions
 
 def get_inter_bank_file(doc, filename, posting_date, account_type="01"):
-    ''' generate file in inter bank format and return the filename '''
+	''' generate file in inter bank format and return the filename '''
 
-    rec  = []
-    total_amount= 0
+	rec  = []
+	total_amount= 0
 
-    filepath	= ''
-    slno	= 0
-    paying_customer = frappe.db.get_value("Bank Payment Settings", doc.bank_name, "paying_customer")  
+	filepath	= ''
+	slno	= 0
+	paying_customer = frappe.db.get_value("Bank Payment Settings", doc.bank_name, "paying_customer")  
 
-    # get credit records for transactions
-    for i in doc.get("items"):
-        narration = str(doc.name) + ' ' + str(doc.remarks if doc.remarks else i.remarks)
-        if str(doc.bank_name) not in (str(i.bank_name),'INR') and i.status in ('Pending', 'Failed'):
-            slno += 1
-            amount_str = format_amount(i.amount)
-            frappe.get_doc('Bank Payment Item', i.name).db_set('file_name', filename+'.csv')
-            rec.append([slno, doc.bank_account_no, paying_customer, i.financial_system_code, i.bank_account_type,
-                   i.bank_account_no, i.beneficiary_name[:50], remove_special_characters(narration[:100]), "BTN", amount_str,
-                   posting_date.strftime("%Y%m%d"), 0, 0, filename.split("_")[-1]])
+	# get credit records for transactions
+	for i in doc.get("items"):
+		narration = str(doc.name) + ' ' + str(doc.remarks if doc.remarks else i.remarks)
+		if str(doc.bank_name) not in (str(i.bank_name),'INR') and i.status in ('Pending', 'Failed'):
+			slno += 1
+			amount_str = format_amount(i.amount)
+			frappe.get_doc('Bank Payment Item', i.name).db_set('file_name', filename+'.csv')
+			rec.append([slno, doc.bank_account_no, paying_customer, i.financial_system_code, i.bank_account_type,
+				   i.bank_account_no, i.beneficiary_name[:50], remove_special_characters(narration[:100]), "BTN", amount_str,
+				   posting_date.strftime("%Y%m%d"), 0, 0, filename.split("_")[-1]])
    
-            total_amount += flt(i.amount,2)
+			total_amount += flt(i.amount,2)
 
-    if len(rec):
-        # header row
-        total_amount_str = format_amount(total_amount)
-        rec = [["03", "001", "01", "FT01", "001", "BHUB", "RMAB", "1", "1",  posting_date.strftime("%Y%m%d%H%M%S"),
-                    posting_date.strftime("%Y%m%d") , len(rec), total_amount_str, filename.split("_")[-1]]] + rec
+	if len(rec):
+		# header row
+		total_amount_str = format_amount(total_amount)
+		rec = [["03", "001", "01", "FT01", "001", "BHUB", "RMAB", "1", "1",  posting_date.strftime("%Y%m%d%H%M%S"),
+					posting_date.strftime("%Y%m%d") , len(rec), total_amount_str, filename.split("_")[-1]]] + rec
 
-    # generate file if both debit and credit records exist
-    if rec:
-        filepath = get_site_path('private','files','epayment','upload').rstrip("/")+"/"
-        if not os.path.exists(filepath):
-            os.makedirs(filepath)
+	# generate file if both debit and credit records exist
+	if rec:
+		filepath = get_site_path('private','files','epayment','upload').rstrip("/")+"/"
+		if not os.path.exists(filepath):
+			os.makedirs(filepath)
 
-        filepath = filepath+filename+'.csv'
-        with open(filepath, 'w') as file:
-            writer = csv.writer(file)
-            writer.writerows(rec)
+		filepath = filepath+filename+'.csv'
+		with open(filepath, 'w') as file:
+			writer = csv.writer(file)
+			writer.writerows(rec)
 
-    noof_transactions = slno
-    return filepath, noof_transactions
+	noof_transactions = slno
+	return filepath, noof_transactions
 
 def format_amount(amount):
-    amount_str = str(flt(amount,2))
-    amount_str_nu = amount_str.split(".")[0] 
-    amount_str_ch = amount_str.split(".")[1].ljust(2,"0")
-    amount_str =  str(amount_str_nu) + "." + str(amount_str_ch)
-    return amount_str
+	amount_str = str(flt(amount,2))
+	amount_str_nu = amount_str.split(".")[0] 
+	amount_str_ch = amount_str.split(".")[1].ljust(2,"0")
+	amount_str =  str(amount_str_nu) + "." + str(amount_str_ch)
+	return amount_str
 
 def remove_special_characters(narration):
-    import re
-    formatted_narration = re.sub('[^A-Za-z0-9]+', ' ', str(narration))
-    return formatted_narration
+	import re
+	formatted_narration = re.sub('[^A-Za-z0-9]+', ' ', str(narration))
+	return formatted_narration
 
 def get_inr_bank_file(doc, filename, posting_date):
 	posting_date = posting_date.strftime("%Y%m%d%H%M%S") 

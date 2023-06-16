@@ -135,7 +135,7 @@ erpnext.accounts.JournalEntry = frappe.ui.form.Controller.extend({
 			// ++++++++++++++++++++ Ver 1.0 BEGINS ++++++++++++++++++++
 			// Project Advance
 			// Following code added by SHIV on 04/09/2017
-			if(jvd.reference_type==="Project Advance"){
+			if(jvd.reference_type==="Project Advance" || jvd.reference_type ==="Project Invoice"){
 				return {};
 			}
 			// +++++++++++++++++++++ Ver 1.0 ENDS +++++++++++++++++++++
