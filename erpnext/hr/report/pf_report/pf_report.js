@@ -31,18 +31,18 @@ frappe.query_reports["PF Report"] = {
 			"options": "Company",
 			"default": frappe.defaults.get_user_default("Company")
 		},
-		{
-                        "fieldname":"tier",
-                        "label": __("Tier"),
-                        "fieldtype": "Select",
-                        "options":[" ", 1, 2],
-                },
-		{
-			"fieldname":"cost_center",
-			"label": __("Parent Cost Center"),
-			"fieldtype": "Link",
-			"options": "Cost Center"
-		}
+		// {
+		// 	"fieldname":"tier",
+		// 	"label": __("Tier"),
+		// 	"fieldtype": "Select",
+		// 	"options":[" ", 1, 2],
+		// },
+		// {
+		// 	"fieldname":"cost_center",
+		// 	"label": __("Parent Cost Center"),
+		// 	"fieldtype": "Link",
+		// 	"options": "Cost Center"
+		// }
 	
 	],
 
