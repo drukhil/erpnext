@@ -219,6 +219,11 @@ erpnext.accounts.JournalEntry = frappe.ui.form.Controller.extend({
 				return {};
 			}
 
+			// expense claim
+			if(jvd.reference_type==="Hall Booking") {
+				return {};
+			}
+
 			// journal entry
 			if(jvd.reference_type==="Journal Entry") {
 				frappe.model.validate_missing(jvd, "account");
@@ -258,7 +263,7 @@ erpnext.accounts.JournalEntry = frappe.ui.form.Controller.extend({
 					frappe.model.validate_missing(jvd, "party_type");
 					frappe.model.validate_missing(jvd, "party");
 
-					out.filters.push([jvd.reference_type, "per_billed", "<", 100]);
+					//out.filters.push([jvd.reference_type, "per_billed", "<", 100]);
 				}
 
 			if(jvd.party_type && jvd.party) {
