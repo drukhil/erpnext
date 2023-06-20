@@ -48,7 +48,8 @@ frappe.query_reports["Budget Consumption Report"] = {
 			"label": __("Cost Center"),
 			"fieldtype": "Link",
 			"options": "Cost Center",
-			"get_query": function() {return {'filters': [['Cost Center', 'is_disabled', '!=', '1'], ['Cost Center', 'is_group', '=', '0']]}}
+			//"get_query": function() {return {'filters': [['Cost Center', 'is_disabled', '!=', '1'], ['Cost Center', 'is_group', '=', '0']]}}
+			"get_query": function() {return {'filters': [['Cost Center', 'is_disabled', '!=', '1']]}}
 		},
 		{
 			"fieldname": "group_by_account",
