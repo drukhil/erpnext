@@ -5,7 +5,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-from frappe.utils import cint, flt, get_datetime
+from frappe.utils import cint, flt, get_datetime, add_days, add_months
 from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
 from frappe.core.doctype.user.user import send_sms
@@ -53,6 +53,15 @@ class SiteRegistration(Document):
 	def validate_site_registration(self):
 		if self.product_category and not frappe.db.exists('Product Category', {'name': self.product_category, 'site_required': 1}):
 			frappe.throw(_("Site Registration is not applicable for {}").format(self.product_category))
+
+		# validate construction duration
+		if self.construction_type:
+			maximum_duration = frappe.db.get_value("Construction Type", self.construction_type, "maximum_duration")
+			max_end_date = add_days(add_months(self.construction_start_date, cint(maximum_duration)),-1)
+
+			if cint(maximum_duration) and str(self.construction_end_date) > str(max_end_date):
+				frappe.throw(_("Construction duration is currently restricted to {} month(s) only. \
+					Your construction end date cannot be beyond {}").format(cint(maximum_duration), max_end_date))
 
 	def attach_cid(self):
 		target_doc = None
