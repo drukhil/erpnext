@@ -37,6 +37,7 @@ class Equipment(Document):
 			if not self.asset_code:
 				frappe.throw("Asset Code is mandatory, Please Fill the Asset Code!")
 		self.set_name()
+		self.validate_asset()
 
 
 	def create_equipment_history(self, branch, on_date, ref_doc, purpose):

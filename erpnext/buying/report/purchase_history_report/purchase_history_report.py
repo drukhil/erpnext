@@ -202,6 +202,7 @@ def get_columns():
 		  "fieldtype": "Date",
 		  "width": 100
 		},
+		
 		{
 		  "fieldname": "po_status",
 		  "label": "PO Status",

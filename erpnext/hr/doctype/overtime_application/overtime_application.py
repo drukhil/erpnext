@@ -55,12 +55,13 @@ class OvertimeApplication(Document):
     def set_approver(self):
         if self.workflow_state ==  "Verified By Supervisor":
             if self.approver:
-                employee = frappe.get_value("Employee", {"user_id": self.approver}, "name")
+                #employee = frappe.get_value("Employee", {"user_id": self.approver}, "name")
+                employee = frappe.db.get_value("Employee", {"user_id": self.approver, 'status': 'Active'}, ["name"])
                 approver = frappe.get_value("Employee", employee, "reports_to")
                 approver_id, approver_name = frappe.get_value("Employee", approver, ["user_id","employee_name"])
                 self.approver = approver_id
                 self.approver_name = approver_name
-        elif self.workflow_state in ("Draft","Waiting Approval","Rejected"):			
+        elif self.workflow_state in ("Draft","Waiting Approval","Rejected"):	
             if self.employee:
                 approver = frappe.get_value("Employee", self.employee, "reports_to")
                 approver_id, approver_name = frappe.get_value("Employee", approver, ["user_id","employee_name"])

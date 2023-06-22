@@ -264,11 +264,11 @@ var assign_items = function(frm, cdt, cdn){
 	for(var id in pr){
 		if(paid_amount > 0){
 			if(pr[id].total_amount <= paid_amount){
-				frappe.model.set_value("Project Payment Reference", pr[id].name, "allocated_amount", flt(pr[id].total_amount));
-				paid_amount -= flt(pr[id].total_amount);
+				frappe.model.set_value("Project Payment Reference", pr[id].name, "allocated_amount", flt(pr[id].total_amount,2));
+				paid_amount -= flt(pr[id].total_amount,2);
 			}
 			else{
-				frappe.model.set_value("Project Payment Reference", pr[id].name, "allocated_amount", flt(paid_amount));
+				frappe.model.set_value("Project Payment Reference", pr[id].name, "allocated_amount", flt(paid_amount,2));
 				paid_amount = 0.0;
 			}
 		}

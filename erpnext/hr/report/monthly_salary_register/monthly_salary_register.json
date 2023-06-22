@@ -7,7 +7,7 @@
  "doctype": "Report", 
  "idx": 1, 
  "is_standard": "Yes", 
- "modified": "2018-12-22 10:50:14.487874", 
+ "modified": "2023-06-05 15:04:03.950206", 
  "modified_by": "kinzang.namgyal@cdcl.bt", 
  "module": "HR", 
  "name": "Monthly Salary Register", 
@@ -27,6 +27,9 @@
   }, 
   {
    "role": "Auditor"
+  }, 
+  {
+   "role": "HR Support"
   }
  ]
 }
