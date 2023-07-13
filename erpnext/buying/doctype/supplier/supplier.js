@@ -58,13 +58,13 @@ cur_frm.fields_dict['accounts'].grid.get_field('account').get_query = function(d
 }
 
 /* ePayment Begins */
-cur_frm.fields_dict['bank_branch'].get_query = function(doc, dt, dn) {
-	return {
-		filters:{
-		 	"financial_institution": doc.bank_name_new
-	 	}
-	}
-}
+// cur_frm.fields_dict['bank_branch'].get_query = function(doc, dt, dn) {
+// 	return {
+// 		filters:{
+// 		 	"financial_institution": doc.bank_name_new
+// 	 	}
+// 	}
+// }
 
 var enable_disable = function(frm){
 	if(frm.doc.bank_name_new){
