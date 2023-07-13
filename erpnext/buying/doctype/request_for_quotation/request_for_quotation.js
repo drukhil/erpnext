@@ -108,9 +108,14 @@ frappe.ui.form.on("Request for Quotation Supplier",{
 			},
 			callback: function(r){
 				if(r.message){
-					frappe.model.set_value(cdt, cdn, 'contact', r.message.contact_person)
-					frappe.model.set_value(cdt, cdn, 'email_id', r.message.contact_email)
-					frappe.model.set_value(cdt, cdn, 'phone', r.message.contact_mobile)
+					frappe.model.set_value(cdt, cdn, 'contact', r.message.contact_person);
+					frappe.model.set_value(cdt, cdn, 'email_id', r.message.contact_email);
+					if(r.message.contact_mobile!="")
+						var contact=r.message.contact_mobile;
+					else
+					    var contact=r.message.contact_phone;
+					console.log("hello :" + contact);
+					frappe.model.set_value(cdt, cdn, 'phone', contact);
 				}
 			}
 		})
