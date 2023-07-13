@@ -4,8 +4,8 @@
 
 {% include 'erpnext/buying/doctype/purchase_common/purchase_common.js' %};
 
-cur_frm.add_fetch('contact', 'email_id', 'email_id');
-cur_frm.add_fetch('contact', 'mobile_no', 'phone');
+cur_frm.add_fetch('supplier', 'email', 'email_id');
+cur_frm.add_fetch('supplier', 'telephone_and_fax','mobile_no');
 
 frappe.ui.form.on("Request for Quotation",{
 	setup: function(frm) {
@@ -100,27 +100,10 @@ frappe.ui.form.on("Request for Quotation",{
 frappe.ui.form.on("Request for Quotation Supplier",{
 	supplier: function(frm, cdt, cdn) {
 		var d = locals[cdt][cdn]
-		frappe.call({
-			method:"erpnext.accounts.party.get_party_details",
-			args:{
-				party: d.supplier,
-				party_type: 'Supplier'
-			},
-			callback: function(r){
-				if(r.message){
-					frappe.model.set_value(cdt, cdn, 'contact', r.message.contact_person);
-					frappe.model.set_value(cdt, cdn, 'email_id', r.message.contact_email);
-					if(r.message.contact_mobile!="")
-						var contact=r.message.contact_mobile;
-					else
-					    var contact=r.message.contact_phone;
-					console.log("hello :" + contact);
-					frappe.model.set_value(cdt, cdn, 'phone', contact);
-				}
-			}
-		})
+		//frappe.model.set_value(cdt, cdn, 'contact', r.message.contact_person);
+		//frappe.model.set_value(cdt, cdn, 'email_id', r.message.contact_email);
+	
 	},
-
 	download_pdf: function(frm, cdt, cdn) {
 		var child = locals[cdt][cdn]
 
