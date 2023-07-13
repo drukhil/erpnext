@@ -640,8 +640,8 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2020-01-11 11:57:52.752781", 
- "modified_by": "kinzang.namgyal@cdcl.bt", 
+ "modified": "2023-07-13 11:03:25.729328", 
+ "modified_by": "Administrator", 
  "module": "Buying", 
  "name": "Request for Quotation", 
  "name_case": "", 
@@ -689,7 +689,7 @@
   }, 
   {
    "amend": 1, 
-   "apply_user_permissions": 0, 
+   "apply_user_permissions": 1, 
    "cancel": 1, 
    "create": 1, 
    "delete": 0, 
@@ -710,7 +710,7 @@
   }, 
   {
    "amend": 1, 
-   "apply_user_permissions": 1, 
+   "apply_user_permissions": 0, 
    "cancel": 0, 
    "create": 1, 
    "delete": 0, 
@@ -726,7 +726,6 @@
    "set_user_permissions": 0, 
    "share": 1, 
    "submit": 0, 
-   "user_permission_doctypes": "[\"Branch\"]", 
    "write": 1
   }, 
   {
@@ -778,6 +777,6 @@
  "sort_order": "DESC", 
  "timeline_field": "", 
  "title_field": "", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }
