@@ -43,6 +43,10 @@ class RequestforQuotation(BuyingController):
 				rfq_supplier.email_id = frappe.db.get_value("Supplier", rfq_supplier.supplier, "email_id")
 			if not rfq_supplier.phone:
 				rfq_supplier.phone = frappe.db.get_value("Supplier", rfq_supplier.supplier, "telephone_and_fax")
+			if not rfq_supplier.attention_person:
+				rfq_supplier.phone = frappe.db.get_value("Supplier", rfq_supplier.supplier, "attention_person")
+			if not rfq_supplier.location:
+				rfq_supplier.phone = frappe.db.get_value("Supplier", rfq_supplier.supplier, "location")
 
 	def validate_email_id(self, args):
 		if not args.email_id:
