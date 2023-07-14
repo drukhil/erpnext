@@ -45,7 +45,7 @@ class DFGHousing(Document):
 	def validate_weightaget(self):
 		old_value = frappe.db.sql(""" select physical_progress_weightage from `tabProject` where name = "{0}" """.format(self.name))
 		if old_value != self.physical_progress_weightage:
-			if frappe.session.user not in ('yeshinedup@gyalsunginfra.bt', 'Administrator'):
+			if frappe.session.user not in ('yeshinedup@gyalsunginfra.bt','chimidee97@gmail.com', 'Administrator'):
 				frappe.throw("You are not authorized to change project weightage, kindly contact Project CTM")
 
 	def on_submit(self):
@@ -151,7 +151,7 @@ class DFGHousing(Document):
 		# self.post_achievement_entries()
 		# self.make_target_entries()
 		self.update_expense()
-		self.validate_weightaget()
+		# self.validate_weightaget()
 
 	def update_progress(self):
                 total_achievement = 0.0

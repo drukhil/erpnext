@@ -126,6 +126,7 @@ has_permission = {
 	"Contact": "erpnext.utilities.address_and_contact.has_permission",
 	"Address": "erpnext.utilities.address_and_contact.has_permission",
 	"Meeting": "erpnext.hr.doctype.meeting.meeting.has_record_permission"
+    
 }
 
 dump_report_map = "erpnext.startup.report_data_map.data_map"
@@ -191,7 +192,8 @@ scheduler_events = {
 		#"erpnext.hr.hr_custom_functions.post_casual_leaves",
 		"erpnext.hr.hr_custom_functions.post_leave_credits",
 		"erpnext.custom_functions.check_pending_approvers",
-		"erpnext.projects.doctype.priority_project.priority_project.update_priority"
+		"erpnext.projects.doctype.priority_project.priority_project.update_priority",
+        "erpnext.projects.doctype.bmt_project.bmt_project.update_bmt"
 	],
 }
 

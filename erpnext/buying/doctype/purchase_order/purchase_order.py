@@ -194,6 +194,11 @@ class PurchaseOrder(BuyingController):
 		clear_doctype_notifications(self)
 
 	def on_submit(self):
+		owner_branch = frappe.db.sql("select branch from `tabEmployee` where user_id = '{0}'".format(self.owner), as_dict=True)
+		boss_branch = frappe.db.sql("select branch from `tabEmployee` where user_id = '{0}'".format(frappe.session.user), as_dict=True)
+		if owner_branch != boss_branch:
+			frappe.throw ("This Purchase order is created by someone from different Branch than You. Kindly check if you should approve it. ")
+			
 		self.check_budget_available()
 
 		if self.is_against_so():

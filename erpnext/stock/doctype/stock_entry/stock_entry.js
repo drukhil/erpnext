@@ -12,6 +12,7 @@ Version          Author          CreatedOn          ModifiedOn          Remarks
 cur_frm.add_fetch("to_warehouse", "email_id", "email_id")
 cur_frm.add_fetch("to_warehouse", "email_id1", "email_id1")
 
+
 frappe.provide("erpnext.stock");
 
 erpnext.stock.StockEntry = erpnext.stock.StockController.extend({
@@ -122,7 +123,7 @@ erpnext.stock.StockEntry = erpnext.stock.StockController.extend({
 			this.item_selector = new erpnext.ItemSelector({frm: this.frm});
 		}
 	},
-
+	
 	refresh: function() {
 		var me = this;
 		erpnext.toggle_naming_series();

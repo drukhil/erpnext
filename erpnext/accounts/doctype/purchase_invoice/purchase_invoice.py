@@ -45,6 +45,11 @@ class PurchaseInvoice(BuyingController):
 	def validate(self):
 		check_future_date(self.posting_date)
 		self.set_status()
+		if self.lds:
+			total = 0
+			for d in self.lds:
+				total += flt(d.total)
+				self.ld_total= total
 		self.adjust_add_ded()
 		if not self.buying_cost_center:
 			frappe.throw("Buying Cost Center is Mandatory")
@@ -94,9 +99,24 @@ class PurchaseInvoice(BuyingController):
                 }[str(self.docstatus or 0)]
 
 	def adjust_add_ded(self):
-                self.total_add_ded = flt(self.freight_and_insurance_charges) - flt(self.discount) + flt(self.royalty) + flt(self.tax) + flt(self.other_charges)
+                self.total_add_ded = flt(self.freight_and_insurance_charges) - flt(self.discount) + flt(self.royalty) + flt(self.tax) + flt(self.other_charges)-flt(self.ld_total)
                 self.discount_amount = -1 * flt(self.total_add_ded)
 	
+	def pull_ld(self):
+		
+		query = """ select sm.name as smt, sm.purchase_order, sm.total from `tabSupplier Monitoring` sm, `tabPurchase Invoice Item` b,
+					 `tabPurchase Invoice` c  where  b.parent = '{0}' and sm.purchase_order = b.purchase_order and sm.docstatus = 1 group by sm.name
+                     """.format(self.name)	
+		
+		entries = frappe.db.sql(query, as_dict=True)
+		if not entries:
+			frappe.msgprint("No LD Record Found")
+
+		self.set('lds', [])
+
+		for d in entries:
+			row = self.append('lds', {})
+			row.update(d)
 
 	def validate_tds(self):
 		if not self.type:

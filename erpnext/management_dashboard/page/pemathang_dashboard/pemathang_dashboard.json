@@ -1,0 +1,27 @@
+{
+ "content": null, 
+ "creation": "2023-05-23 15:04:21.319100", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2023-05-23 15:05:41.804844", 
+ "modified_by": "Administrator", 
+ "module": "Management Dashboard", 
+ "name": "pemathang-dashboard", 
+ "owner": "Administrator", 
+ "page_name": "pemathang-dashboard", 
+ "roles": [
+  {
+   "role": "Administrator"
+  }, 
+  {
+   "role": "Employee"
+  }, 
+  {
+   "role": "Projects Readonly"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null
+}

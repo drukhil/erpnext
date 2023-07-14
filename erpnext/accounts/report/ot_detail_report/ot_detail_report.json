@@ -7,7 +7,7 @@
  "doctype": "Report", 
  "idx": 0, 
  "is_standard": "Yes", 
- "modified": "2020-11-14 09:51:35.109552", 
+ "modified": "2022-12-10 14:46:12.579424", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "OT Detail Report", 
@@ -27,6 +27,12 @@
   }, 
   {
    "role": "HR User"
+  }, 
+  {
+   "role": "HR User"
+  }, 
+  {
+   "role": "OT Supervisor"
   }
  ]
 }

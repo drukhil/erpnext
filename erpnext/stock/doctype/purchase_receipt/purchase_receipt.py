@@ -218,6 +218,8 @@ class PurchaseReceipt(BuyingController):
 				ae.item_code = a.item_code
 				ae.item_name = a.item_name
 				ae.qty = a.qty
+				ae.cost_center = a.cost_center
+				ae.warehouse = a.warehouse
 				ae.received_date = self.posting_date
 				ae.ref_doc = self.name
 				ae.branch = frappe.db.get_value("Cost Center", a.cost_center, "branch")
@@ -226,7 +228,7 @@ class PurchaseReceipt(BuyingController):
 		if a_list:
 			subject = "Asset Procurement Notice"
 			message = " Dear Sir, Assets '{0}' are/is received. Kindly proceed further actions"
-			email = 'sherabdhendup20@gmail.com'
+			email = 'tsheringyangzom@ggyalsunginfra.bt'
 			frappe.sendmail(recipients=email, sender=None, subject=subject, message=message)
 		
 	##

@@ -74,7 +74,7 @@ def dash_test():
 	METABASE_SECRET_KEY = "8e8db02d3fdc1c5ae4252b4b9cdc036c9050f7c86659fce6ba043f7bcfe833d4"
 
 	payload = {
-	  "resource": {"question": 88},
+	  "resource": {"dashboard": 47},
 	  "params": {
 	    
 	  }
@@ -91,7 +91,7 @@ def update_aa():
 		print a.name
 
 def update_impp():
-	for a in frappe.db.sql(""" select name from `tabImprest Recoup` where name = 'IMPP2022000211-1'""", as_dict =1):
+	for a in frappe.db.sql(""" select name from `tabImprest Recoup` where name = 'IMPP2023000120'""", as_dict =1):
 		doc = frappe.get_doc("Imprest Recoup", a.name)
 		#doc.post_receipt_entry()
 		#update_dependencies(doc.branch, doc.imprest_type, doc.entry_date)
@@ -332,12 +332,12 @@ def update_asset_details():
 		print a.name, count
 
 def ipol():
-	doc = frappe.get_doc("Issue POL", 'IPOL220900081-1')
-	doc.submit()
+	doc = frappe.get_doc("Issue POL", 'IPOL230600182')
+	doc.cancel()
 	print doc.name
 
 def submit_imprest():
-	doc = frappe.get_doc("Imprest Recoup", 'IMPP2022000232')
+	doc = frappe.get_doc("Imprest Recoup", 'IMPP2022000238-1')
 	doc.submit()
 	print doc.name
 
@@ -367,33 +367,40 @@ def ss():
 		print (a)
 
 def submit_se():
-	doc = frappe.get_doc("Stock Entry", "SEMI22101199")
+	doc = frappe.get_doc("Stock Entry", "SEMI23064657")
 	doc.submit()
 	print doc.name
 
 def submit_ca():
-	doc = frappe.get_doc("Cost Appropriation", "CA2022000011")
+	doc = frappe.get_doc("Cost Appropriation", "CA2023000048")
 	doc.submit()
 	print doc.name
 
 def cancel_se():
-	doc = frappe.get_doc("Stock Entry", "SEMI22090321")
+	doc = frappe.get_doc("Stock Entry", "SEMI22122016")
 	doc.cancel()
 	print doc.name
 
 def submit_je():
-	doc = frappe.get_doc("Journal Entry", "JEJV221100097")
+	doc = frappe.get_doc("Journal Entry", "JEJV230601100")
 	doc.submit()
 	print doc.name
 
 def submit_pr():
-	doc = frappe.get_doc("Purchase Receipt", "PRCO22100009")
+	doc = frappe.get_doc("Purchase Receipt", "PRCO23060011")
 	doc.cancel()
 	print doc.name
 
 def save_sm():
 	doc = frappe.get_doc("Supplier Monitoring", "SMT220001")
 	doc.save()
+	print doc.name
+
+
+
+def submit_la():
+	doc = frappe.get_doc("Leave Application", "LAP221200224")
+	doc.submit()
 	print doc.name
 
 def email_test():
@@ -431,6 +438,16 @@ def update_ot_cc():
                 cc = frappe.get_doc("Employee", b.employee).bank_name
                 doc.db_set("bank_name", cc)
                 print doc.name, cc
+
+def update_dfg_housing():
+	count = 0
+	for a in frappe.db.sql("select name from `tabDFG Housing`", as_dict = 1):
+		doc = frappe.get_doc("DFG Housing", a.name)
+		doc.on_update_after_submit()
+		count += 1
+
+		print a.name, count
+
 
 def update_tds():
         count = 0

@@ -16,5 +16,7 @@ class AttendanceOthers(Document):
 
 	def on_cancel(self):
                 user = frappe.session.user
-                if "HR Manager" not in frappe.get_roles(user):
+                if "DFG User" not in frappe.get_roles(user):
                         frappe.throw("Only HR Manager Can Cancel the document")
+
+                

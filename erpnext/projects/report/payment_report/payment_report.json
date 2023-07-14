@@ -1,5 +1,5 @@
 {
- "add_total_row": 0, 
+ "add_total_row": 1, 
  "apply_user_permissions": 1, 
  "creation": "2020-12-02 12:22:03.562514", 
  "disabled": 0, 
@@ -7,7 +7,7 @@
  "doctype": "Report", 
  "idx": 0, 
  "is_standard": "Yes", 
- "modified": "2020-12-02 12:22:03.562514", 
+ "modified": "2023-07-04 16:49:57.465001", 
  "modified_by": "Administrator", 
  "module": "Projects", 
  "name": "Payment Report", 
@@ -32,7 +32,7 @@
    "role": "Accounts User"
   }, 
   {
-   "role": "Projects GM"
+   "role": "Projects CTM"
   }, 
   {
    "role": "Projects User"

@@ -129,7 +129,7 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 							row.gratuity_amount = mr['gratuity']
 						}
 						 else {
-							//row.daily_rate 	= mr['rate_per_day'];
+							row.daily_rate 	= mr['rate_per_day'];
 							//row.hourly_rate 	= mr['rate_per_hour'];
 							row.gratuity_amount = 0
 							row.total_ot_amount = parseFloat(mr['total_ot']);

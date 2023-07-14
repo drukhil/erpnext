@@ -303,8 +303,15 @@ def get_data():
 		{
                         "module_name": "Knowledge And Support",
                         "color": "#2c3e50",
-                        "icon": "icon-phone",
+                        "icon": "icon-file-text-alt",
                         "label": _("Knowledge And Support"),
                         "type": "module"
+                },
+				{
+                        "module_name": "Phone",
+                        "color": "#2c3e50",
+                        "icon": "icon-phone",
+                        "label": _("Phone Directory"),
+                        "type": "link"
                 },
 	]

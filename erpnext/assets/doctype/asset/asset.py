@@ -35,7 +35,7 @@ class Asset(Document):
                         frappe.throw("Gross Amount should be >= (Opening + Useful Life + Residual)")
 
 	def on_submit(self):
-		self.make_asset_gl_entry();
+		self.make_asset_gl_entry()
 		self.make_opening_accumulated_gl_entry()
 		self.set_status()
 
@@ -47,8 +47,8 @@ class Asset(Document):
 		self.set_status()
 
 	def on_update_after_submit(self):
-		self.set_status()
-		self.update_parent_cc()	
+		self.set_status()	
+		self.update_parent_cc()
 
 	def update_parent_cc(self):
 		if not frappe.get_value("Cost Center", self.cost_center, "is_group"):
@@ -394,6 +394,7 @@ def transfer_asset(args):
 @frappe.whitelist()
 def get_item_details(item_code):
 	asset_category = frappe.db.get_value("Item", item_code, "asset_category")
+
 	if not asset_category:
 		frappe.throw(_("Please enter Asset Category in Item {0}").format(item_code))
 

@@ -28,28 +28,36 @@ def execute(filters=None):
 	
 def get_columns(data):
 	columns = [
-		
-		
+		_("#Posting Member") + "::80", 
+		_("Acc No DPA") + "::80", 
+
 		_("Company") + ":Link/Branch:120", 
+		_("Dept Code") + "::80", 
+		_("Dept Name") + "::110", 
 		_("Branch") + ":Link/Branch:120", 
-        _("Division") + ":Link/Division:120",
+        
 		_("NPPF Agency Code") + " ::70",
 		_("Month") + "::80",
 		_("Year") + "::80", 
 		
-		
+		_("Employee Code") + ":Link/Employee:90", 
 		_("Employee Name") + "::140", 
 		
 		_("CID") + "::120",
 		
 		_("PF Account#") + "::100",
+		_("ension Scheme") + "::70", 
 		_("Grade") + "::70",
 		_("Designation") + ":Link/Designation:120",
-		_("Transaction Code") + "::100", 
-		_("Journal/ Invoice #") + "::100",
+		_("PI Code") + "::100", 
+		_("Journal #") + "::100",
 		_("Basic Pay") + ":Currency:120",
+		_("Pay Arrear") + ":Currency:100",
+		_("EOLS MTG") + ":Currency:100",
         _("Employee PF") + ":Currency:120", 
 		_("Employer PF") + ":Currency:120", 
+		_("PF Amt GC") + ":Currency:100",
+		_("PF Amt VC") + ":Currency:120",
 		_("Total") + ":Currency:120"
 	]
 	
@@ -59,11 +67,11 @@ def get_data(filters):
 	conditions, filters = get_conditions(filters)
 
         data = frappe.db.sql("""
-                select t1.company, t1.branch,  t1.division, "C080000070",t1.month, t1.fiscal_year,   t3.employee_name,t3.passport_number,  t3.nppf_number,   t1.employee_grade, t1.designation,  " ", " ",
-                        sum(case when t2.salary_component = 'Basic Pay' then ifnull(t2.amount,0) else 0 end) as basicpay,
+                select "#Posting Menber", 0, t1.company, "", "", t1.branch,   "C080000070",t1.month, t1.fiscal_year, t3.name,  t3.employee_name,t3.passport_number,  t3.nppf_number,  0, t1.employee_grade, t1.designation,  " ", " ",
+                        sum(case when t2.salary_component = 'Basic Pay' then ifnull(t2.amount,0) else 0 end) as basicpay, "", "",
                         
                         sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end) as employeepf,
-                        sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end) as employerpf,
+                        sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end) as employerpf, "","",
                         sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0)*2 else 0 end) as total
                        
                         

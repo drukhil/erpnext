@@ -149,7 +149,7 @@ def get_data():
 					"is_query_report": True,
 					"name": "Stock Balance Report",
 					"doctype": "Stock Ledger Entry",
-					"label": _("Stock Balance")
+					"label": _("Stock Balance Report")
 				},
 				#{
 				#	"type": "report",
@@ -160,14 +160,14 @@ def get_data():
 				#{
 				#	"type": "report",
 				#	"is_query_report": True,
-				#	"name": "Stock Ageing Report",
+				#	"name": "Stock Balance Report",
 				#	"doctype": "Item",
 				#	"label": _("Stock Ageing")
 				#},
 				#{
 				#	"type": "report",
 				#	"is_query_report": True,
-				#	"name": "Material Shortage Report",
+				#	"name": "Stock Balance Report",
 				#	"doctype": "Bin",
 				#},
 				#{

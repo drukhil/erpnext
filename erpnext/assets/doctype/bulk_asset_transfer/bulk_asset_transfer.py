@@ -8,7 +8,7 @@ from frappe import _
 from frappe.model.document import Document
 from erpnext.accounts.utils import make_asset_transfer_gl
 from erpnext.assets.asset_utils import check_valid_asset_transfer
-from erpnext.assets.doctype.asset_movement.asset_movement import save_equipment
+# from erpnext.assets.doctype.asset_movement.asset_movement import save_equipment
 
 class BulkAssetTransfer(Document):
 	def validate_data(self):

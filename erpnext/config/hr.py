@@ -13,6 +13,11 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "DFG",
+					"description": _("DFG records."),
+				},
+				{
+					"type": "doctype",
 					"name": "Attendance",
 					"description": _("Attendance record."),
 				},                                
@@ -43,6 +48,12 @@ def get_data():
 				},   
 				{
 					"type": "doctype",
+					"name": "Requisition Form",
+					"label": _("Employee Requisition Form"),
+					"description": _("Employee Requisition Form."),
+				},
+				{
+					"type": "doctype",
 					"name": "Unfreeze OAP",
 					"label": _("Unfreeze OAP"),
 					"description": _("Unfreeze OAP."),
@@ -51,7 +62,7 @@ def get_data():
 		},
 				
 		{
-                        "label": _("Muster Roll Employee/Operator/Open Air Prisoner"),
+                        "label": _("Muster Roll Employee/Operator/Open Air Prisoner/DFG"),
                         "icon": "icon-facetime-video",
                         "items": [
                                 {
@@ -245,6 +256,11 @@ def get_data():
 					"name": "Travel Claim",
                                         "label": _("Travel Claim"),
 					"description": _("Claims for travels"),
+				},
+				{
+					"type": "doctype",
+					"name": "Vehicle Requisition",
+					"description": _("Vehicle Requisition"),
 				},
 				{
 					"type": "doctype",

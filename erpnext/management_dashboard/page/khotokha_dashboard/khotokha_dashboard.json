@@ -1,0 +1,30 @@
+{
+ "content": null, 
+ "creation": "2023-03-17 14:10:40.882665", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2023-03-17 15:09:12.641912", 
+ "modified_by": "Administrator", 
+ "module": "Management Dashboard", 
+ "name": "khotokha-dashboard", 
+ "owner": "Administrator", 
+ "page_name": "khotokha-dashboard", 
+ "roles": [
+  {
+   "role": "Administrator"
+  }, 
+  {
+   "role": "Employee"
+  }, 
+  {
+   "role": "Projects User"
+  }, 
+  {
+   "role": "MR Creator"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null
+}

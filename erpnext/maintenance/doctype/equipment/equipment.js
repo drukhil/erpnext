@@ -30,7 +30,7 @@ frappe.ui.form.on('Equipment', {
 			frm.set_df_property("is_disabled", "read_only", 1)
 		    	cur_frm.set_df_property("fuelbook", "read_only", 0)
 		    	cur_frm.set_df_property("hsd_type", "read_only", 0)
-			frappe.meta.get_docfield("Equipment Operator", "operator", cur_frm.doc.name).read_only = 1;
+			frappe.meta.get_docfield("Equipment Operator", "operator", cur_frm.doc.name).read_only = 0;
                 	frappe.meta.get_docfield("Equipment Operator", "start_date", cur_frm.doc.name).read_only = 1;
    			frappe.meta.get_docfield("Equipment Operator", "end_date", cur_frm.doc.name).read_only = 1;
                 }

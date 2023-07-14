@@ -246,7 +246,7 @@ erpnext.EmployeeSelector = Class.extend({
 				<div class="checkbox">\
 				<label><input type="checkbox" class="employee-check" employee="%(employee)s"/>\
 				%(employee)s (%(id)s)</label>\
-				</div></div>', {employee: m.person_name, id:m.name})).appendTo(row);
+				</div></div>', {employee: m.person_name, id: m.name})).appendTo(row);
 		});
 
 		mark_employee_toolbar.appendTo($(this.wrapper));

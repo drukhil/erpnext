@@ -167,12 +167,12 @@ class AssetMovement(Document):
 		frappe.db.set_value("Asset", self.asset, "cost_center", cc)
 		frappe.db.set_value("Asset", self.asset, "branch", branch)
 
-		equipment = frappe.db.get_value("Equipment", {"asset_code": self.asset}, "name")
-                if equipment:
-                        save_equipment(equipment, branch, self.posting_date, self.name, purpose)
+# 		equipment = frappe.db.get_value("Equipment", {"asset_code": self.asset}, "name")
+#                 if equipment:
+#                         save_equipment(equipment, branch, self.posting_date, self.name, purpose)
 
-def save_equipment(equipment, branch, posting_date, ref_doc, purpose):
-                equip = frappe.get_doc("Equipment", equipment)
-                equip.branch = branch
-                equip.create_equipment_history(branch, posting_date, ref_doc, purpose)
-                equip.save()
+# def save_equipment(equipment, branch, posting_date, ref_doc, purpose):
+#                 equip = frappe.get_doc("Equipment", equipment)
+#                 equip.branch = branch
+#                 equip.create_equipment_history(branch, posting_date, ref_doc, purpose)
+#                 equip.save()

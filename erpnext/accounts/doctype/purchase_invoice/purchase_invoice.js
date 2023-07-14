@@ -343,6 +343,16 @@ cur_frm.cscript.select_print_heading = function(doc,cdt,cdn){
 }
 
 frappe.ui.form.on("Purchase Invoice", {
+	pull_ld: function(frm) {
+		return frappe.call({
+			method: "pull_ld",
+			doc: frm.doc,
+			callback: function(r, rt) {
+				frm.refresh_fields();
+			}
+		});
+	},	
+
 	onload: function(frm) {
 		$.each(["warehouse", "rejected_warehouse"], function(i, field) {
 			frm.set_query(field, "items", function() {

@@ -90,6 +90,11 @@ def get_employee_details(employee_type):
 			from `tabOperator`""".format(employee_type), as_dict=1):
 			if d:
 				emp_map.setdefault(d.name, d)
+	elif employee_type == "DFG":
+		for d in frappe.db.sql("""select name, '{0}' as employment_type, person_name, id_card
+			from `tabDFG`""".format(employee_type), as_dict=1):
+			if d:
+				emp_map.setdefault(d.name, d)
 	
 	elif employee_type == "Open Air Prisoner":
 		for d in frappe.db.sql(""" select name, '{0}' as employment_type, person_name, id_card 

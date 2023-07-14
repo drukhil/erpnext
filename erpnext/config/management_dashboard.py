@@ -83,8 +83,18 @@ def get_data():
                 #                 },
 								{
                                         "type": "page",
+                                        "name": "bmt-focused-project",
+                                        "label": "BMT Focused Progress"
+                                },
+								{
+                                        "type": "page",
                                         "name": "dessung-project",
                                         "label": "Priority Progress"
+                                },
+								{
+                                        "type": "page",
+                                        "name": "dfg-housing",
+                                        "label": "DFG Housing Progress"
                                 },
 								{
                                         "type": "page",
@@ -157,7 +167,7 @@ def get_data():
 			]	
 		},
 		 {
-                        "label": _("Asset Management"),
+                        "label": _("Site Dashboards"),
                         "icon": "icon-list",
                         "items": [
                                 #{
@@ -178,16 +188,30 @@ def get_data():
                                 #        "name": "Employee Asset Report",
                                 #        "doctype": "Asset"
                                 #},
-                                #{
-                                #        "type": "report",
-                                #        "is_query_report": True,
-                                #        "name": "Others' Asset Report",
-                                #        "doctype":"Asset Others"
-                                #},
+                               {
+                                        "type": "page",
+                                        "name": "tareythang-dashboard",
+                                        "label": "Tareythang Dashboard"
+                                },
+				{
+                                        "type": "page",
+                                        "name": "bongdeyma-dashboard",
+                                        "label": "Bongdeyma Dashboard"
+                                },
+				{
+                                        "type": "page",
+                                        "name": "pemathang-dashboard",
+                                        "label": "Pemathang Dashboard"
+                                },
+				{
+                                        "type": "page",
+                                        "name": "jamtsholing-dashboar",
+                                        "label": "Jamtsholing Dashboard"
+                                },
 				{
                                         "type": "page",
                                         "name": "asset-management",
-                                        "label": "Asset Management"
+                                        "label": "Khotokha Dashboard"
                                 }
 				#{
 				#	"type": "report",
@@ -198,6 +222,20 @@ def get_data():
 
                         ]
                 },
+		# {
+		# 	"label": _("Site Dashboard "),
+		# 	"icon": "icon-list",
+		# 	"items": [
+                           
+		
+		# 		{
+        #                                 "type": "page",
+        #                                 "name": "khotokha-dashboard",
+        #                                 "label": "Khotokha Dashboard"
+        #                         }
+
+		# 	]
+		# }
 
 	]
 

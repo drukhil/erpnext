@@ -350,8 +350,8 @@
  "istable": 0, 
  "max_attachments": 1, 
  "menu_index": 0, 
- "modified": "2019-10-29 10:47:28.703238", 
- "modified_by": "dorji2392@bt.bt", 
+ "modified": "2023-02-03 09:39:20.005477", 
+ "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Stock Reconciliation", 
  "owner": "Administrator", 
@@ -455,6 +455,26 @@
    "share": 1, 
    "submit": 1, 
    "write": 1
+  }, 
+  {
+   "amend": 0, 
+   "apply_user_permissions": 0, 
+   "cancel": 0, 
+   "create": 1, 
+   "delete": 0, 
+   "email": 1, 
+   "export": 1, 
+   "if_owner": 0, 
+   "import": 0, 
+   "permlevel": 0, 
+   "print": 1, 
+   "read": 1, 
+   "report": 1, 
+   "role": "Stock User", 
+   "set_user_permissions": 0, 
+   "share": 1, 
+   "submit": 0, 
+   "write": 1
   }
  ], 
  "quick_entry": 1, 
@@ -463,6 +483,6 @@
  "search_fields": "posting_date", 
  "sort_field": "modified", 
  "sort_order": "DESC", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }

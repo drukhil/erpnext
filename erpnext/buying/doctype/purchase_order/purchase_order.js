@@ -6,6 +6,10 @@ frappe.provide("erpnext.buying");
 {% include 'erpnext/buying/doctype/purchase_common/purchase_common.js' %};
 
 frappe.ui.form.on("Purchase Order", {
+	setup: function(frm) {
+		frm.get_docfield("items").allow_bulk_edit = 1;			
+		
+	},
 	onload: function(frm) {
 		erpnext.queries.setup_queries(frm, "Warehouse", function() {
 			return erpnext.queries.warehouse(frm.doc);

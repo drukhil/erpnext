@@ -14,11 +14,12 @@ def get_columns ():
 		("Party") + ":Data:150",
 		("Payment Type") + ":Data:150",
 		("Posting Date")+":Date:100",
-		("Voucher No.") + ":Link/Payment Entry:140"
+		("Voucher No.") + ":Link/Payment Entry:140",
+		("Cost Center.") + ":Link/Cost Center:140"
 	]	
 
 def get_data(filters):
-	query = """ select party, payment_type,posting_date, name from `tabPayment Entry` where docstatus = 1"""
+	query = """ select party, payment_type,posting_date, name, pl_cost_center from `tabPayment Entry` where docstatus = 1"""
 	
 	if filters.get("branch"):
 		query += " and branch = \'" +str (filters.branch) + "\'"

@@ -152,9 +152,9 @@ def verify_workflow_tc(doc):
 
  
 	if doc.workflow_state == "Approved":
-		if frappe.session.user not in ('sonamyangchen@gyalsunginfra.bt', 'thinleydema@gyalsunginfra.bt'):
+		if frappe.session.user not in ('sonamyangchen@gyalsunginfra.bt', 'phuntsho@gyalsunginfra.bt'):
 			doc.workflow_state = "Waiting HR Verification"
-			frappe.throw("Only Mr/Mrs. <b> Sonam Yangchen/Thinley Dema  </b> can approve this Document")
+			frappe.throw("Only Mr/Mrs. <b> Sonam Yangchen/Phuntsho  </b> can approve this Document")
 		doc.workflow_state = "Approved"
 		doc.docstatus = 1
 		doc.hr_approver = approver_hr

@@ -82,6 +82,11 @@ def get_data():
                                         "name": "project-management",
                                         "label": "Project Management"
                                 },
+				{
+                                        "type": "page",
+                                        "name": "bmt-focused-project",
+                                        "label": "BMT Focused Activity"
+                                },
 				# {
                 #                         "type": "page",
                 #                         "name": "design-management",

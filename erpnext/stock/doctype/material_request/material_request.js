@@ -24,6 +24,7 @@ frappe.ui.form.on('Material Request', {
 		}
 	},
 	setup: function(frm) {
+		frm.get_docfield("items").allow_bulk_edit = 1;	
 		frm.get_field('items').grid.editable_fields = [
 			{fieldname: 'item_code', columns: 2},
 			{fieldname: 'item_name', columns: 2},

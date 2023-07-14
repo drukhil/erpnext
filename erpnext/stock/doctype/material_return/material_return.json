@@ -324,7 +324,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2022-06-03 14:57:38.768740", 
+ "modified": "2023-07-14 11:05:05.290716", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Material Return", 
@@ -374,7 +374,7 @@
   {
    "amend": 0, 
    "apply_user_permissions": 0, 
-   "cancel": 0, 
+   "cancel": 1, 
    "create": 1, 
    "delete": 0, 
    "email": 1, 

@@ -134,8 +134,8 @@ class Project(Document):
 	#def after_insert
 	def on_update_after_submit(self):
 		self.flags.dont_sync_tasks = True
-		if not self.completion_date:
-			frappe.throw("Date of Update is Required", title="Missing Input")
+		# if not self.completion_date:
+		# 	frappe.throw("Date of Update is Required", title="Missing Input")
 		#if self.pe_id != frappe.session.user:
 		#	frappe.throw(" Only {0} Can update this project".format(pe_name))
 
