@@ -30,6 +30,22 @@ class CustomerOrder(Document):
 		self.update_user_details()
 		self.create_customer()
 		self.get_site_details()
+		self.disallow_making_order()
+
+	#Disallow making orders if previous order are not delivered
+	def disallow_making_order(self):
+		for a in frappe.db.sql("""
+						select co.name
+						from `tabSales Order` so
+						inner join `tabCustomer Order` co
+						on so.name=co.sales_order
+						where co.customer="{}"
+						and so.status = "To Deliver and Bill"
+						and so.docstatus=1
+						and co.product_category="{}"
+						""".format(self.customer, self.product_category), as_dict=True):
+			if a.name:
+				frappe.throw("Making order not allowed for {} as the previous order {} is still not delivered".format(self.product_category, a.name))
 
 	def before_submit(self):
 		self.posting_date = now()
