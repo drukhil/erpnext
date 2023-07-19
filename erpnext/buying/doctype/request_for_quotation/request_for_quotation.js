@@ -6,6 +6,7 @@
 
 cur_frm.add_fetch('supplier', 'email', 'email_id');
 cur_frm.add_fetch('supplier', 'telephone_and_fax','mobile_no');
+cur_frm.add_fetch('supplier', 'attention_person','attention_person');
 
 frappe.ui.form.on("Request for Quotation",{
 	setup: function(frm) {
