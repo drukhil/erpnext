@@ -266,9 +266,15 @@ erpnext.accounts.JournalEntry = frappe.ui.form.Controller.extend({
 					//out.filters.push([jvd.reference_type, "per_billed", "<", 100]);
 				}
 
-			if(jvd.party_type && jvd.party) {
-				out.filters.push([jvd.reference_type,
+			if(jvd.party_type && jvd.party)	 {
+				if(jvd.reference_type != "Hire Charge Invoice"){
+					out.filters.push([jvd.reference_type,
 					(jvd.reference_type.indexOf("Sales")===0 ? "customer" : "supplier"), "=", jvd.party]);
+				}
+				else{
+					out.filters.push([jvd.reference_type,
+						"customer", "=", jvd.party]);
+				}
 			}
 		}
 			return out;
