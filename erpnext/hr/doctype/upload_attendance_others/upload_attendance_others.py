@@ -208,8 +208,9 @@ def upload():
                                                 doc.employee_type = "DES Employee"
                                     	
 					#Prevent future dates creation
-					if not getdate(doc.date) > getdate(nowdate()):
-						doc.submit()
+                                        # Jai commented. 25 July, 2023
+					# if not getdate(doc.date) > getdate(nowdate()):
+					# 	doc.submit()
 		except Exception, e:
 			error = True
 			ret.append('Error for row (#%d) %s : %s' % (row_idx,
