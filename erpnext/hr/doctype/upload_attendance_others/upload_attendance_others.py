@@ -211,6 +211,7 @@ def upload():
                                         # Jai commented. 25 July, 2023
 					# if not getdate(doc.date) > getdate(nowdate()):
 					# 	doc.submit()
+					doc.submit()
 		except Exception, e:
 			error = True
 			ret.append('Error for row (#%d) %s : %s' % (row_idx,
