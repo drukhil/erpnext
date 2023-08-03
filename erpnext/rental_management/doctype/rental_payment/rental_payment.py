@@ -60,7 +60,7 @@ class RentalPayment(AccountsController):
 			if a.rent_write_off:
 				a.balance_rent = flt(a.bill_amount) - flt(a.rent_received) - flt(a.tds_amount) - flt(a.discount_amount) - flt(a.rent_write_off_amount)
 			else:
-				a.balance_rent = flt(a.bill_amount) - flt(a.rent_received) - flt(a.tds_amount) - flt(a.discount_amount)
+				a.balance_rent = round(a.bill_amount) - round(a.rent_received) - round(a.tds_amount) - round(a.discount_amount)
 
 			if flt(rent_received_amt) > flt(a.bill_amount):
 				a.rent_received = flt(a.bill_amount) - flt(a.tds_amount) - flt(a.discount_amount)
@@ -69,7 +69,7 @@ class RentalPayment(AccountsController):
 				frappe.msgprint("Rent Received amount is changed to {} as the total of Rent receive + Discount + TDS cannot be more than Bill Amount {} for tenant {}".format(a.rent_received, a.bill_amount, a.tenant_name))
 			
 			if a.balance_rent > 0 and (a.pre_rent_amount > 0 or a.excess_amount > 0):
-				frappe.throw("Pre rent and excess rent collection not allowed as current rent is not settled")
+				frappe.throw("#Row. {}, Pre rent and excess rent collection not allowed as current rent is not settled".format(a.idx))
 
 			write_off_amount += flt(a.rent_write_off_amount)
 			tds_amount += flt(a.tds_amount)
