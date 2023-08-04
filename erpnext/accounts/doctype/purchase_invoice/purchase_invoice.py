@@ -107,7 +107,7 @@ class PurchaseInvoice(BuyingController):
 			net_amount -= flt(self.write_off_amount)
 		
 		self.net_total = flt(net_amount)
-		self.outstanding_amount = flt(net_amount)
+		# self.outstanding_amount = flt(net_amount) #it get update at gl entry Jai
 
 	def validate_tds(self):
 		if not self.type:
@@ -449,7 +449,7 @@ class PurchaseInvoice(BuyingController):
 			# Didnot use base_grand_total to book rounding loss gle
 			grand_total_in_company_currency = flt((self.net_total) * self.conversion_rate, self.precision("grand_total"))
 		elif self.total_add_ded > 0:
-			grand_total_in_company_currency = flt((self.total+self.other_charges) * self.conversion_rate, self.precision("grand_total"))
+			grand_total_in_company_currency = flt((self.total+self.other_charges-self.discount) * self.conversion_rate, self.precision("grand_total"))
 		else:
 			# Didnot use base_grand_total to book rounding loss gle
 			grand_total_in_company_currency = flt((self.base_net_total+self.other_charges) * self.conversion_rate, self.precision("grand_total"))
