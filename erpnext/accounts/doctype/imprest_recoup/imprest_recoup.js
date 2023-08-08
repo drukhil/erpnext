@@ -119,7 +119,8 @@ frappe.ui.form.on('Imprest Recoup', {
 				args: {
 					doctype: 'Cost Center',
 					filters: {
-						'branch': frm.doc.branch
+						'branch': frm.doc.branch,
+						'is_group': 0
 					},
 					fieldname: ['name']
 				},
