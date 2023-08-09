@@ -34,11 +34,11 @@ class ProcessMRPayment(Document):
                                         if flt(total_days) == round(flt(a.number_of_days),2):
                                                 a.total_wage = flt(salary)
                                 if a.employee_type == 'DFG':
-					salary = flt(total_days) * flt(a.daily_rate)
+					salary = frappe.db.get_value(a.employee_type, a.employee, "salary")
 					if flt(a.total_wage) > flt(salary):
 						a.total_wage = flt(salary)
 					if flt(total_days) == round(flt(a.number_of_days),2):
-						a.total_wage =flt(salary)
+						a.total_wage = flt(salary)
 					if round(flt(a.number_of_days),2) >= 21:
 						a.total_wage = flt(salary)
 

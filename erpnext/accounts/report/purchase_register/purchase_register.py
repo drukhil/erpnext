@@ -31,7 +31,7 @@ def execute(filters=None):
 		purchase_receipt = list(set(invoice_po_pr_map.get(inv.name, {}).get("purchase_receipt", [])))
 		project = list(set(invoice_po_pr_map.get(inv.name, {}).get("project", [])))
 
-		row = [inv.name, inv.posting_date, inv.supplier, inv.supplier_name,
+		row = [inv.name, inv.posting_date,inv.branch, inv.supplier, inv.supplier_name,
 			supplier_details.get(inv.supplier),
 			inv.credit_to, inv.mode_of_payment, ", ".join(project), inv.bill_no, inv.bill_date, inv.remarks,
 			", ".join(purchase_order), ", ".join(purchase_receipt), company_currency]
@@ -64,7 +64,7 @@ def execute(filters=None):
 def get_columns(invoice_list):
 	"""return columns based on filters"""
 	columns = [
-		_("Invoice") + ":Link/Purchase Invoice:120", _("Posting Date") + ":Date:80", 
+		_("Invoice") + ":Link/Purchase Invoice:120", _("Posting Date") + ":Date:80", _("Branch") + "::80", 
 		_("Supplier Id") + "::120", _("Supplier Name") + "::120", 
 		_("Supplier Type") + ":Link/Supplier Type:120", _("Payable Account") + ":Link/Account:120", 
 		_("Mode of Payment") + ":Link/Mode of Payment:80", _("Project") + ":Link/Project:80", 
@@ -123,7 +123,7 @@ def get_invoices(filters):
 	conditions = get_conditions(filters)
 	return frappe.db.sql("""
 		select 
-			name, posting_date, credit_to, supplier, supplier_name, bill_no, bill_date, remarks, 
+			name, posting_date, branch, credit_to, supplier, supplier_name, bill_no, bill_date, remarks, 
 			base_net_total, base_grand_total, outstanding_amount, mode_of_payment
 		from `tabPurchase Invoice` 
 		where docstatus = 1 %s

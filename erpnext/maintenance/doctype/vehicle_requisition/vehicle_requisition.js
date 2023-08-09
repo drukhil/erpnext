@@ -45,7 +45,7 @@ frappe.ui.form.on('Vehicle Requisition', {
 			return {
 				
 					filters: [
-						['Employee', 'designation', 'in', ['Operator', 'Driver', 'GCE-NC2 (Driver)', "Admin. Assistant"]],
+						['Employee', 'designation', 'in', ['Operator', 'Driver', 'GCE-NC2 (Driver)', "Admin. Assistant", 'GCE-NC2 (Light Driver)']],
 						['Employee', 'branch', '=', frm.doc.branch],
 						
 						['Employee', 'status', '=', 'Active']

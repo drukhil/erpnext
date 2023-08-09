@@ -7,8 +7,8 @@
  "doctype": "Report", 
  "idx": 1, 
  "is_standard": "Yes", 
- "modified": "2019-07-17 12:51:18.646061", 
- "modified_by": "kinzang.namgyal@cdcl.bt", 
+ "modified": "2023-08-01 15:54:40.349802", 
+ "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Purchase Register", 
  "owner": "Administrator", 
@@ -30,6 +30,9 @@
   }, 
   {
    "role": "CPBD"
+  }, 
+  {
+   "role": "Accounts User"
   }
  ]
 }

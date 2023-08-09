@@ -74,7 +74,7 @@ def dash_test():
 	METABASE_SECRET_KEY = "8e8db02d3fdc1c5ae4252b4b9cdc036c9050f7c86659fce6ba043f7bcfe833d4"
 
 	payload = {
-	  "resource": {"dashboard": 47},
+	  "resource": {"dashboard": 10},
 	  "params": {
 	    
 	  }
@@ -332,12 +332,12 @@ def update_asset_details():
 		print a.name, count
 
 def ipol():
-	doc = frappe.get_doc("Issue POL", 'IPOL230600182')
-	doc.cancel()
+	doc = frappe.get_doc("Issue POL", 'IPOL230700228')
+	doc.submit()
 	print doc.name
 
 def submit_imprest():
-	doc = frappe.get_doc("Imprest Recoup", 'IMPP2022000238-1')
+	doc = frappe.get_doc("Imprest Recoup", 'IMPP2023000167')
 	doc.submit()
 	print doc.name
 
@@ -353,10 +353,10 @@ def ipol1():
 			print doc.name
 
 def rpol():
-	pol = ["POL221100232"]
+	pol = ["POL230700358"]
 	for a in pol:
 		doc = frappe.get_doc("POL", a)
-		doc.cancel()
+		doc.submit()
 		print (a)
 
 def ss():
@@ -382,12 +382,12 @@ def cancel_se():
 	print doc.name
 
 def submit_je():
-	doc = frappe.get_doc("Journal Entry", "JEJV230601100")
+	doc = frappe.get_doc("Journal Entry", "JEJV230701995")
 	doc.submit()
 	print doc.name
 
 def submit_pr():
-	doc = frappe.get_doc("Purchase Receipt", "PRCO23060011")
+	doc = frappe.get_doc("Purchase Receipt", "PRSM22050115")
 	doc.cancel()
 	print doc.name
 
@@ -395,7 +395,6 @@ def save_sm():
 	doc = frappe.get_doc("Supplier Monitoring", "SMT220001")
 	doc.save()
 	print doc.name
-
 
 
 def submit_la():
