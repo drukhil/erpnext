@@ -44,6 +44,7 @@ erpnext.hr.OvertimeControlPanel = frappe.ui.form.Controller.extend({
 
 				if(!r.messages) r.messages = [];
 				// replace links if error has occured
+				console.log(r);
 				if(r.exc || r.error) {
 					r.messages = $.map(r.message.messages, function(v) {
 						var msg = v.replace("Inserted", "Valid")

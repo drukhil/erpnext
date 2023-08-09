@@ -25,12 +25,13 @@ def execute(filters=None):
 
 		total_p = 0.0
 		for day in range(filters["total_days_in_month"]):
-			status = att_map.get(emp).get(day + 1, '')
+			for t in ("R","S"):
+				status = att_map.get(emp).get(str(day + 1)+str(t), '')
 
-			if status > 0:
-				total_p += flt(status)
+				if status > 0:
+					total_p += flt(status)
 
-			row.append(status)
+				row.append(status)
 
 		row += [total_p]
 		data.append(row)
@@ -43,21 +44,24 @@ def get_columns(filters):
 	]
 
 	for day in range(filters["total_days_in_month"]):
-		columns.append(cstr(day+1) +"::20")
+		columns.append(cstr(day+1)+"R" +"::35")
+		columns.append(cstr(day+1)+"S" +"::35")
 
 	columns += [_("Total Hours") + ":Float:100"]
 	return columns
 
 def get_attendance_list(conditions, filters):
 	attendance_list = frappe.db.sql("""select number as employee, day(date) as day_of_month,
-		number_of_hours as status from `tabOvertime Entry` where docstatus = 1 %s order by number, date""" %
+					number_of_hours as status, number_of_hours_special as hrs 
+				from `tabOvertime Entry` where docstatus = 1 %s order by number, date""" %
 		conditions, filters, as_dict=1)
 
 	att_map = {}
 	for d in attendance_list:
-		att_map.setdefault(d.employee, frappe._dict()).setdefault(d.day_of_month, "")
-		att_map[d.employee][d.day_of_month] = d.status
-
+		for t in ("R","S"):
+			day_of_month = str(d.day_of_month) + str(t)
+			att_map.setdefault(d.employee, frappe._dict()).setdefault(day_of_month, "")
+			att_map[d.employee][day_of_month] = d.status if t=="R" else d.hrs
 	return att_map
 
 def get_conditions(filters):

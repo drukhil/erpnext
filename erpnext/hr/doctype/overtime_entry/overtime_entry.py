@@ -7,4 +7,7 @@ import frappe
 from frappe.model.document import Document
 
 class OvertimeEntry(Document):
-	pass
+	def validate(self):
+		pass
+
+

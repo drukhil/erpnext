@@ -139,6 +139,7 @@ def get_active_employees(args, start_date, end_date):
 
 @frappe.whitelist()
 def upload():
+    from erpnext.projects.doctype.process_mr_payment.process_mr_payment import get_pay_details
     if not frappe.has_permission("Attendance Others", "create"):
         raise frappe.PermissionError
 
@@ -157,16 +158,32 @@ def upload():
     # from frappe.utils.csvutils import check_record, import_doc
 
     frappe.msgprint("Started Parsing")
+    months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
     for i, row in enumerate(rows[4:]):
         if not row: continue
         try:
             row_idx = i + 4
-            for j in range(8, len(row) + 1):
-                month = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].index(row[6]) + 1	
-                month = str(month) if cint(month) > 9 else str("0" + str(month))
-                day = str(cint(j) - 7) if cint(j) > 9 else str("0" + str(cint(j) - 7))
-                status = ''
-                
+
+            year = str(row[5])
+            month = months.index(row[6]) + 1	
+            month = str(month).rjust(2,str("0"))
+            employee = str(row[3]).strip('\'')
+            employee_type = None
+            if str(row[2]) == "MR":
+                employee_type = "Muster Roll Employee"
+            elif str(row[2]) == "GEP":
+                employee_type = "GEP Employee"
+            else:
+                continue
+
+            # get pay details
+            pay_details = get_pay_details(employee_type, employee, year, month)
+            if not pay_details:
+                frappe.throw("Wage Details(Rate Per Day) is not defined")
+            for j in range(8, len(row) + 1):    
+                day   = str(cint(j) - 7).rjust(2,str("0"))
+                date  = "-".join([str(year), str(month), str(day)])
+                status = ''                
                 if str(row[j -1]) in ("P","p"):
                     status = 'Present'
                 elif str(row[j -1]) in ("A","a"):
@@ -174,25 +191,23 @@ def upload():
                 else:
                     status = ''
                         
-                old = frappe.db.get_value("Attendance Others", {"employee": row[3].strip('\''), "date": str(row[5]) + '-' + str(month) + '-' + str(day)}, ["status","name"], as_dict=1)
+                old = frappe.db.get_value("Attendance Others", {"employee": employee, 
+                        "date": date}, ["status","name"], as_dict=1)
                 if old:
                     doc = frappe.get_doc("Attendance Others", old.name)
                     doc.db_set('status', status if status in ('Present','Absent') else doc.status)
                     doc.db_set('branch', row[0])
                     doc.db_set('cost_center', row[1])
+                    doc.db_set('rate_per_day', flt(pay_details[0].get('rate_per_day')))
                 elif not old and status in ('Present','Absent'):
                     doc = frappe.new_doc("Attendance Others")
-                    doc.status = status
-                    doc.branch = row[0]
+                    doc.status      = status
+                    doc.branch      = row[0]
                     doc.cost_center = row[1]
-                    doc.employee = str(row[3]).strip('\'')
-                    doc.date = str(row[5]) + '-' + str(month) + '-' + str(day)
-                    
-                    if str(row[2]) == "MR":
-                        doc.employee_type = "Muster Roll Employee"
-                    elif str(row[2]) == "GEP":
-                        doc.employee_type = "GEP Employee"
-                        
+                    doc.employee    = employee
+                    doc.date        = date
+                    doc.employee_type = employee_type
+                    doc.db_set('rate_per_day', flt(pay_details[0].get('rate_per_day')))    
                     #Prevent future dates creation
                     if not getdate(doc.date) > getdate(nowdate()):
                         doc.submit()

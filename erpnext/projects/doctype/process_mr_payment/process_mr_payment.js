@@ -21,12 +21,6 @@ frappe.ui.form.on('Process MR Payment', {
 	},
 
 	onload: function(frm) {
-		if(!frm.doc.from_date) {
-			frm.set_value("from_date", frappe.datetime.month_start(get_today()))	
-		}
-		if(!frm.doc.to_date) {
-			frm.set_value("to_date", frappe.datetime.month_end(get_today()))	
-		}
 		if(!frm.doc.posting_date) {
 			frm.set_value("posting_date", get_today())	
 		}
@@ -37,17 +31,14 @@ frappe.ui.form.on('Process MR Payment', {
 	},
 
 	load_records: function(frm) {
-		cur_frm.set_df_property("load_records", "disabled",  true);
-		//msgprint ("Processing wages.............")
-		if(frm.doc.from_date && frm.doc.cost_center && frm.doc.employee_type && frm.doc.from_date < frm.doc.to_date) {
-			console.log(frm.doc.employee_type, frm.doc.fiscal_year, frm.doc.month, frm.doc.from_date, frm.doc.to_date, frm.doc.cost_center, frm.doc.branch, frm.doc.name)
-			get_records(frm.doc.employee_type, frm.doc.fiscal_year, frm.doc.month, frm.doc.from_date, frm.doc.to_date, frm.doc.cost_center, frm.doc.branch, frm.doc.name)
-		}
-		else if(frm.doc.from_date && frm.doc.from_date > frm.doc.to_date) {
-			msgprint("To Date should be smaller than From Date")
-			frm.set_value("to_date", "")
+		//cur_frm.set_df_property("load_records", "disabled",  true);
+
+		//if(frm.doc.from_date && frm.doc.cost_center && frm.doc.employee_type && frm.doc.from_date < frm.doc.to_date) {
+		if(frm.doc.cost_center && frm.doc.employee_type) {
+			get_records(frm.doc.employee_type, frm.doc.fiscal_year, frm.doc.month, frm.doc.cost_center, frm.doc.branch, frm.doc.name)
 		}
 	},
+
 	load_employee: function(frm) {
 		//load_accounts(frm.doc.company)
 		return frappe.call({
@@ -73,7 +64,7 @@ frappe.ui.form.on('Process MR Payment', {
 	// }
 });
 
-function get_records(employee_type, fiscal_year, month, from_date, to_date, cost_center, branch, dn) {
+function get_records(employee_type, fiscal_year, month, cost_center, branch, dn) {
 	cur_frm.clear_table("items");
 	cur_frm.refresh_field("items");
 	frappe.call({
@@ -81,18 +72,13 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 		args: {
 			"fiscal_year": fiscal_year,
 			"fiscal_month": month,
-			"from_date": from_date,
-			"to_date": to_date,
 			"cost_center": cost_center,
 			"branch": branch,
 			"employee_type": employee_type,
 			"dn": dn
 		},
-		//refresh: function(frm) {
-		//	console.log("ISNIDE")
-	//	},
-	//	freeze: 1,
-	//	freeze_message: "Processing.....Please Wait",
+		freeze: true,
+		freeze_message: "Loading wage details. Please Wait...",
 		callback: function(r) {
 			if(r.message) {
 				var total_overall_amount = 0;
@@ -103,7 +89,7 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 				r.message.forEach(function(mr) {
 					if(mr['number_of_days'] > 0 || mr['number_of_hours'] > 0) {
 						var row = frappe.model.add_child(cur_frm.doc, "MR Payment Item", "items");
-						
+		
 						row.employee_type 	= mr['type'];
 						row.employee 		= mr['employee'];
 						row.person_name 	= mr['person_name'];
@@ -111,36 +97,40 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 						row.fiscal_year 	= fiscal_year;
 						row.month 			= month;
 						row.number_of_days 	= mr['number_of_days'];
-						row.number_of_hours = parseFloat(mr['number_of_hours']);
+						row.number_of_hours = flt(mr['number_of_hours']);
+						row.number_of_hours_special = flt(mr['number_of_hours_special']);
 						row.bank = mr['bank'];
 						row.account_no = mr['account_no'];
 						row.designation = mr['designation'];
 						if(mr['type'] == 'GEP Employee'){
-							row.daily_rate      = parseFloat(mr['salary'])/parseFloat(mr['noof_days_in_month']);
-							row.hourly_rate     = parseFloat(mr['salary']*1.5)/parseFloat(mr['noof_days_in_month']*8);
-							row.total_ot_amount = parseFloat(row.number_of_hours) * parseFloat(row.hourly_rate);
-							row.total_wage      = parseFloat(row.daily_rate) * parseFloat(row.number_of_days);
+							row.daily_rate      = flt(mr['salary'])/flt(mr['noof_days_in_month']);
+							row.hourly_rate     = flt(mr['salary']*1.5)/flt(mr['noof_days_in_month']*8);
+							row.total_ot_amount = flt(row.number_of_hours) * flt(row.hourly_rate);
+							row.total_wage      = flt(row.daily_rate) * flt(row.number_of_days);
 							console.log(row.total_ot_amount);
-							if((parseFloat(row.total_wage) > parseFloat(mr['salary']))||(parseFloat(mr['noof_days_in_month']) == parseFloat(mr['number_of_days']))){
-								row.total_wage = parseFloat(mr['salary']);
+							if((flt(row.total_wage) > flt(mr['salary']))||(flt(mr['noof_days_in_month']) == flt(mr['number_of_days']))){
+								row.total_wage = flt(mr['salary']);
 							}
 						} else {
-							//row.daily_rate 	= mr['rate_per_day'];
-							//row.hourly_rate 	= mr['rate_per_hour'];
-							row.total_ot_amount = parseFloat(mr['total_ot']);
-							row.total_wage 		= parseFloat(mr['total_wage']);
+							row.daily_rate 	= flt(mr['rate_per_day']);
+							row.hourly_rate 	= flt(mr['rate_per_hour']); // Holiday Rate
+							row.hourly_rate_normal = flt(mr['rate_per_hour_normal']);
+							//row.total_ot_amount = flt(mr['total_ot']);
+							//row.total_wage 		= flt(mr['total_wage']);
+							row.total_ot_amount = flt(mr['number_of_hours']) * flt(mr['rate_per_hour_normal']) + flt(mr['number_of_hours_special']) * flt(mr['rate_per_hour'])
+							row.total_wage 		= flt(mr['rate_per_day']) * flt(mr['number_of_days'])
 						}
 						
 						/*
-						if(mr['type'] == 'GEP Employee' && parseFloat(row.total_wage) > parseFloat(mr['salary'])){
-							row.total_wage = parseFloat(mr['salary']);
+						if(mr['type'] == 'GEP Employee' && flt(row.total_wage) > flt(mr['salary'])){
+							row.total_wage = flt(mr['salary']);
 						}
-						else if(mr['type'] == 'GEP Employee' && parseFloat(mr['noof_days_in_month']) == parseFloat(mr['number_of_days'])){
-							row.total_wage = parseFloat(mr['salary']);
+						else if(mr['type'] == 'GEP Employee' && flt(mr['noof_days_in_month']) == flt(mr['number_of_days'])){
+							row.total_wage = flt(mr['salary']);
 						}
 						*/
 						
-						row.total_amount 	= parseFloat(row.total_ot_amount) + parseFloat(row.total_wage);
+						row.total_amount 	= flt(row.total_ot_amount) + flt(row.total_wage);
 						refresh_field("items");
 
 						total_overall_amount += row.total_amount;

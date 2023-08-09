@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import flt, cint, datetime
+from frappe.utils import flt, cint, datetime, get_last_day
 from calendar import monthrange
 from erpnext.custom_utils import check_budget_available, get_branch_cc
 
@@ -249,61 +249,83 @@ class ProcessMRPayment(Document):
 			hjv.insert()
 			
 
-def update_mr_rates(employee_type, employee, cost_center, from_date, to_date):
-	# Updating wage rate
-	rates = frappe.db.sql("""
-		select
-            greatest(ifnull(from_date,'{from_date}'),'{from_date}') as from_date, 
-			least(ifnull(to_date,'{to_date}'),'{to_date}') as to_date, 
-			rate_per_day,
-			rate_per_hour,
-			rate_per_hour_normal
-		from `tabMusterroll`
-		where parent = '{employee}'
-		and '{year_month}' between date_format(ifnull(from_date,'{from_date}'),'%Y%m') and date_format(ifnull(to_date,'{to_date}'),'%Y%m')
-	""".format(
-		employee=employee,
-		year_month=str(to_date)[:4]+str(to_date)[5:7],
-		from_date=from_date,
-		to_date=to_date
-	),
-	as_dict=True)
+def get_pay_details(employee_type, employee, year, month):
+	from_date = "-".join([str(year), str(month), '01'])
+	to_date   = str(get_last_day(from_date))
+
+	if employee_type == "GEP Employee":
+		return frappe.db.sql("""
+			SELECT 
+				salary, rate_per_day, rate_per_hour, rate_per_hour_normal
+			FROM `tabGEP Employee`
+			WHERE name = "{employee}"
+		""".format(employee = employee), as_dict = True)
+	else:
+		return frappe.db.sql("""
+			SELECT
+				rate_per_day, rate_per_hour, rate_per_hour_normal
+			FROM `tabMusterroll`
+			WHERE parent = '{employee}'
+			AND '{from_date}' <= IFNULL(to_date, '{to_date}')
+			AND '{to_date}' >= IFNULL(from_date, '{from_date}')
+			ORDER BY IFNULL(to_date,'{to_date}') DESC
+			LIMIT 1
+		""".format(employee=employee, from_date=from_date, to_date=to_date), as_dict = True)
+
+# def update_mr_rates(employee_type, employee, cost_center, from_date, to_date):
+# 	# Updating wage rate
+# 	rates = frappe.db.sql("""
+# 		SELECT
+#             GREATEST(IFNULL(from_date,'{from_date}'),'{from_date}') AS from_date, 
+# 			LEAST(IFNULL(to_date,'{to_date}'),'{to_date}') AS to_date, 
+# 			rate_per_day, rate_per_hour, rate_per_hour_normal
+# 		FROM `tabMusterroll`
+# 		WHERE parent = '{employee}'
+# 		AND '{year_month}' BETWEEN DATE_FORMAT(IFNULL(from_date,'{from_date}'),'%Y%m') 
+# 			AND DATE_FORMAT(IFNULL(to_date,'{to_date}'),'%Y%m')
+# 	""".format(employee=employee, year_month=str(to_date)[:4]+str(to_date)[5:7],
+# 	from_date=from_date, to_date=to_date), as_dict = True)
  
-	for r in rates:
-		frappe.db.sql("""
-			update `tabAttendance Others`
-			set rate_per_day = {rate_per_day}
-			where employee_type = '{employee_type}'
-			and employee = '{employee}'
-			and `date` between '{from_date}' and '{to_date}'
-			and status = 'Present'
-			and docstatus = 1 
-		""".format(
-			rate_per_day=r.rate_per_day,
-			employee_type=employee_type,
-			employee=employee,
-			from_date=r.from_date,
-			to_date=r.to_date
-		))
-		frappe.db.sql("""
-			update `tabOvertime Entry`
-			set rate_per_hour = {rate_per_hour}, rate_per_hour_normal = {rate_per_hour_normal}
-			where employee_type = '{employee_type}'
-			and number = '{employee}'
-			and `date` between '{from_date}' and '{to_date}'
-			and docstatus = 1 
-		""".format(
-			rate_per_hour=r.rate_per_hour,
-			rate_per_hour_normal = r.rate_per_hour_normal,
-			employee_type=employee_type,
-			employee=employee,
-			from_date=r.from_date,
-			to_date=r.to_date
-		))
-	frappe.db.commit()
+# 	for r in rates:
+# 		frappe.db.sql("""
+# 			update `tabAttendance Others`
+# 			set rate_per_day = {rate_per_day}
+# 			where employee_type = '{employee_type}'
+# 			and employee = '{employee}'
+# 			and `date` between '{from_date}' and '{to_date}'
+# 			and status = 'Present'
+# 			and docstatus = 1 
+# 		""".format(
+# 			rate_per_day=r.rate_per_day,
+# 			employee_type=employee_type,
+# 			employee=employee,
+# 			from_date=r.from_date,
+# 			to_date=r.to_date
+# 		))
+# 		frappe.db.sql("""
+# 			update `tabOvertime Entry`
+# 			set rate_per_hour = {rate_per_hour}, rate_per_hour_normal = {rate_per_hour_normal}
+# 			where employee_type = '{employee_type}'
+# 			and number = '{employee}'
+# 			and `date` between '{from_date}' and '{to_date}'
+# 			and docstatus = 1 
+# 		""".format(
+# 			rate_per_hour=r.rate_per_hour,
+# 			rate_per_hour_normal = r.rate_per_hour_normal,
+# 			employee_type=employee_type,
+# 			employee=employee,
+# 			from_date=r.from_date,
+# 			to_date=r.to_date
+# 		))
+# 	frappe.db.commit()
 
 @frappe.whitelist()
-def get_records(employee_type, fiscal_year, fiscal_month, from_date, to_date, cost_center, branch, dn):
+def get_records(employee_type, fiscal_year, fiscal_month, cost_center, branch, dn):
+	''' 
+	This method updates the follwoing details for the given month 
+		1. `tabAttendance Others`.rate_per_day
+		2. `tabOvertime Entry`.rate_per_hour & `tabOvertimeEntry.rate_per_hour_normal`
+	'''
 	month = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].index(fiscal_month) + 1
 	month = str(month) if cint(month) > 9 else str("0" + str(month))
 
@@ -313,150 +335,101 @@ def get_records(employee_type, fiscal_year, fiscal_month, from_date, to_date, co
 
 	data    = []
 	master  = frappe._dict()
-	
 	emp_list = frappe.db.sql("""
-                SELECT
-                    name,
-                	person_name,
-                    id_card,
-                    rate_per_day,
-                    rate_per_hour,
-                    rate_per_hour_normal,
-					status,
-					designation,
-					bank_name as bank,
-					bank_ac_no as account_no,
-                    salary
-                FROM `tab{employee_type}` as e
-                WHERE not exists(
-                                select 1
-                                    from `tabMR Payment Item` i, `tabProcess MR Payment` m
-                                    where m.fiscal_year = '{fiscal_year}'
-									and m.month = '{fiscal_month}'
-									and m.docstatus < 2
-									and m.cost_center = '{cost_center}'
-									and m.name != '{dn}'
-									and i.parent = m.name
-									and i.employee = e.name
-									and i.employee_type = '{employee_type}')
-									and (exists(
-             					select 1
-									from `tabAttendance Others`
-                    				where employee_type = '{employee_type}'
-									and employee = e.name
-									and e.status = 'Active'
-                                    and date between '{from_date}' and '{to_date}'
-                                    and cost_center = '{cost_center}'
-                                    and status = 'Present'
-                                    and docstatus = 1)
-									or
-									exists(
-								select 1
-									from `tabOvertime Entry`
-                                    where employee_type = '{employee_type}'
-									and number = e.name
-                                	and date between '{from_date}' and '{to_date}'
-                                    and cost_center = '{cost_center}'
-                                    and docstatus = 1))""".format(
-                                        employee_type=employee_type,
-										fiscal_year=fiscal_year,
-										fiscal_month=fiscal_month,
-										dn=dn,
-										cost_center=cost_center,
-										from_date = from_date,
-										to_date = to_date),as_dict=True)
-	#frappe.msgprint('{0}'.format(emp_list))
+		SELECT e.name, e.person_name, e.id_card, e.status, e.designation, 
+			e.salary, bank_name AS bank, bank_ac_no AS account_no
+		FROM `tab{employee_type}` as e
+		INNER JOIN `tabMusterroll`
+		INNER JOIN 
+			(
+				SELECT employee
+				FROM `tabAttendance Others`
+				WHERE employee_type = '{employee_type}'
+				AND date between '{from_date}' and '{to_date}'
+				AND cost_center = '{cost_center}'
+				AND status = 'Present'
+				AND docstatus = 1
+			  	UNION
+				SELECT number as employee
+				FROM `tabOvertime Entry`
+				WHERE employee_type = '{employee_type}'
+				AND date between '{from_date}' and '{to_date}'
+				AND cost_center = '{cost_center}'
+				AND docstatus = 1
+			) as r
+			ON e.name=r.employee
+		WHERE e.status = 'Active'
+			AND NOT EXISTS(
+					SELECT 1
+					FROM `tabMR Payment Item` i, `tabProcess MR Payment` m
+					WHERE m.fiscal_year = '{fiscal_year}'
+					AND m.month = '{fiscal_month}'
+					AND m.docstatus < 2
+					AND m.cost_center = '{cost_center}'
+					AND m.name != '{dn}'
+					AND i.parent = m.name
+					AND i.employee = e.name
+					AND i.employee_type = '{employee_type}'
+				)
+	""".format(employee_type=employee_type, fiscal_year=fiscal_year, fiscal_month=fiscal_month,
+	dn=dn, cost_center=cost_center, from_date = from_date, to_date = to_date), as_dict=True)
+
 	for e in emp_list:
-		#frappe.msgprint("e: "+str(e))
+		pay_details=get_pay_details(employee_type, e.name, fiscal_year, month)
+		rate_per_day 		 = flt(pay_details[0].get("rate_per_day"))
+		rate_per_hour 		 = flt(pay_details[0].get("rate_per_hour"))
+		rate_per_hour_normal = flt(pay_details[0].get("rate_per_hour_normal"))
 		master.setdefault(e.name, frappe._dict({
-						"type": employee_type,
-						"employee": e.name,
-						"person_name": e.person_name,
-						"id_card": e.id_card,
-						"rate_per_day": e.rate_per_day,
-						"rate_per_hour": e.rate_per_hour,
-						"rate_per_hour_normal": e.rate_per_hour_normal,
-						"designation" : e.designation,
-						"account_no" : e.account_no,
-						"bank" : e.bank,
-						"salary": e.salary
-			}))
-		if employee_type == "Muster Roll Employee":
-			update_mr_rates(employee_type, e.name, cost_center, from_date, to_date)
-		if employee_type == "GEP Employee":
-		
-			frappe.db.sql("""
-                        update `tabAttendance Others`
-                        set rate_per_day = {rate_per_day}
-                        where employee_type = '{employee_type}'
-                        and employee = '{employee}'
-                        and status = 'Present'
-                        and docstatus = 1 
-                """.format(
-                        rate_per_day=flt(e.rate_per_day),
-                        employee_type=employee_type,
-                        employee=e.name,
-                ))
-
-			frappe.db.sql("""
-                        update `tabOvertime Entry`
-                        set rate_per_hour = {rate_per_hour}
-                        where employee_type = '{employee_type}'
-                        and number = '{employee}'
-                        and docstatus = 1 
-                """.format(
-                        rate_per_hour=flt(e.rate_per_hour),
-                        employee_type=employee_type,
-                        employee=e.name,
-                ))
-
-			frappe.db.commit()     
+			"type": employee_type,
+			"employee": e.name,
+			"person_name": e.person_name,
+			"id_card": e.id_card,
+			"rate_per_day": rate_per_day,
+			"rate_per_hour": rate_per_hour,
+			"rate_per_hour_normal": rate_per_hour_normal,
+			"designation" : e.designation,
+			"account_no" : e.account_no,
+			"bank" : e.bank,
+			"salary": e.salary
+		}))
 			
 	rest_list = frappe.db.sql("""
-                                select employee,
-                                        sum(number_of_days)     as number_of_days,
-                                        sum(number_of_hours)    as number_of_hours,
-                                        sum(total_wage)         as total_wage,
-                                        sum(total_ot)           as total_ot,
-                                        {4} as noof_days_in_month
-                                from (
-                                        select distinct
-                                                employee,
-												date,
-                                                1 as number_of_days,
-                                                0 as number_of_hours,
-                                                ifnull(rate_per_day,0)  as total_wage,
-                                                0 as total_ot
-                                        from `tabAttendance Others`
-                                        where employee_type = '{0}'
-                                        and date between '{1}' and '{2}'
-                                        and cost_center = '{3}'
-                                        and status = 'Present'
-                                        and docstatus = 1
-                                        UNION ALL
-                                        select distinct
-                                                number as employee,
-												date,
-                                                0 as number_of_days,
-                                                ifnull(number_of_hours,0) as number_of_hours,
-                                                0 as total_wage,
-                                                (CASE WHEN is_holiday=0 THEN ifnull(number_of_hours,0)*ifnull(rate_per_hour_normal,0) ELSE ifnull(number_of_hours,0)*ifnull(rate_per_hour,0) END) as total_ot
-                                                
-                                        from `tabOvertime Entry`
-                                        where employee_type = '{0}'
-                                        and date between '{1}' and '{2}'
-                                        and cost_center = '{3}'
-                                        and docstatus = 1
-                                ) as abc
-                                group by employee
-        """.format(employee_type, from_date, to_date, cost_center, total_days), as_dict=True)
+		SELECT employee,
+			SUM(number_of_days)     AS number_of_days,
+			SUM(number_of_hours)    AS number_of_hours,
+			SUM(number_of_hours_special)    AS number_of_hours_special,
+			SUM(total_wage)         AS total_wage,
+			SUM(total_ot)           AS total_ot,
+			{total_days} 			AS noof_days_in_month
+		FROM (
+			SELECT DISTINCT employee, date, 
+				1 AS number_of_days, 0 AS number_of_hours, 0 AS number_of_hours_special,
+				IFNULL(rate_per_day,0) AS total_wage, 0 AS total_ot
+			FROM `tabAttendance Others`
+			WHERE employee_type = '{employee_type}' AND docstatus = 1
+			AND date BETWEEN '{from_date}' AND '{to_date}'
+			AND cost_center = '{cost_center}' AND status = 'Present'
+			UNION ALL
+			SELECT DISTINCT number AS employee, date, 
+				0 AS number_of_days, ifnull(number_of_hours,0) AS number_of_hours,
+				ifnull(number_of_hours_special,0) AS number_of_hours_special, 0 AS total_wage, 
+			    (IFNULL(number_of_hours,0) * IFNULL(rate_per_hour_normal,0) + IFNULL(number_of_hours_special,0) * IFNULL(rate_per_hour,0)) AS total_ot	
+			FROM `tabOvertime Entry`
+			WHERE employee_type = '{employee_type}'
+			AND date BETWEEN '{from_date}' AND '{to_date}'
+			AND cost_center = '{cost_center}'
+			AND docstatus = 1
+		) AS abc
+		GROUP BY employee
+	""".format(employee_type = employee_type, from_date = from_date, to_date = to_date, 
+	cost_center = cost_center, total_days = total_days), as_dict=True)
 
-		#ifnull(number_of_hours,0)*ifnull(rate_per_hour_normal,0) as total_ot
+	#ifnull(number_of_hours,0)*ifnull(rate_per_hour_normal,0) as total_ot
 	for r in rest_list:
-			if master.get(r.employee) and (flt(r.total_wage)+flt(r.total_ot)):
-				r.employee_type = r.type
-				master[r.employee].update(r)
-				data.append(master[r.employee])
+		if master.get(r.employee) and (flt(r.total_wage)+flt(r.total_ot)):
+			r.employee_type = r.type
+			master[r.employee].update(r)
+			data.append(master[r.employee])
 					
 	if data:
 		return data
