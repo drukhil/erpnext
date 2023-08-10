@@ -9,7 +9,7 @@ from frappe.model.document import Document
 from frappe.utils import flt, nowdate, time_diff_in_hours
 from erpnext.custom_utils import check_budget_available, get_branch_cc
 from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee
-
+from datetime import datetime, timedelta
 class OvertimeApplication(Document):
     def validate(self):
         self.validate_dates()
@@ -91,11 +91,18 @@ class OvertimeApplication(Document):
 
             if str(a.date) > str(nowdate()):
                 frappe.throw(_("Row#{0} : Future dates are not accepted").format(a.idx), title="Invalid Date")
-                                
+
+            #Validate if time interval falls between another time interval for the same date   
             for b in self.items:
                 if a.date == b.date and a.idx != b.idx:
-                    frappe.throw("Duplicate Dates in row " + str(a.idx) + " and " + str(b.idx))
-
+                    time_format = "%H:%M:%S"
+                    start1 = datetime.strptime(a.from_time, time_format)
+                    end1 = datetime.strptime(a.to_time, time_format)
+                    start2 = datetime.strptime(b.from_time, time_format)
+                    end2 = datetime.strptime(b.to_time, time_format)
+                    #frappe.throw("{}, {}, {} and {},{},{}".format(start2,start1,end2,start2,end1,end2))
+                    if start2 <= start1 <= end2 or start2 <= end1 <= end2:
+                        frappe.throw("Duplicate Dates in row " + str(a.idx) + " and " + str(b.idx))
     ##
     # Allow only the approver to submit the document
     ##
@@ -122,8 +129,8 @@ class OvertimeApplication(Document):
         je.title = "Overtime payment for " + self.employee_name + "(" + self.employee + ")"
         je.voucher_type = 'Bank Entry'
         je.naming_series = 'Bank Payment Voucher'
-        je.remark = 'Payment Paid against : ' + self.name + " for " + self.employee;
-        je.user_remark = 'Payment Paid against : ' + self.name + " for " + self.employee;
+        je.remark = 'Payment Paid against : ' + self.name + " for " + self.employee
+        je.user_remark = 'Payment Paid against : ' + self.name + " for " + self.employee
         je.posting_date = self.posting_date
         total_amount = self.actual_amount
         je.branch = self.branch

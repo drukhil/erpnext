@@ -11,7 +11,7 @@ frappe.ui.form.on('Overtime Application', {
 		}
 	},
 	refresh: function(frm){
-		enable_disable(frm);
+		//enable_disable(frm);
 	},
 	approver: function(frm) {
 		if(frm.doc.approver){
