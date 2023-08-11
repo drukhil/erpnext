@@ -77,6 +77,8 @@ class Asset(Document):
 		self.value_after_depreciation = (flt(self.gross_purchase_amount) -
 			flt(self.opening_accumulated_depreciation)) - flt(self.residual_value) - 1
 
+		self.next_depreciation_date = get_last_day(self.purchase_date) 
+
 	def validate_asset_values(self):
 		if flt(self.expected_value_after_useful_life) >= flt(self.gross_purchase_amount):
 			frappe.throw(_("Expected Value After Useful Life must be less than Gross Purchase Amount"))
@@ -412,8 +414,8 @@ def get_item_details(item_code):
 	return ret
 
 @frappe.whitelist()
-def get_next_depreciation_date():
-	return calculate_depreciation_date()
+def get_next_depreciation_date(dep_start_date=None):
+	return get_last_day(dep_start_date) if dep_start_date else calculate_depreciation_date()
 
 def sync_cc_branch():
 	objs = frappe.db.sql("select a.name as asset, c.branch as branch  from tabAsset a, `tabCost Center` c where a.cost_center = c.name and a.branch != c.branch", as_dict=True)

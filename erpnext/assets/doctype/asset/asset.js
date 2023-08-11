@@ -169,6 +169,22 @@ frappe.ui.form.on('Asset', {
 		else {
 			cur_frm.set_value("marked_on", "")
 		}
+	},
+	purchase_date: function(frm) {
+		if(frm.doc.purchase_date){
+			frappe.call({
+				method: 'erpnext.assets.doctype.asset.asset.get_next_depreciation_date',
+				args: {
+					dep_start_date:frm.doc.purchase_date
+					},
+				callback: function(r){
+					if (r.message) {
+						cur_frm.set_value("next_depreciation_date", r.message);
+						//cur_frm.set_df_property("next_depreciation_date", "hidden", true);
+					}
+				}
+			});
+		}
 	}
 });
 
@@ -337,26 +353,6 @@ erpnext.asset.scrap_asset = function(frm) {
 cur_frm.add_fetch("item_code", "item_name", "asset_name");
 cur_frm.add_fetch("issued_to", "cost_center", "cost_center");
 cur_frm.add_fetch("issued_to", "branch", "branch");
-
-//Set next depreciation date as the last day of the month
-cur_frm.cscript.onload = function(doc) {
-
-frappe.call({
-    'method': 'erpnext.assets.doctype.asset.asset.get_next_depreciation_date',
-    'args': {
-        },
-       callback: function(r){
-           if (r.message) {
-                 if(doc.next_depreciation_date) {}
-                 else {
-                      cur_frm.set_value("next_depreciation_date", r.message);
-                      //cur_frm.set_df_property("next_depreciation_date", "hidden", true);
-                 }
-           }
-       }
-});
-
-}
 
 //Set Depreciation rate based on asset category
 cur_frm.cscript.asset_category = function(doc) {
