@@ -323,7 +323,9 @@ class ProjectPayment(AccountsController):
                                                          "cost_center": self.cost_center,
                                                          "party_check": 0,
                                                          "account_type": bank_account_type,
-                                                         "is_advance": "No"
+                                                         "is_advance": "No",
+                                                         "party_type": self.party_type if bank_account_type in ("Payable","Receivable") else None,
+                                                         "party": self.party if bank_account_type in ("Payable","Receivable") else None,
                                         }, currency.default_currency)
                                 )
 
