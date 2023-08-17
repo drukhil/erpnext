@@ -28,7 +28,7 @@ class ReceivablePayableReport(object):
 			columns += [args.get("party_type") + " Name::110"]
 
 		columns += [_("Voucher Type") + "::110", _("Voucher No") + ":Dynamic Link/"+_("Voucher Type")+":120",
-			_("Due Date") + ":Date:80"]
+			_("Cost Center") + ":Link/Cost Center:200", _("Due Date") + ":Date:80"]
 
 		if args.get("party_type") == "Supplier":
 			columns += [_("Bill No") + "::80", _("Bill Date") + ":Date:80"]
@@ -115,7 +115,7 @@ class ReceivablePayableReport(object):
 					# get due date
 					due_date = voucher_details.get(gle.voucher_no, {}).get("due_date", "")
 
-					row += [gle.voucher_type, gle.voucher_no, due_date]
+					row += [gle.voucher_type, gle.voucher_no, gle.cost_center, due_date]
 
 					# get supplier bill details
 					if args.get("party_type") == "Supplier":
@@ -251,7 +251,7 @@ class ReceivablePayableReport(object):
 				select_fields = "sum(debit) as debit, sum(credit) as credit"
 
 			self.gl_entries = frappe.db.sql("""select name, posting_date, account, party_type, party,
-				voucher_type, voucher_no, against_voucher_type, against_voucher,
+				voucher_type, voucher_no, cost_center, against_voucher_type, against_voucher,
 				account_currency, remarks, {0}
 				from `tabGL Entry`
 				where docstatus < 2 and party_type=%s and (party is not null and party != '') {1}
@@ -278,6 +278,10 @@ class ReceivablePayableReport(object):
 		if self.filters.account:
 			conditions.append("account=%s")
 			values.append(self.filters.account)
+		
+		if self.filters.cost_center:
+			conditions.append("cost_center=%s")
+			values.append(self.filters.cost_center)
 
 		if party_type_field=="customer":
 			if self.filters.get("customer_group"):
