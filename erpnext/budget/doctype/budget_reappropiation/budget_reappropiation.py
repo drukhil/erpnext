@@ -79,7 +79,6 @@ class BudgetReappropiation(Document):
 
 		to_account = self.get_cc_acc_budget(to_cc, to_acc, fiscal_year)
 		from_account = self.get_cc_acc_budget(from_cc, from_acc, fiscal_year)
-		frappe.throw("{} and {}".format(to_account, from_account))
 
 		if to_account and from_account:
 			#Deduct in the From Account and Cost Center
