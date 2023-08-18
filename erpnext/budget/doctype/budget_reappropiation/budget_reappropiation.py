@@ -15,6 +15,30 @@ class BudgetReappropiation(Document):
 				frappe.throw("Amount should be greater than 0 on row " + str(a.idx))
 			if self.from_cost_center == self.to_cost_center and a.from_account == a.to_account:
 				frappe.throw("From and To Account cannot be same")
+		
+		self.update_users()
+
+	def update_users(self):
+		if not frappe.db.exists("Budget Reappropiation", self.name):
+			self.created_by = frappe.session.user
+		
+		if self.workflow_state=="Waiting Verifying":
+			if not self.applied_by:
+				self.applied_by = frappe.session.user
+		
+		if self.workflow_state=="Waiting Approval":
+			if not self.verified_by:
+				self.verified_by = frappe.session.user
+		
+		if self.workflow_state=="Approved":
+			if not self.approved_by:
+				self.approved_by = frappe.session.user
+
+		if self.workflow_state=="Rejected":
+			self.applied_by = None
+			self.verified_by = None
+			self.approved_by = None	
+
 	def on_submit(self):
 		self.budget_check()
 		for a in self.items:
@@ -55,6 +79,7 @@ class BudgetReappropiation(Document):
 
 		to_account = self.get_cc_acc_budget(to_cc, to_acc, fiscal_year)
 		from_account = self.get_cc_acc_budget(from_cc, from_acc, fiscal_year)
+		frappe.throw("{} and {}".format(to_account, from_account))
 
 		if to_account and from_account:
 			#Deduct in the From Account and Cost Center
