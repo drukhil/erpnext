@@ -63,7 +63,7 @@ def verify_workflow(doc):
 	if doc.workflow_state == "Waiting Approval":
 		if doc.owner != frappe.session.user:
 			doc.workflow_state = "Draft"
-			frappe.throw("Only Mr/Mrs. <b> '{0}' </b>  can Apply/Reapply this Document".format(frappe.get_doc("User", doc.employee_name).full_name))
+			frappe.throw("Only Mr/Mrs. <b> '{0}' </b>  can Apply/Reapply this Document".format(frappe.get_doc("User", frappe.db.get_value("Employee", doc.employee, "user_id")).full_name))
 		doc.workflow_state = "Waiting Approval"
 		doc.docstatus = 0
 

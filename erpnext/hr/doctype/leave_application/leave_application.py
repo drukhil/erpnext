@@ -44,11 +44,14 @@ class LeaveApplication(Document):
 			else:
 				self.workflow_state = "Waiting Approval"
 		elif self.workflow_state == "Cancelled":
-                        if frappe.session.user not in (self.leave_approver,"Administrator"):
-                                frappe.throw(_("Only leave approver <b>{0}</b> ( {1} ) can cancel this document.").format(self.leave_approver_name, self.leave_approver), title="Operation not permitted")
-                        self.status = "Cancelled"
-                else:
-                        pass
+			hr_approver = frappe.db.get_value("Employee", frappe.db.get_single_value("HR Settings", "hr_approver"), "user_id")
+			if not hr_approver:
+				frappe.throw(_("Missing HR Approver user set from HR Setting."))
+			if frappe.session.user not in (self.leave_approver,"Administrator", hr_approver):
+				frappe.throw(_("Only leave approver <b>{0}</b> ( {1} ) can cancel this document.").format(self.leave_approver_name, self.leave_approver), title="Operation not permitted")
+			self.status = "Cancelled"
+		else:
+			pass
 
 	"""def get_feed(self):
 		return _("{0}: From {0} of type {1}").format(self.status, self.employee_name, self.leave_type)

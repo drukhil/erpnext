@@ -386,6 +386,12 @@ def submit_je():
 	doc.submit()
 	print doc.name
 
+def cancel_je():
+	doc = frappe.get_doc("Journal Entry", "JEBP230700130")
+	doc.cancel()
+	frappe.db.commit()
+	print (doc.name)
+
 def submit_pr():
 	doc = frappe.get_doc("Purchase Receipt", "PRSM22050115")
 	doc.cancel()
@@ -396,6 +402,11 @@ def save_sm():
 	doc.save()
 	print doc.name
 
+def cancel_pi():
+	doc = frappe.get_doc("Purchase Invoice", "PISM23080222")
+	doc.cancel()
+	frappe.db.commit()
+	print(doc.name)
 
 def submit_la():
 	doc = frappe.get_doc("Leave Application", "LAP221200224")
