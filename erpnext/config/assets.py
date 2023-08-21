@@ -31,9 +31,13 @@ def get_data():
 					"label": "Asset Addition Tool",
 					"hide_count": True
 				},
-                                				{
+                {
 					"type": "doctype",
 					"name": "Bulk Asset Transfer",
+				},
+				{
+					"type": "doctype",
+					"name": "Bulk Asset Depreciation",
 				},
 				{
 					"type": "doctype",

@@ -1727,7 +1727,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2021-09-03 10:00:22.237165", 
+ "modified": "2023-08-21 16:15:14.339113", 
  "modified_by": "Administrator", 
  "module": "Assets", 
  "name": "Asset", 
@@ -1903,6 +1903,6 @@
  "sort_field": "modified", 
  "sort_order": "DESC", 
  "title_field": "asset_name", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }
