@@ -6,18 +6,21 @@ cur_frm.add_fetch('employee', 'employee_name', 'employee_name')
 frappe.ui.form.on('Budget Reappropiation', {
 	refresh: function(frm) {
 	
+
 	},
-	
-	creator: function(frm){
-		if(frm.doc.creator){
-			frm.set_value("creator_name", frappe.user.full_name(frm.doc.creator));
+	created_by: function(frm){
+		if(frm.doc.created_by){
+			frm.set_value("creator_name", frappe.user.full_name(frm.doc.created_by));
 		}	
 	},
 	
-
+	
 
 	
 });
+
+cur_frm.cscript.refresh = function(doc, cdt, cdn){
+}
 
 //cost center
 //-----------------------

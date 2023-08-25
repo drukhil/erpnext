@@ -9,6 +9,7 @@ from frappe.utils.data import nowdate, flt
 from erpnext.custom_utils import check_budget_available
 
 class BudgetReappropiation(Document):
+	
 	def validate(self):
 		for a in self.items:
 			if not flt(a.amount) > 0:
@@ -16,31 +17,40 @@ class BudgetReappropiation(Document):
 			if self.from_cost_center == self.to_cost_center and a.from_account == a.to_account:
 				frappe.throw("From and To Account cannot be same")
 		
+		self.budget_check()
 		self.update_users()
 
 	def update_users(self):
 		if not frappe.db.exists("Budget Reappropiation", self.name):
 			self.created_by = frappe.session.user
+			self.creator_name = frappe.db.get_value("Employee", {"user_id":self.created_by},"employee_name")
 		
-		if self.workflow_state=="Waiting Verifying":
-			if not self.applied_by:
-				self.applied_by = frappe.session.user
+		if self.workflow_state=="Waiting Verifying" and not self.applied_by:
+			self.applied_by = frappe.session.user 
+			self.applied_name = frappe.db.get_value("Employee", {"user_id":self.applied_by},"employee_name")
 		
 		if self.workflow_state=="Waiting Approval":
 			if not self.verified_by:
 				self.verified_by = frappe.session.user
+				self.verified_name = frappe.db.get_value("Employee", {"user_id":self.verified_by},"employee_name")
 		
-		if self.workflow_state=="Approved":
+		if self.workflow_state=="Waiting for Submitting":
 			if not self.approved_by:
 				self.approved_by = frappe.session.user
+				self.approver_name = frappe.db.get_value("Employee", {"user_id":self.approved_by},"employee_name")
+
+		if self.workflow_state=="Submitted":
+			if not self.submitted_by:
+				self.submitted_by = frappe.session.user
+				self.submitter_name = frappe.db.get_value("Employee", {"user_id":self.submitted_by},"employee_name")
 
 		if self.workflow_state=="Rejected":
 			self.applied_by = None
 			self.verified_by = None
 			self.approved_by = None	
+			self.submitted_by = None
 
 	def on_submit(self):
-		self.budget_check()
 		for a in self.items:
 			self.reappropriate(a.from_account, a.to_account, a.amount, False)
 
@@ -53,9 +63,23 @@ class BudgetReappropiation(Document):
 	##
 	def budget_check(self):
 		#Get cost center & target details
+		'''
 		budgets = frappe.db.sql("select from_account, sum(amount) as amount from `tabBudget Reappropiation Detail` where parent = %s group by from_account", self.name, as_dict=True)
 		for a in budgets:
 			check_budget_available(self.from_cost_center, a.from_account, str(self.fiscal_year) + "-01-01", a.amount)
+		'''
+		bgt_dtl=[]
+		for b in self.get("items"):
+			if b.from_account not in bgt_dtl:
+				bgt_dtl.append(b.from_account)
+
+		for c in bgt_dtl:
+			reappropiation_amt = 0.00
+			for d in self.get("items"):
+				if c == d.from_account:
+					reappropiation_amt += d.amount
+			check_budget_available(self.from_cost_center, c, str(self.fiscal_year) + "-01-01", reappropiation_amt)
+
 
 	##
 	# Get budget details from CC and Account
