@@ -9,16 +9,29 @@ from frappe.utils import add_days, getdate, nowdate, formatdate, today, get_firs
 
 class SupplierMonitoring(Document):
 	def validate(self):
-		tot = 0.0
 		if not self.items:
 			frappe.throw("No items found for the the given Purchase Order")
 		self.check_requirements()
 		self.update_ld()
 		self.check_duplicate()
+		self.validate_smt_po_qty()
+		self.calc_ld_total()
+
+	def calc_ld_total(self):
+		tot = 0.0
 		for a in self.get("items"):
 			tot += flt(a.liquidated_damage)
 		self.total = tot
 
+	def validate_smt_po_qty(self):
+		for d in self.get("items"):
+			po_bal_qty = flt(frappe.db.sql("""select (qty - received_qty) as bal_qty 
+						from `tabPurchase Order Item` 
+						where name=%s and parent=%s and docstatus=1 """, (str(d.purchase_order_item), self.purchase_order)
+					)[0][0]
+				)
+			if flt(d.received_quantity) > flt(po_bal_qty):
+				frappe.throw("Received Quantity {0} cannot be greater than the difference of PO quantity and received quantity {1}".format(d.received_quantity, flt(po_bal_qty)))
 
 	def update_ld(self):
 		for a in self.get("items"):
@@ -34,24 +47,33 @@ class SupplierMonitoring(Document):
 			
 
 	def check_duplicate(self):
-		if frappe.db.exists("Supplier Monitoring", {'purchase_order': self.purchase_order, 'docstatus': 1}):
-            		frappe.throw(('You have already created a Supplier Monitoring transaction for the purchase Order,  <b>{}</b>, This is the document number <b>{}</b>'.format(self.purchase_order, self.name)))
+		data = []
+		for d in self.get("items"):
+			if d.item_code not in data:
+				data.append(d.item_code)
+			else:
+				frappe.throw("Duplicate Item entry at #Row. {}".format(d.idx))
+		# if frappe.db.exists("Supplier Monitoring", {'purchase_order': self.purchase_order, 'docstatus': 1}):
+        #     		frappe.throw(('You have already created a Supplier Monitoring transaction for the purchase Order,  <b>{}</b>, This is the document number <b>{}</b>'.format(self.purchase_order, self.name)))
 	
 
 	def get_items(self, po):
 		data = frappe.db.sql("""
 			SELECT 
-				item_code, item_name, uom, qty, rate, amount, schedule_date from `tabPurchase Order Item` 
+				item_code, item_name, uom, qty, rate, amount, schedule_date, received_qty, name as purchase_order_item from `tabPurchase Order Item` 
 			WHERE	
-			parent = '{0}' 
+			parent = '{0}' and docstatus = 1
 		""".format(po), as_dict=1)
 		
 		if not data:
 			frappe.throw("No items found for the Purchase Order {}".format(po))
-        	self.set('items', [])
-        	for d in data:
-            		row = self.append('items', {})
-            		row.update(d)
+		self.set('items', [])
+		for d in data:
+			if flt(d.qty) == flt(d.received_qty):
+				continue
+			row = self.append('items', {})
+			row.received_quantity = flt(d.qty) - flt(d.received_qty)
+			row.update(d)
 
 	def check_requirements(self):		
 		for a in self.get("items"):
@@ -63,8 +85,8 @@ class SupplierMonitoring(Document):
 				frappe.throw("Received Quantity cannot be greater than the PO quantity at Row {}".format(a.idx))
 			if flt(a.liquidated_damage) > max_amount:
 				frappe.throw("Liquidated Damage cannot be more than the 10% of the PO Amount")
-			if flt(a.received_quantity) > a.qty:
-				frappe.throw("Received Quantity cannot be more than the PO quantity")
+			# if flt(a.received_quantity) > a.qty:
+			# 	frappe.throw("Received Quantity cannot be more than the PO quantity")
 
 @frappe.whitelist()
 def calculate_durations(from_date = None, to_date = None):

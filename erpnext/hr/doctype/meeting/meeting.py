@@ -29,7 +29,7 @@ class Meeting(Document):
                 subject = "Minutes of Meeting on" + self.topic
                 message = "Find Attached the Minutes of the meeting on the '{0}'. Check ERP system for the same. The meeting ID is '{1}'.".format(self.topic, self.name)
 		user = []
-		user.append('jigme@gyalsunginfra.bt')
+		user.append('jairajrai@gyalsunginfra.bt')
 		for a in self.table_10:
 			user.append(a.email_id)
                 if user:

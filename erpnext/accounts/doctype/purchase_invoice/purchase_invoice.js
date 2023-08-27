@@ -344,10 +344,14 @@ cur_frm.cscript.select_print_heading = function(doc,cdt,cdn){
 
 frappe.ui.form.on("Purchase Invoice", {
 	pull_ld: function(frm) {
+		frm.clear_table("lds");
+		cur_frm.refresh_field("lds");
 		return frappe.call({
 			method: "pull_ld",
 			doc: frm.doc,
 			callback: function(r, rt) {
+				cur_frm.refresh_field("lds");
+				cur_frm.set_value('ld_total', r.message);
 				frm.refresh_fields();
 			}
 		});

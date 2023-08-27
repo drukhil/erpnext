@@ -377,9 +377,10 @@ def submit_ca():
 	print doc.name
 
 def cancel_se():
-	doc = frappe.get_doc("Stock Entry", "SEMI22122016")
+	doc = frappe.get_doc("Stock Entry", "SEMI23075690")
 	doc.cancel()
-	print doc.name
+	frappe.db.commit()
+	print (doc.name)
 
 def submit_je():
 	doc = frappe.get_doc("Journal Entry", "JEJV230701995")
@@ -408,13 +409,19 @@ def cancel_pi():
 	frappe.db.commit()
 	print(doc.name)
 
+def cancel_exp_allocation():
+	doc = frappe.get_doc("Expense Allocation", "EA2023000444")
+	doc.cancel()
+	frappe.db.commit()
+	print(doc.name)
+
 def submit_la():
 	doc = frappe.get_doc("Leave Application", "LAP221200224")
 	doc.submit()
 	print doc.name
 
 def email_test():
-	recipients = 'jigme@gyalsunginfra.bt'
+	recipients = 'jairajrai@gyalsunginfra.bt'
 	subject = "testing"
 	doc = frappe.get_doc("Material Request", 'MRMR20120018')
 	message = """Dear Sir/Madam, <br>  {0} has requested you to verify the Material Request <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(frappe.get_desk_link("Material Request", doc.name)))

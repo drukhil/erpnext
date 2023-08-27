@@ -104,19 +104,27 @@ class PurchaseInvoice(BuyingController):
 	
 	def pull_ld(self):
 		
+		# query = """ select sm.name as smt, sm.purchase_order, sm.total from `tabSupplier Monitoring` sm, `tabPurchase Invoice Item` b,
+		# 			 `tabPurchase Invoice` c  where  b.parent = '{0}' and sm.purchase_order = b.purchase_order and sm.docstatus = 1 group by sm.name
+        #              """.format(self.name)	
+		
 		query = """ select sm.name as smt, sm.purchase_order, sm.total from `tabSupplier Monitoring` sm, `tabPurchase Invoice Item` b,
-					 `tabPurchase Invoice` c  where  b.parent = '{0}' and sm.purchase_order = b.purchase_order and sm.docstatus = 1 group by sm.name
+					 `tabPurchase Invoice` c  where  b.parent = '{0}' and sm.purchase_order = b.purchase_order and sm.docstatus = 1 and (sm.purchase_invoice is null or sm.purchase_invoice = '') group by sm.name
                      """.format(self.name)	
 		
 		entries = frappe.db.sql(query, as_dict=True)
 		if not entries:
 			frappe.msgprint("No LD Record Found")
 
+		total_ld = 0
 		self.set('lds', [])
 
 		for d in entries:
+			total_ld += flt(d.total)
 			row = self.append('lds', {})
 			row.update(d)
+		
+		return total_ld
 
 	def validate_tds(self):
 		if not self.type:
@@ -347,6 +355,15 @@ class PurchaseInvoice(BuyingController):
 		self.update_fixed_asset()
 		self.consume_budget()
 		self.update_rrco_receipt()
+		self.update_smt_ld()
+
+	def update_smt_ld(self):
+		if self.get("lds"):
+			for d in self.get("lds"):
+				if self.docstatus != 2:
+					frappe.db.sql("update `tabSupplier Monitoring` set purchase_invoice='{0}' where name='{1}'".format(self.name, str(d.smt)))
+				else:
+					frappe.db.sql("update `tabSupplier Monitoring` set purchase_invoice='' where name='{0}'".format(str(d.smt)))
 
 	def check_po_closed(self):
                 for a in self.items:
@@ -749,6 +766,7 @@ class PurchaseInvoice(BuyingController):
 		#self.update_project()
 		self.update_fixed_asset()
 		self.cancel_consumed()
+		self.update_smt_ld()
 
 	def update_project(self):
 		project_list = []

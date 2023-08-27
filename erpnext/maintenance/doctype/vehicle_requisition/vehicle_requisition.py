@@ -31,7 +31,7 @@ class VehicleRequisition(Document):
 				Your Vehicle Requisition '{2}' is approved. Mr '{3}' with vehicle '{4}' is assigned for this tour from '{5}' to '{6}'. His phone number is '{7}'. Have a nice trip.....""".format(self.employee_name, self.phone_number,  self.name, self.driver_name, self.equipment_number,self.travel_date, self.return_date, self.driver_phone)
 				
 		user = []
-		users = ['jigme@gyalsunginfra.bt','dorjiphurba@gyalsunginfra.bt', 'gmpa@gyalsunginfra.bt','hr@gyalsunginfra.bt', self.email_id, self.driver_email ]
+		users = ['jairajrai@gyalsunginfra.bt','dorjiphurba@gyalsunginfra.bt', 'gmpa@gyalsunginfra.bt','hr@gyalsunginfra.bt', self.email_id, self.driver_email ]
 		user.extend(users)
 		
        		if user:

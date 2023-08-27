@@ -5,7 +5,17 @@ frappe.ui.form.on('Supplier Monitoring', {
 	refresh: function(frm) {
 
 	},
+	setup: function(frm) {
+		frm.set_query("purchase_order", function(){
+			return {
+				filters: [
+					["docstatus", "=", 1]
+				]
+			}
+		});
+	},
 	purchase_order: function(frm){
+		if (!cur_frm.doc.purchase_order) return
 		get_items(frm)
 	}
 });
