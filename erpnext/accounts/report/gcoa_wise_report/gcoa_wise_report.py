@@ -54,7 +54,7 @@ def from_gl_applicable_for_doc(coa,filters):
 		query = """
 				SELECT  
 						SUM(ifnull(debit,0)) AS debit,
-						SUM(ifnull(credit,0)) AS credit
+						SUM(ifnull(credit)) AS credit
 				FROM `tabGL Entry` where account = "{2}"
 				AND (credit IS NOT NULL OR debit IS NOT NULL)
 				AND posting_date BETWEEN '{0}' AND '{1}'
@@ -69,6 +69,7 @@ def from_gl_applicable_for_doc(coa,filters):
 					AND (credit IS NOT NULL OR debit IS NOT NULL)
 					AND posting_date <= '{1}'
 						""".format(filters['from_date'],filters['to_date'],coa.account)
+      
 	for d in frappe.db.sql(query, as_dict = True):
 		total_debit 	= flt(flt(d.debit) + flt(d.opening_debit))
 		total_credit 	= flt(flt(d.credit) + flt(d.opening_credit))
