@@ -5,6 +5,17 @@ frappe.ui.form.on('Transport Request', {
 	refresh: function(frm) {
 		custom.apply_default_settings(frm);
 		check_if_boulder_t(frm);
+		if(frm.doc.docstatus == 1 && !frm.doc.transporter) {
+			cur_frm.add_custom_button(__('Change to Draft'), function(){
+				return frappe.call({
+					method: "change_to_draft",
+					doc: cur_frm.doc,
+					callback: function(r, rt){
+						frm.reload_doc();
+					}
+				});
+			});
+		}
 	},
 	onload: function(frm) {
 		cur_frm.set_query("vehicle_capacity",function(){

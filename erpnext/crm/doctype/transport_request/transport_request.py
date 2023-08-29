@@ -213,4 +213,8 @@ class TransportRequest(Document):
 			transporter, enabled = frappe.db.get_value("Transporter", {"transporter_id": self.user}, ["transporter_name", "enabled"])
 			doc = frappe.get_doc("Transporter", {"transporter_id": self.user})
 			self.db_set("transporter", doc.name)
+	
+	def change_to_draft(self):
+		frappe.db.sql("update `tabTransport Request` set docstatus=0 where name = '{}'".format(self.name))
+		frappe.db.commit()
 						
