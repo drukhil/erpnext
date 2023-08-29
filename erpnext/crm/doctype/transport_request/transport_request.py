@@ -208,7 +208,9 @@ class TransportRequest(Document):
 				doc.transporter_id = self.user
 				doc.mobile_no = u_mobile_no
 				doc.user = self.user		
-				doc.submit()				
+				doc.submit()
 	
 			transporter, enabled = frappe.db.get_value("Transporter", {"transporter_id": self.user}, ["transporter_name", "enabled"])
+			doc = frappe.get_doc("Transporter", {"transporter_id": self.user})
+			self.db_set("transporter", doc.name)
 						
