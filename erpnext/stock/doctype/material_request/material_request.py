@@ -80,6 +80,7 @@ class MaterialRequest(BuyingController):
 	def validate(self):
 		check_future_date(self.transaction_date)
 		super(MaterialRequest, self).validate()
+		self.validate_branch_perm()
 		cc  = frappe.db.sql(""" select name from `tabCost Center` where branch = "{0}" """.format(self.branch), as_dict = 1)
                 if cc:
                         self.cost_center = cc[0].name
@@ -242,6 +243,22 @@ class MaterialRequest(BuyingController):
 				"indented_qty": get_indented_qty(item_code, warehouse)
 			})
 
+	def validate_branch_perm(self):
+		user = frappe.session.user
+		user_roles = frappe.get_roles(user)
+		if user == "Administrator" or "System Manager" in user_roles or "Purchase Master" in user_roles: 
+			return
+	
+		branch_assign = frappe.db.sql("""select bi.branch from `tabAssign Branch` ab, `tabBranch Item` bi
+						where ab.user = '{user}'
+						and bi.parent = ab.name""".format(user=user), as_dict=1)
+		branch_list = [d.branch for d in branch_assign]
+		# frappe.throw(str(branch_list))
+		if self.branch not in branch_list:
+			frappe.throw("You do not have Branch access for {}, through Assign Branch".format(str(self.branch)))
+		if not self.is_new() and frappe.db.get_value(self.doctype, self.name, "branch") not in branch_list:
+			frappe.throw("You do not have Branch access for {} to update to new branch {}, through Assign Branch".format(frappe.db.get_value("Material Request", self.name, "branch"), self.branch))
+			
 def update_completed_and_requested_qty(stock_entry, method):
 	if stock_entry.doctype == "Stock Entry":
 		material_request_map = {}

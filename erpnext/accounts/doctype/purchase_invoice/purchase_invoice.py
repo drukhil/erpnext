@@ -44,6 +44,7 @@ class PurchaseInvoice(BuyingController):
 
 	def validate(self):
 		check_future_date(self.posting_date)
+		self.validate_branch_perm()
 		self.set_status()
 		if self.lds:
 			total = 0
@@ -868,6 +869,22 @@ class PurchaseInvoice(BuyingController):
 			if rrco:
 				obj = frappe.get_doc("RRCO Receipt Entries", rrco)
 				obj.db_set("purchase_invoice", self.name)
+
+	def validate_branch_perm(self):
+		user = frappe.session.user
+		user_roles = frappe.get_roles(user)
+		if user == "Administrator" or "System Manager" in user_roles: 
+			return
+	
+		branch_assign = frappe.db.sql("""select bi.branch from `tabAssign Branch` ab, `tabBranch Item` bi
+						where ab.user = '{user}'
+						and bi.parent = ab.name""".format(user=user), as_dict=1)
+		branch_list = [d.branch for d in branch_assign]
+		# frappe.throw(str(branch_list))
+		if self.branch not in branch_list:
+			frappe.throw("You do not have Branch access for {}, through Assign Branch".format(str(self.branch)))
+		if not self.is_new() and frappe.db.get_value(self.doctype, self.name, "branch") not in branch_list:
+			frappe.throw("You do not have Branch access for {} to update to new branch {}, through Assign Branch".format(frappe.db.get_value("Purchase Invoice", self.name, "branch"), self.branch))
 
 @frappe.whitelist()
 def make_debit_note(source_name, target_doc=None):
