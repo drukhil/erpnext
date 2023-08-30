@@ -343,6 +343,20 @@ cur_frm.cscript.select_print_heading = function(doc,cdt,cdn){
 }
 
 frappe.ui.form.on("Purchase Invoice", {
+	pull_ld: function(frm) {
+		frm.clear_table("lds");
+		cur_frm.refresh_field("lds");
+		return frappe.call({
+			method: "pull_ld",
+			doc: frm.doc,
+			callback: function(r, rt) {
+				cur_frm.refresh_field("lds");
+				cur_frm.set_value('ld_total', r.message);
+				frm.refresh_fields();
+			}
+		});
+	},	
+
 	onload: function(frm) {
 		$.each(["warehouse", "rejected_warehouse"], function(i, field) {
 			frm.set_query(field, "items", function() {
@@ -424,6 +438,7 @@ cur_frm.cscript.type = function(doc) {
     doUpdates(doc);
 
     if(percent > 0) {
+	console.log(percent);
 	frappe.call({
 		method: "erpnext.accounts.doctype.purchase_invoice.purchase_invoice.get_tds_accounts",
 		args: {

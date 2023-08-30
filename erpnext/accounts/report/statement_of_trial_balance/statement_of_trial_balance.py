@@ -19,7 +19,7 @@ def execute(filters=None):
 
 def validate_filters(filters):
 
-	if not filters.fiscal_year:
+	'''if not filters.fiscal_year:
 		frappe.throw(_("Fiscal Year {0} is required").format(filters.fiscal_year))
 
 	fiscal_year = frappe.db.get_value("Fiscal Year", filters.fiscal_year, ["year_start_date", "year_end_date"], as_dict=True)
@@ -34,14 +34,14 @@ def validate_filters(filters):
 
 	if not filters.to_date:
 		filters.to_date = filters.year_end_date
-
+	'''
 	filters.from_date = getdate(filters.from_date)
 	filters.to_date = getdate(filters.to_date)
 
 	if filters.from_date > filters.to_date:
 		frappe.throw(_("From Date cannot be greater than To Date"))
 
-	if (filters.from_date < filters.year_start_date) or (filters.from_date > filters.year_end_date):
+	'''if (filters.from_date < filters.year_start_date) or (filters.from_date > filters.year_end_date):
 		frappe.msgprint(_("From Date should be within the Fiscal Year. Assuming From Date = {0}")\
 			.format(formatdate(filters.year_start_date)))
 
@@ -50,7 +50,7 @@ def validate_filters(filters):
 	if (filters.to_date < filters.year_start_date) or (filters.to_date > filters.year_end_date):
 		frappe.msgprint(_("To Date should be within the Fiscal Year. Assuming To Date = {0}")\
 			.format(formatdate(filters.year_end_date)))
-		filters.to_date = filters.year_end_date
+		filters.to_date = filters.year_end_date'''
 
 def get_data(filters):
 	accounts = frappe.db.sql("""select name, account_code, parent_account, account_name, root_type, report_type, lft, rgt

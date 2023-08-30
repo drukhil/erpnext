@@ -16,12 +16,11 @@ class OpenAirPrisoner(Document):
 		self.populate_work_history()
 
 	def calculate_rates(self):
-		if not self.rate_per_day:
-			self.rate_per_day = flt(self.salary) / 30
+		# if not self.rate_per_day:
+		self.rate_per_day = flt(self.salary) / 30
 
-		if not self.gratuity_fund:
-			gratuity_percent = frappe.db.get_single_value("HR Settings", "gratuity_percent")
-			self.gratuity_fund =  flt(gratuity_percent)/100 * flt(self.salary)
+		gratuity_percent = frappe.db.get_value("HR Settings", None, "gratuity_percent")
+		self.gratuity_fund = flt(gratuity_percent)/100  * flt(self.salary)
 
 		'''if not self.rate_per_hour:
 			self.rate_per_hour = (flt(self.salary) * 1.5) / (30 * 8)

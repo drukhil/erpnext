@@ -1,0 +1,33 @@
+{
+ "content": null, 
+ "creation": "2023-03-08 14:36:38.577324", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2023-03-08 14:36:38.577324", 
+ "modified_by": "Administrator", 
+ "module": "Management Dashboard", 
+ "name": "bmt-focused-project", 
+ "owner": "Administrator", 
+ "page_name": "BMT Focused Project", 
+ "roles": [
+  {
+   "role": "Employee"
+  }, 
+  {
+   "role": "Administrator"
+  }, 
+  {
+   "role": "Technical Committee Member"
+  }, 
+  {
+   "role": "Management"
+  }, 
+  {
+   "role": "Projects Readonly"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null
+}

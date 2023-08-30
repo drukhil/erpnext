@@ -11,15 +11,13 @@ from erpnext.accounts.utils import get_account_currency, get_fiscal_year
 import collections
 from erpnext.hr.doctype.travel_authorization.travel_authorization import get_exchange_rate
 from erpnext.custom_utils import check_budget_available, get_branch_cc
-
-from erpnext.custom_workflow import verify_workflow_tc 
-
+from erpnext.custom_workflow import verify_workflow_tc
 
 class TravelClaim(Document):
 	def get_status(self):
                 if self.workflow_state =="Verified By Supervisor":
                         self.supervisor_approval = 1
-			self.seupervisor_approved_on = nowdate()
+			self.supervisor_approved_on = nowdate()
                 elif self.workflow_state == "Approved":
                         self.hr_approval =1
 			self.hr_approved_on = nowdate()
@@ -40,8 +38,8 @@ class TravelClaim(Document):
 		if frappe.session.user == self.supervisor and not self.supervisor_approval:
 			self.db_set("supervisor_approved_on", '')
 			self.supervisor_approved_on = ''
-		if self.supervisor_approved_on and not hr_role:
-			frappe.throw("Cannot change records after approval by supervisor")
+		#if self.supervisor_approved_on and not hr_role:
+		#	frappe.throw("Cannot change records after approval by supervisor")
 		#self.check_return_date()
 		self.validate_dates()
 		#self.check_approval()
@@ -66,10 +64,10 @@ class TravelClaim(Document):
 				self.db_set("workflow_state", 'Waiting Approval')
                                 frappe.throw("You cannot approve your own claim.")
 		
-	
+		if self.workflow_state not in ('Cancelled', 'Approved'):
+			self.db_set("docstatus", 0)
+		verify_workflow_tc(self)
 
-		#verify_workflow_tc(self)
-	
 	def on_update(self):
 		self.check_double_dates()
 
@@ -114,7 +112,7 @@ class TravelClaim(Document):
                                                         
                                         for m in range(int(m_start), int(m_end)+1):
                                                 key          = str(y)+str(m).rjust(2,str('0'))
-						m_start_date = key[:4]+'-'+key[4:]+'-01'
+                                                m_start_date = key[:4]+'-'+key[4:]+'-01'
                                                 m_start_date = i.date if str(y)+str(m).rjust(2,str('0')) == str(from_year)+str(from_month) else m_start_date
                                                 m_end_date   = i.till_date if str(y)+str(m).rjust(2,str('0')) == str(to_year)+str(to_month) else get_last_day(m_start_date)
                                                 if counts.has_key(key):
@@ -123,66 +121,65 @@ class TravelClaim(Document):
                                                         counts[key] = date_diff(m_end_date, m_start_date)+1
                         else:
                                 frappe.throw(_("Row#{0} : Till Date cannot be before from date.").format(i.idx), title="Invalid Data")
-		return collections.OrderedDict(sorted(counts.items()))
+                return collections.OrderedDict(sorted(counts.items()))
         
         def validate_dsa_ceiling(self):
 		total_count = 0
-		lastday_dsa_percent = frappe.db.get_single_value("HR Settings", "return_day_dsa")
-		for i in self.get("items"):
-			i.remarks        = ""
-			i.days_allocated = 0                                
-			if i.last_day and not lastday_dsa_percent:
-				i.days_allocated = 0
-				i.half_dsa_days = 0
-				continue
-		      	
-			from_date = i.date
-			to_date     = i.date if not i.till_date else i.till_date 
-			i.no_days = date_diff(to_date, from_date) + 1
-			'''if i.no_days and not i.quarantine:
-				total_count += i.no_days'''
-			if i.quarantine:
-				i.no_days = 0
-			total_count += i.no_days
-			counted = total_count - flt(i.no_days)
-			#if counted >= 30:
-			#	counted = 30 
-			#frappe.msgprint("Testing count {0}, amount {1}, counted {2}".format(total_count, i.amount, counted))
-			if flt(total_count) <= 15:
-				i.days_allocated = i.no_days
-				i.half_dsa_days = 0
-		
-			if 15 < flt(total_count) <= 30:
-				i.half_dsa_days = flt(total_count) - 15
-				if flt(counted) > 15:
-					i.half_dsa_days = flt(total_count) - flt(counted)
-				i.days_allocated = i.no_days - i.half_dsa_days
-				
-			
-			if flt(total_count) > 30:
-				#lapse = flt(total_count) - flt(counted) - 30
-				lapse = flt(total_count) - 30
-				if flt(counted) > 30:
-					lapse = flt(total_count) - flt(counted)
-				eligible = flt(i.no_days) - flt(lapse)
-				if flt(eligible) > 15:
-					i.days_allocated = 15 - flt(counted)
-					i.half_dsa_days = flt(eligible) - i.days_allocated
-				elif 0 < flt(eligible) <= 15:
-					i.days_allocated = 0.0
-					i.half_dsa_days =  flt(eligible)
-				
-				else:
-					i.days_allocated = 0.0
-					i.half_dsa_days = 0.0
-		
+                lastday_dsa_percent = frappe.db.get_single_value("HR Settings", "return_day_dsa")
+                for i in self.get("items"):
+                        i.remarks        = ""
+                        i.days_allocated = 0
+                        if i.last_day and not lastday_dsa_percent:
+                                i.days_allocated = 0
+                                i.half_dsa_days = 0
+                                continue
+			if not i.halt:
+				i.quarantine = 0
+                        from_date = i.date
+                        to_date     = i.date if not i.till_date else i.till_date
+                       	i.no_days = date_diff(to_date, from_date) + 1
+                        '''if i.no_days and not i.quarantine:
+                                total_count += i.no_days'''
+			if not i.quarantine:
+				total_count += i.no_days
+                        counted = total_count - flt(i.no_days)
+                        # if counted >= 30:
+                        #       counted = 30 
+                        # frappe.msgprint("Testing count {0}, amount {1}, counted {2}".format(total_count, i.amount, counted))
+			if flt(total_count) <= 30:
+                                i.days_allocated = i.no_days
+                                i.half_dsa_days = 0
+
+                        if flt(total_count) > 30:
+                                i.half_dsa_days = flt(total_count) - 30
+                                if flt(counted) > 30:
+                                        i.half_dsa_days = flt(total_count) - flt(counted)
+                                i.days_allocated = i.no_days - i.half_dsa_days
+
+                        # if flt(total_count) > 30:
+                        #         #lapse = flt(total_count) - flt(counted) - 30
+                        #         lapse = flt(total_count) - 30
+                        #         if flt(counted) > 30:
+                        #                 lapse = flt(total_count) - flt(counted)
+                        #         eligible = flt(i.no_days) - flt(lapse)
+                        #         if flt(eligible) > 15:
+                        #                 i.days_allocated = 15 - flt(counted)
+                        #                 i.half_dsa_days = flt(eligible) - i.days_allocated
+                        #         elif 0 < flt(eligible) <= 15:
+                        #                 i.days_allocated = 0.0
+                        #                 i.half_dsa_days =  flt(eligible)
+
+                        #         else:
+                        #                 i.days_allocated = 0.0
+                        #                 i.half_dsa_days = 0.0
+
 			if i.last_day and lastday_dsa_percent:
                                 i.days_allocated = i.no_days
                                 i.half_dsa_days = 0
 
 			if i.quarantine:
-				i.days_allocated = 0
-				i.half_dsa_days = 0
+                                i.days_allocated = 0
+                                i.half_dsa_days = 0
 
         def update_amounts(self):
                 #dsa_per_day         = flt(frappe.db.get_value("Employee Grade", self.grade, "dsa"))
@@ -190,18 +187,17 @@ class TravelClaim(Document):
                 total_claim_amount  = 0
                 exchange_rate       = 0
                 company_currency    = "BTN"
-               	total_days          = 0 
+                
                 for i in self.get("items"):
                         exchange_rate      = 1 if i.currency == company_currency else get_exchange_rate(i.currency, company_currency)
                         #i.dsa             = flt(dsa_per_day)
-                        i.dsa              = flt(i.dsa) 
+			i.dsa              = flt(i.dsa) 
                         i.dsa_percent      = lastday_dsa_percent if i.last_day else i.dsa_percent
 			if i.quarantine:
 				i.dsa = 0.0
-				i.dsa_percent = 0.0	
-			#i.half_dsa_days    = flt(i.no_days) - flt(i.days_allocated)
-                        i.amount           = (flt(i.days_allocated)*(flt(i.dsa)*flt(i.dsa_percent)/100)) + (flt(i.mileage_rate) * flt(i.distance)) + flt(i.half_dsa_days * i.dsa * 0.5)
-                        i.actual_amount    = flt(i.amount) * flt(exchange_rate)
+				i.dsa_percent = 0.0
+        		i.amount           = (flt(i.days_allocated)*(flt(i.dsa)*flt(i.dsa_percent)/100)) + (flt(i.mileage_rate) * flt(i.distance)) + flt(i.half_dsa_days * i.dsa * 0.5)                
+			i.actual_amount    = flt(i.amount) * flt(exchange_rate)
                         if not i.quarantine:
 				total_claim_amount = flt(total_claim_amount) +  flt(i.actual_amount)
 

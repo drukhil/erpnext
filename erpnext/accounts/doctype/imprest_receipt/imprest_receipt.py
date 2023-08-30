@@ -43,13 +43,16 @@ class ImprestReceipt(Document):
                 
         def update_amounts(self):
                 opening_balance = get_opening_balance(self.branch, self.imprest_type, self.name, self.entry_date)
+
                 if flt(opening_balance) != flt(self.opening_balance):
                         #frappe.msgprint(_("Opening balance has been changed from Nu.{0}/- to Nu.{1}/-").format(flt(self.opening_balance),flt(opening_balance)),title="Change in values")
                         self.opening_balance = flt(opening_balance)
+
                 self.receipt_amount  = flt(self.amount)
                 self.purchase_amount = 0.0
                 self.closing_balance = flt(self.opening_balance)+flt(self.receipt_amount)
-        def validate_amounts(self):
+        
+	def validate_amounts(self):
                 if flt(self.opening_balance) < 0:
                         frappe.throw("Opening balance cannot be a negative value.",title="Invalid Data")
                 elif flt(self.amount) < 0:
@@ -60,7 +63,7 @@ class ImprestReceipt(Document):
                 # Validate against imprest limit set under branch
                 imprest_limit = frappe.db.get_value("Branch Imprest Item", {"parent": self.branch, "imprest_type": self.imprest_type}, "imprest_limit")
 
-		if not imprest_limit:
+                if not imprest_limit:
                         frappe.throw("Please set imprest limit for the branch.", title="Insufficient Balance")
                 else:
                         if flt(self.closing_balance,2) > flt(imprest_limit,2):
@@ -122,7 +125,7 @@ def update_dependencies(branch = None, imprest_type = None, entry_date = None):
 
         for t in trans:
                 opening_balance = get_opening_balance(branch, t.imprest_type, t.name, t.entry_date)
-		closing_balance = flt(opening_balance)+flt(t.receipt_amount)-flt(t.purchase_amount)
+                closing_balance = flt(opening_balance)+flt(t.receipt_amount)-flt(t.purchase_amount)
                 if flt(closing_balance) < 0.0:
                         msg = '<br><b>Reference# : <a href="#Form/{1}/{0}">{0}</a></b>'.format(t.name,t.doctype)
                         frappe.throw(_("Insufficient opening balance for dependent <b>{1}</b> transaction. {0}").format(msg,t.doctype),title="<div style='color: red'>Insufficient Balance</div>")
@@ -174,7 +177,7 @@ def get_opening_balance(branch = None, imprest_type = None, docname = None, entr
                                 and entry_date < '{2}'
                                 and docstatus = 1
                         ) as x
-        """.format(branch, docname, entry_date, imprest_type))
+        """.format(branch, docname, entry_date, imprest_type), debug = 1)
 
         if result:
                 return result[0][0]

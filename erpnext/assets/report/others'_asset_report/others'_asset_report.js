@@ -27,7 +27,7 @@ frappe.query_reports["Others' Asset Report"] = {
                         "fieldname": "owner",
                         "label": __("Owner"),
                         "fieldtype": "Link",
-                        "options": "Supplier"
+                        "options": "Organization"
                 },
 		{
                         "fieldname": "custodian",

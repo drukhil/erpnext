@@ -13,6 +13,10 @@ frappe.ui.form.on('TDS Remittance', {
 			}
 		});
 	},
+	setup: function(frm) {
+		frm.get_docfield("items").allow_bulk_edit = 1;		
+		
+	},
 	refresh: function(frm) {
 		if(frm.doc.docstatus===1){
                         frm.add_custom_button(__('Accounting Ledger'), function(){

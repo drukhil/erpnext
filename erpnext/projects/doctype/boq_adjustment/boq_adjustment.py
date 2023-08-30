@@ -10,8 +10,7 @@ from frappe.utils import cstr, flt, getdate, today
 
 class BOQAdjustment(Document):
 	def validate(self):
-                #self.update_balances()
-                self.validate_boq_and_items()
+                self.validate_boq_item()
 
         def on_submit(self):
                 self.update_boq_and_project()
@@ -19,35 +18,10 @@ class BOQAdjustment(Document):
         def on_cancel(self):
                 self.update_boq_and_project()
 
-        '''
-        def update_balances(self, flag='get'):
-                # refresh the balance details if BOQ balances are changed due to MB entries/direct invoices
+        def validate_boq_item(self):
                 for i in self.boq_item:
-                        if i.boq_item_name:
-                                balance_quantity, balance_rate, balance_amount = frappe.db.get_value("BOQ Item", i.boq_item_name, ["balance_quantity","balance_amount"])
-                                if flag
-        '''
-                        
-        def validate_boq_and_items(self):
-                # validate adjustment date
-                if self.adjustment_date  < self.boq_date:
-                        frappe.throw(_("Adjustment Date cannot be earlier to BOQ Date"),title="Invalid Data")
-                elif self.adjustment_date > today():
-                        frappe.throw(_("Adjustment Date cannot be a future date"),title="Invalid Data")
-
-                # do not allow adjustment if there is any adjustment already done on later date
-                for t in frappe.get_all("BOQ Adjustment", ["name","adjustment_date"], {"boq": self.boq, "name": ("!=",self.name), "adjustment_date": (">",self.adjustment_date), "docstatus":("<",2)}):
-                        msg = '<b>Reference# : <a href="#Form/BOQ Adjustment/{0}">{0}</a>, Dated: {1}</b>'.format(t.name,t.adjustment_date)
-                        frappe.throw(_("Backdating not permitted as there is an adjustment already exists <br>{0}").format(msg),title="Not permitted")
-
-                # validate items
-                for i in self.boq_item:
-                        # create new items if any under BOQ
                         if not i.boq_item_name:
                                 frappe.throw(_("Row#{0} : Adding new items not permitted.").format(i.idx), title="Not permitted")
-                                pass
-                                
-                                
                                 
                         if i.is_group:
                                 if flt(i.adjustment_quantity) or flt(i.adjustment_amount):

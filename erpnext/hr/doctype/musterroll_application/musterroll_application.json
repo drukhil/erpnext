@@ -574,7 +574,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2020-07-29 10:08:21.389909", 
+ "modified": "2022-05-25 17:51:19.283979", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "MusterRoll Application", 
@@ -583,7 +583,7 @@
  "permissions": [
   {
    "amend": 0, 
-   "apply_user_permissions": 0, 
+   "apply_user_permissions": 1, 
    "cancel": 0, 
    "create": 1, 
    "delete": 0, 
@@ -599,6 +599,7 @@
    "set_user_permissions": 0, 
    "share": 1, 
    "submit": 1, 
+   "user_permission_doctypes": "[\"Branch\"]", 
    "write": 1
   }, 
   {
@@ -676,7 +677,7 @@
    "print": 1, 
    "read": 1, 
    "report": 1, 
-   "role": "Projects GM", 
+   "role": "Projects CTM", 
    "set_user_permissions": 0, 
    "share": 1, 
    "submit": 0, 
@@ -704,7 +705,7 @@
   }, 
   {
    "amend": 0, 
-   "apply_user_permissions": 0, 
+   "apply_user_permissions": 1, 
    "cancel": 0, 
    "create": 0, 
    "delete": 0, 
@@ -720,6 +721,7 @@
    "set_user_permissions": 0, 
    "share": 1, 
    "submit": 0, 
+   "user_permission_doctypes": "[\"Branch\"]", 
    "write": 0
   }, 
   {
@@ -850,8 +852,8 @@
   {
    "amend": 1, 
    "apply_user_permissions": 1, 
-   "cancel": 1, 
-   "create": 1, 
+   "cancel": 0, 
+   "create": 0, 
    "delete": 0, 
    "email": 1, 
    "export": 1, 
@@ -861,10 +863,10 @@
    "print": 1, 
    "read": 1, 
    "report": 1, 
-   "role": "Projects GM", 
+   "role": "Projects CTM", 
    "set_user_permissions": 0, 
    "share": 1, 
-   "submit": 1, 
+   "submit": 0, 
    "user_permission_doctypes": "[\"Branch\"]", 
    "write": 1
   }

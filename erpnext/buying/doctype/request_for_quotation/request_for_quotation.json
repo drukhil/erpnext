@@ -640,8 +640,8 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2020-07-15 14:35:18.881227", 
- "modified_by": "ucdorji@gyalsunginfra.bt", 
+ "modified": "2020-12-18 21:32:32.785096", 
+ "modified_by": "Administrator", 
  "module": "Buying", 
  "name": "Request for Quotation", 
  "name_case": "", 
@@ -779,6 +779,6 @@
  "sort_order": "DESC", 
  "timeline_field": "", 
  "title_field": "", 
- "track_changes": 0, 
- "track_seen": 0
+ "track_changes": 1, 
+ "track_seen": 1
 }

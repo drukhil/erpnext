@@ -78,10 +78,10 @@ frappe.ui.form.on("Timesheet", {
 					"icon-file-alt");
 			}
 
-			if(!frm.doc.salary_slip && frm.doc.employee){
+			/*if(!frm.doc.salary_slip && frm.doc.employee){
 				frm.add_custom_button(__("Make Salary Slip"), function() { frm.trigger("make_salary_slip") },
 					"icon-file-alt");
-			}
+			} */
 		}
 
 		// ++++++++++++++++++++ Ver 1.0 BEGINS ++++++++++++++++++++

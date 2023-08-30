@@ -58,11 +58,11 @@ frappe.query_reports["Accounts Receivable"] = {
 			"fieldtype": "Int",
 			"default": "90",
 			"reqd": 1
-		},
-		{
-			"fieldname":"inter_company_customer",
-			"label": __("DHI Inter Company?"),
-			"fieldtype": "Check",
 		}
+		//{
+		//	"fieldname":"inter_company_customer",
+		//	"label": __("DHI Inter Company?"),
+		//	"fieldtype": "Check",
+		//}
 	]
 }

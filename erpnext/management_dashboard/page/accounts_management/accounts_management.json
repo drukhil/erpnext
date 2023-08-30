@@ -1,0 +1,30 @@
+{
+ "content": null, 
+ "creation": "2021-08-05 14:30:15.084456", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2022-05-23 16:56:42.562309", 
+ "modified_by": "Administrator", 
+ "module": "Management Dashboard", 
+ "name": "accounts-management", 
+ "owner": "Administrator", 
+ "page_name": "Accounts Management", 
+ "roles": [
+  {
+   "role": "Administrator"
+  }, 
+  {
+   "role": "Management"
+  }, 
+  {
+   "role": "Accounts Manager"
+  }, 
+  {
+   "role": "Purchase Manager"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null
+}

@@ -1,6 +1,5 @@
 {
- "creation": "2021-02-19 12:02:28.583605", 
- "css": ".test {\n\theight:90px\n\n}", 
+ "creation": "2021-02-25 21:22:52.841139", 
  "custom_format": 1, 
  "disabled": 0, 
  "doc_type": "Issue List", 
@@ -9,11 +8,11 @@
  "font": "Default", 
  "html": "<div class=\"page-break\">\n    <div id=\"header-html\" class=\"hidden-pdf\">\n    {%- if letter_head and not no_letterhead -%}\n        <div class=\"letter-head\">\n            {{ letter_head }}\n        </div>\n    {%- endif -%}\n</div>\n\n<div id=\"footer-html\" class=\"visible-pdf\">\n    {% if not no_letterhead and footer %}\n        <div class=\"letter-head-footer\">\n        {{ footer }}\n        </div>\n    {% endif %}\n\n    <p class=\"text-center small page-number visible-pdf\">\n        {{ _(\"Page {0} of {1}\").format('<span class=\"page\"></span>', '<span class=\"topage\"></span>') }}\n    </p>\n</div>\n<div class=\"print-heading\">\n<div  style=\"text-align: center;\">\n\t<h3>{{ doc.type}} </h3>\n<h5><u>\n{{doc.branch}}\n</u></h5>\n</div>\n\n<br/>\n<table class = \"table1\" style=\"margin-top: 1px; text-align:justify;font-size:small; width:100% \">\n<tr>\n<td><strong>Title:</strong></td>\n<td>{{ doc.issue_name }}</td>\n<td><strong>Module:</strong></td>\n<td>{{doc.module}}</td>\n</tr>\n<tr>\n\n<td><strong>Posting Date:</strong></td>\n<td>{{ frappe.utils.formatdate(doc.posting_date) }}</td>\n</tr>\n<tr>\n</table>\n\n<div class=\"row section-break\" style=\"margin-top: 20px;\">\n\t\t<div class=\"col-xs-12 column-break\" style=\"text-align: left;\"><b> Detailed information about the new feature to be developed. </b> <br>{{doc.issue_details}}\n</div>\n</div>\n<div class=\"row section-break\" style=\"margin-top: 60px;\">\n\t\t<div class=\"col-xs-12 column-break\" style=\"text-align: left;\">Requested By: <b> </br>\t</br>\t\t \n                {{doc.requested_by_name}} ( {{doc.requested_by}}) </br>\n\t\t{{ doc.requestedby_designation }} </br>\n\t\t{{doc.branch}} \n</div>\n</div>\n\n<div class=\"row section-break\" style=\"margin-top: 40px;\">\n\t\t<div class=\"col-xs-12 column-break\" style=\"text-align: left;\">\n <table class=\"table table-bordered\" style=\"margin-top: 20px; font-size: small\">\n  <thead>\n        <tr>   \n\t<th style=\"text-align: center;\" colspan=\"12\" ;>Recommended: YES/NO (Tick: Recommendation shall be made by the individual Module CTM.)</th>\n        </tr>\n  </thead>\n        \n<tbody>\n<tr class = 'test'> <td style=\"width: 30%;\">  Sign & Remarks By CTM</td> <td> </td> </tr>\t\t\t\t\t\t\t\n<tr class = 'test'> <td style=\"width: 30%;\"> Sign & Developer's Note</td> <td> </td></tr>\n<tr class = 'test'> <td style= width: 30%> Sign & Remarks(Remarks by GM, PAD)</td> <td></td></tr>\n</tbody>\n</table>\n</div>\n<div class=\"printedby\">This print is system generated and should be considered VALID only with appropriate seal and/or signature. <br>  Printed by {{ frappe.user }} on {{ frappe.utils.nowdate()  }} at {{ frappe.utils.nowtime() }}</div>", 
  "idx": 0, 
- "modified": "2021-02-24 15:28:30.055096", 
+ "modified": "2021-02-25 21:22:52.841139", 
  "modified_by": "Administrator", 
  "name": "New Ticket", 
  "owner": "Administrator", 
- "print_format_builder": 1, 
+ "print_format_builder": 0, 
  "print_format_type": "Server", 
  "standard": "Yes"
 }

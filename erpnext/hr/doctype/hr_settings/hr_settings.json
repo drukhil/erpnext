@@ -390,9 +390,8 @@
   }, 
   {
    "allow_on_submit": 0, 
-   "bold": 1, 
+   "bold": 0, 
    "collapsible": 0, 
-   "description": "<b> Settings for OAP Gratuity </b>", 
    "fieldname": "oap_settings", 
    "fieldtype": "Section Break", 
    "hidden": 0, 
@@ -416,7 +415,7 @@
   }, 
   {
    "allow_on_submit": 0, 
-   "bold": 0, 
+   "bold": 1, 
    "collapsible": 0, 
    "fieldname": "gratuity_percent", 
    "fieldtype": "Int", 
@@ -680,7 +679,7 @@
  "issingle": 1, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2020-12-29 13:25:30.837422", 
+ "modified": "2020-12-30 17:11:52.254711", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "HR Settings", 

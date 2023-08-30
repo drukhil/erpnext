@@ -48,6 +48,7 @@ class DelayFactor(Document):
 		#	project.expected_end_date = max_date
 		#project.task_dates()
 		#project.make_target_entries()
+		project.expected_end_date = add_days(project.expected_end_date, self.no_of_days)
 		project.validate()
 
 @frappe.whitelist()

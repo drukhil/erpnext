@@ -1,0 +1,36 @@
+{
+ "content": null, 
+ "creation": "2021-08-04 15:53:10.255662", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2022-05-26 12:07:46.200549", 
+ "modified_by": "Administrator", 
+ "module": "Management Dashboard", 
+ "name": "project-management", 
+ "owner": "Administrator", 
+ "page_name": "Project Management", 
+ "roles": [
+  {
+   "role": "Administrator"
+  }, 
+  {
+   "role": "Management"
+  }, 
+  {
+   "role": "Projects User"
+  }, 
+  {
+   "role": "Employee"
+  }, 
+  {
+   "role": "Projects CTM"
+  }, 
+  {
+   "role": "Projects Readonly"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null
+}

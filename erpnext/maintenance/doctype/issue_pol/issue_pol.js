@@ -98,7 +98,7 @@ frappe.ui.form.on("Issue POL", "refresh", function(frm) {
                 }
         }
 
-	frm.fields_dict['items'].grid.get_field('equipment').get_query = function(doc, cdt, cdn) {
+	/*frm.fields_dict['items'].grid.get_field('equipment').get_query = function(doc, cdt, cdn) {
 		doc = locals[cdt][cdn]
                 if(frm.doc.purpose == "Transfer") {
                         return {
@@ -114,7 +114,7 @@ frappe.ui.form.on("Issue POL", "refresh", function(frm) {
                                 }
                         }
                 }
-	}
+	}*/
 })
 
 frappe.ui.form.on("POL Issue Report Item", "equipment", function(doc, cdt, cdn) {

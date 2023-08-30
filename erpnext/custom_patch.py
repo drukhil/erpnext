@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 import frappe
-from frappe import _, scrub
+from frappe import _
 from frappe.model.document import Document
 from frappe import msgprint
 from frappe.utils import rounded, flt, cint, now, nowdate, getdate, get_datetime,now_datetime
@@ -13,154 +13,545 @@ from erpnext.accounts.utils import make_asset_transfer_gl
 from datetime import datetime
 import os
 import subprocess
+from erpnext.accounts.doctype.imprest_receipt.imprest_receipt import get_opening_balance, update_dependencies
 
-from erpnext.hr.doctype.travel_authorization.travel_authorization import TravelAuthorization
-#from erpnext.hr.doctype.travel_authorization.travel_authorization import validate_advance 
+def update_mr_cc():
+        li = []
+        count = 0
+        neg = 0
+        for a in frappe.db.sql(""" select name, branch from `tabMaterial Request` """, as_dict = 1):
+                cc  = frappe.db.sql(""" select name from `tabCost Center` where branch = "{0}" """.format(a.branch), as_dict = 1)
+                if cc:
+                        frappe.db.sql(""" update `tabMaterial Request` set cost_center = "{0}" where name = "{1}" 
+                                """.format(cc[0].name, a.name))
+                        count += 1
+                        print count, "updating {0}".format(a.name)
+                else:
+                        li.append(a.branch)
+                        neg += 1
+        print neg, "cost center not found {0}".format(li)
 
-def delete_pro():
-	for a in frappe.db.sql(""" select name, idx from `tabActivity Tasks`""", as_dict = 1):
-		task_group = '{0}{1}'.format(a.name, a.idx)
-		frappe.db.sql(""" update `tabActivity Tasks` set task_group = '{0}' where name = "{0}" """.format(task_group, a.name))
-		print "updated"
+def update_po_cc():
+        li = []
+        count = 0
+        neg = 0
+        for a in frappe.db.sql(""" select name, branch from `tabPurchase Order` """, as_dict = 1):
+                cc  = frappe.db.sql(""" select name from `tabCost Center` where branch = "{0}" """.format(a.branch), as_dict = 1)
+                if cc:
+                        frappe.db.sql(""" update `tabPurchase Order` set cost_center = "{0}" where name = "{1}" """.format(cc[0].name, a.name))
+                        count += 1
+                        print count, "updating {0}".format(a.name)
+                else:
+                        li.append(a.branch)
+                        neg += 1
+        print neg, "cost center not found {0}".format(li)
+
+def update_cus():
+	count = 0
+        for a in frappe.db.sql(""" select name, issued_to from `tabAsset` """, as_dict = 1):
+		if a.issued_to not in ('GYAL20441'):
+			issued_to = frappe.get_doc("Employee", a.issued_to).employee_name
+			frappe.db.sql(""" update `tabAsset` set employee_name  = "{0}" where name = '{1}'""".format(issued_to, a.name))
+			count += 1
+			print count, a.name, issued_to
+
+def update_parent_cc():
+	li = frappe.db.sql(""" select branch, name from `tabPurchase Order`""", as_dict =1)
+	for a in li:
+		if a.branch not in ('Commandant Residence (NS-B)'):
+			cc = frappe.get_doc("Cost Center", {'branch': a.branch})
+			parent = cc.parent_cost_center
+			if cc.is_group:
+				parent = cc.name
+			frappe.db.sql(""" update `tabPurchase Order` set parent_cc = '{0}' where name = '{1}'
+			""".format(parent, a.name))
+
+def dash_test():
+	import jwt
+	import time
+
+	METABASE_SITE_URL = "https://erp.ns.bt/metabase"
+	METABASE_SECRET_KEY = "8e8db02d3fdc1c5ae4252b4b9cdc036c9050f7c86659fce6ba043f7bcfe833d4"
+
+	payload = {
+	  "resource": {"dashboard": 10},
+	  "params": {
+	    
+	  }
+	}
+	token = jwt.encode(payload, METABASE_SECRET_KEY, algorithm="HS256")
+
+	iframeUrl = METABASE_SITE_URL + "/embed/dashboard/" + token + "#theme=night&bordered=true&titled=true"
+	print(iframeUrl)
+
+
+def update_aa():
+	for a in frappe.db.sql(""" select name from `tabSalary Slip` where employment_type = 'GCE' and fiscal_year = '2021' and month = '05'""", as_dict = 1):
+		frappe.db.sql(""" delete from `tabSalary Detail` where parent = '{0}'""".format(a.name))
+		print a.name
+
+def update_impp():
+	for a in frappe.db.sql(""" select name from `tabImprest Recoup` where name = 'IMPP2023000120'""", as_dict =1):
+		doc = frappe.get_doc("Imprest Recoup", a.name)
+		#doc.post_receipt_entry()
+		#update_dependencies(doc.branch, doc.imprest_type, doc.entry_date)
+                #doc.post_gl_entry()
+                #doc.consume_budget()
+		doc.make_gl_entry()
+		frappe.db.commit()
+		print a.name
+
+def update_tc():
+	for a in frappe.db.sql(""" select name from `tabTravel Claim` where name = 'TC201100055'""", as_dict =1):
+		doc = frappe.get_doc("Travel Claim", a.name)
+		doc.post_journal_entry()
+		frappe.db.commit()
+		print "Journal  is submitted"
+
+def update_iip():
+	for a in frappe.db.sql(""" select name, equipment from `tabPOL` where equipment = 'EQUIP210016'""", as_dict =1):
+		doc = frappe.get_doc("POL", a,name)
+		eq = frappe.get_doc("Equipment", a.equipment)
+		frappe.db.sql(""" update `tabPOL` set equipment_number '{0}' , equipment_type = '{1}', 
+			fuel_book = '{2}', equipment_category = '{2}' where name = '{3}'
+		""".format(eq.equipment_number, eq.equipment_type, eq.fuelbook, eq.equipment_category, a.name)) 
+def update_iipol():
+	count = 1
+	for a in frappe.db.sql(""" select name from `tabIssue POL` where branch = 'GA-Khotokha' and pol_type = '100167' 
+			and docstatus = 1""", as_dict = 1):
+		dat = frappe.db.sql(""" select name from `tabPOL Entry` where branch = 'GA-Khotokha' and 
+			pol_type = '100167' and type = 'Issue' and reference_type = 'Issue POL' 
+			and docstatus = 1 and reference_name = '{0}'""".format(a.name, as_dict = 1))
+		if not dat:
+			doc = frappe.get_doc("Issue POL", a.name)
+			con = frappe.new_doc("POL Entry")
+			con.flags.ignore_permissions = 1
+			con.equipment = doc.tanker
+			con.pol_type = doc.pol_type
+			con.branch = doc.branch
+			con.date = doc.posting_date
+			con.posting_time = doc.posting_time
+			con.qty = doc.total_quantity
+			con.reference_type = "Issue POL"
+			con.reference_name = doc.name
+			con.type = "Issue"
+			con.is_opening = 0
+			con.submit()
+			count += 1
+			print count
 
 def update_project_entry():
-	#for a in frappe.db.sql(""" select name from `tabTarget Entry Sheet`""", as_dict = 1):
-	for a in frappe.db.sql(""" select name from `tabAchievement Entry Sheet`""", as_dict = 1):
-		#doc = frappe.get_doc("Target Entry Sheet", a.name)
-		doc = frappe.get_doc("Achievement Entry Sheet", a.name)
-		print a.name
-		doc.save()
-	
-def update_project_group():
-	for a in frappe.db.sql(""" select name from `tabProject` where name = "Dy. Commandant Residence (NS-B) - GYALSUNG" """, as_dict = 1):
+        #for a in frappe.db.sql(""" select name from `tabTarget Entry Sheet`""", as_dict = 1):
+        for a in frappe.db.sql(""" select name from `tabAchievement Entry Sheet`""", as_dict = 1):
+                #doc = frappe.get_doc("Target Entry Sheet", a.name)
+                doc = frappe.get_doc("Achievement Entry Sheet", a.name)
+                print a.name
+                doc.save()
+
+def update_operator():
+	doc = frappe.get_doc("Muster Roll Employee", '12003000958')
+	row = doc.append ("internal_work_history",{})
+	row.branch  = "GA-Pemathang"
+	row.cost_center = "GA-Pemathang - GYALSUNG"
+	row.from_date = '2020-03-01'
+	row.save()
+
+def update_ot():
+        count = 0
+        for a in frappe.db.sql(""" select name from `tabProcess Overtime Payment`""", as_dict = 1):
+                doc = frappe.get_doc("Process Overtime Payment", a.name)
+                ot_account = frappe.db.get_single_value("HR Accounts Settings", "overtime_account")
+                frappe.db.sql(""" update `tabProcess Overtime Payment` set ot_account = '{0}' where name = '{1}'""".format(ot_account, doc.name))
+                print a.name, count
+		
+def update_pro():
+        for a in frappe.db.sql(""" select name, physical_progress_weightage from `tabProject` where is_group = 1""", as_dict = 1):
+                frappe.db.sql(""" update `tabProject` set parent_weightage = {0} where parent_project = "{1}" """.format(a.physical_progress_weightage, a.name))
+                print a.name
+
+
+def validate_proj():
+	count = 0
+	for a in frappe.db.sql(""" select name from `tabProject`""", as_dict = 1):
 		doc = frappe.get_doc("Project", a.name)
-		doc.make_group()
-                doc.make_tsk_group()
-		print "yes", doc.name
+		count += 1
+		doc.save()
+		print count, a.name
 
 def update_la():
-	count = 0
-	for a in frappe.db.sql(""" select name, employee from `tabLeave Allocation` where docstatus = 1""", as_dict = 1):
-		emp = frappe.get_doc("Employee", a.employee).employment_type
-		frappe.db.sql(""" update `tabLeave Allocation` set employee_type = '{0}' where name = '{1}'""".format(emp, a.name))
-		count += 1 
-		print a.name, count
+        count = 0
+        for a in frappe.db.sql(""" select name, employee from `tabLeave Allocation` where docstatus = 1""", as_dict = 1):
+                emp = frappe.get_doc("Employee", a.employee).employment_type
+                frappe.db.sql(""" update `tabLeave Allocation` set employee_type = '{0}' where name = '{1}'""".format(emp, a.name))
+                count += 1
+                print a.name, count
 
-def update_pro():
-	for a in frappe.db.sql(""" select name, physical_progress_weightage from `tabProject` where is_group = 1""", as_dict = 1):
-		frappe.db.sql(""" update `tabProject` set parent_weightage = {0} where parent_project = "{1}" """.format(a.physical_progress_weightage, a.name))
+def update_ipol():
+	import csv
+        with open('/home/frappe/erp/ipol.csv','r') as f:
+                data = csv.reader(f)
+                count = 1
+                for row in data:
+			dat = frappe.db.sql(""" select name from `tabPOL Entry` where branch = 'GA-Jamtsholing' and 
+				pol_type = '100167' and type = 'Issue' and reference_type = 'Issue POL' 
+				and docstatus = 1 and reference_name = '{0}'""".format(row[0], as_dict = 1))
+			if not dat:
+				doc = frappe.get_doc("Issue POL", row[0])
+				con = frappe.new_doc("POL Entry")
+				con.flags.ignore_permissions = 1
+				con.equipment = doc.tanker
+				con.pol_type = doc.pol_type
+				con.branch = doc.branch
+				con.date = doc.posting_date
+				con.posting_time = doc.posting_time
+				con.qty = doc.total_quantity
+				con.reference_type = "Issue POL"
+				con.reference_name = doc.name
+				con.type = "Issue"
+				con.is_opening = 0
+				con.submit()
+				count += 1 
+				print count
+	
+def update_dsa():
+	for a in ("TA210300019", "TA210200042", "TA210200041"):
+		doc = frappe.get_doc("Travel Authorization", a)
+		doc.set_dsa_rate()
+
+def update_la():
+        count = 0
+        for a in frappe.db.sql(""" select name, employee from `tabLeave Allocation` where docstatus = 1""", as_dict = 1):
+                emp = frappe.get_doc("Employee", a.employee).employment_type
+                frappe.db.sql(""" update `tabLeave Allocation` set employee_type = '{0}' where name = '{1}'""".format(emp, a.name))
+                count += 1
+                print a.name, count
+
+
+def update_budget_tot():
+	count = 1
+	for a in frappe.db.sql(""" select name from `tabBudget` where actual_total = '' and docstatus = 1""", as_dict = 1):
+		doc = frappe.get_doc("Budget", a.name)
+		doc.validate()
+		doc.submit()
+		count += 1
+		print count, a.name
+
+def update_project():
+	for a in frappe.db.sql(""" select name from `tabProject` """, as_dict = 1, debug = 1):
+		doc = frappe.get_doc("Project", a.name)
+		doc.save()
+		doc.submit()
 		print a.name
 
-def update_mrr():
-	for a in frappe.db.sql(""" select name from `tabMuster Roll Employee`""", as_dict = 1):
-		rate = frappe.db.sql(""" select rate_per_day from `tabMusterroll` where parent = '{0}' and docstatus <= 1 order by from_date desc limit 1""".format(a.name), as_dict = 1)
-		doc = frappe.get_doc("Muster Roll Employee", a.name)
-		doc.db_set("rate_per_day", rate[0].rate_per_day)
-		print doc.name
+'''def update_progress():
+	count = 1
+	for a in frappe.db.sql(""" select name, physical_progress_weightage from `tabProject` where is_group = 1""", as_dict = 1):
+		frappe.db.sql(""" update `tabProject` set parent_weightage = {0} where name = '{1}'
+		""".format(a.physical_progress_weightage, a.name))
+		count += 1 
+		print count, a.name
+'''
+def add_comment():
+	count = 0
+	for a in frappe.db.sql(""" select name from `tabLeave Allocation` b where b.from_date = '2021-01-01' and b.to_date = '2021-12-31' and b.leave_type = 'Earned Leave' and b.docstatus = 2""", as_dict = 1):
+		doc = frappe.get_doc("Leave Allocation", a.name)
+		doc.add_comment('Comment', text='Cancelled the Allocation as the system is configured to allocate el on monthly basis')
+		count+=1 
+		print count, doc.name
 
+
+def update_musterroll2():
+	for a in frappe.db.sql(" select name, cost_center, payment_jv, month, fiscal_year, employee_type from `tabProcess MR Payment` where fiscal_year = '2021' and month = 'Jan'", as_dict = 1):
+		
+		frappe.db.sql(""" update `tabProcess MR Payment` set docstatus = 0 where name = '{0}'""".format(a.name))
+		frappe.db.sql(""" update `tabMR Payment Item` set docstatus = 0 where parent = '{0}'""".format(a.name))
+		if a.payment_jv:
+			frappe.db.sql(""" delete from `tabJournal Entry` where name = '{0}'""".format(a.payment_jv))
+		doc = frappe.get_doc("Process MR Payment", a.name)
+		doc.save()
+		print  a.name, a.cost_center, a.payment_jv, a.month, a.fiscal_year, a.employee_type
+
+def update_musterroll1():
+	count = 1
+	for a in frappe.db.sql(" select parent, rate_per_day, rate_per_hour from `tabMusterroll` order by parent, from_date asc", as_dict = 1):
+		doc = frappe.get_doc("Muster Roll Employee", a.parent)
+		if doc.status == 'Active':
+			doc.db_set("project", '')
+			doc.db_set("rate_per_day", a.rate_per_day)
+			doc.db_set("rate_per_hour", flt(a.rate_per_day)/8)
+			count += 1
+			#doc.save()
+			print count, doc.name, a.parent, a.rate_per_day, a.rate_per_hour
+
+def travel_advance():
+	doc = frappe.get_doc("Travel Authorization", 'TA201200016-2')
+	doc.check_advance()
+	print doc.name
+
+def update_mrr():
+        for a in frappe.db.sql(""" select name from `tabMuster Roll Employee`""", as_dict = 1):
+                rate = frappe.db.sql(""" select rate_per_day from `tabMusterroll` where parent = '{0}' and docstatus <= 1 order by from_date desc limit 1""".format(a.name), as_dict = 1)
+                doc = frappe.get_doc("Muster Roll Employee", a.name)
+                doc.db_set("rate_per_day", rate[0].rate_per_day)
+                print doc.name
+
+def cancel_ipol():
+	count = 0
+	for a in frappe.db.sql(""" select name from `tabIssue POL` where cost_center in ('Jamtsholing - GYALSUNG', 'GA-Jamtsholing - GYALSUNG') and docstatus <= 1 order by posting_date desc""", as_dict =1):
+		doc = frappe.get_doc("Issue POL", a.name)
+		doc.db_set("docstatus", 2)
+		count += 1
+		doc.add_comment('Comment', text='Cancelled As there is issue while cancelling from Fleet Manager/DPM account') 
+		print a.name, count
+
+def update_ipol_branch():
+	count = 0
+	for a in frappe.db.sql(""" select equipment, name from `tabPOL Issue Report Item`""", as_dict = 1):
+		doc = frappe.get_doc("Equipment", a.equipment).branch
+		frappe.db.sql(""" update `tabPOL Issue Report Item` set equipment_branch = '{0}' where name = '{1}'""".format(doc, a.name))
+		count += 1 
+		print a.name , count
+
+
+def update_pol_branch():
+	count = 0
+	for a in frappe.db.sql(""" select name, equipment from `tabPOL`""", as_dict = 1):
+		eq = frappe.get_doc("Equipment", a.equipment).branch
+		frappe.db.sql(""" update `tabPOL` set equipment_branch = '{0}' where name = '{1}'""".format(eq, a.name))
+		count +=1 
+		print a.name, count
+		
+		
+
+def update_asset_details():
+	count = 0
+	for a in frappe.db.sql(" select name, issued_to from `tabAsset Issue Details`", as_dict = 1):
+		emp = frappe.get_doc("Employee", a.issued_to).employee_name
+		frappe.db.sql(""" update `tabAsset Issue Details` set issued_to_name = "{0}" where name = '{1}'""".format(emp, a.name), debug = 1)
+		count += 1
+		print a.name, count
+
+def ipol():
+	doc = frappe.get_doc("Issue POL", 'IPOL230700228')
+	doc.submit()
+	print doc.name
+
+def submit_imprest():
+	doc = frappe.get_doc("Imprest Recoup", 'IMPP2023000167')
+	doc.submit()
+	print doc.name
+
+def ipol1():
+	import csv
+        with open('/home/frappe/erp/ipol.csv','r') as f:
+                data = csv.reader(f)
+                count = 1
+                for row in data:
+			doc = frappe.get_doc("Issue POL", row[0])
+			doc.submit()
+			#doc.cancel()
+			print doc.name
+
+def rpol():
+	pol = ["POL230700358"]
+	for a in pol:
+		doc = frappe.get_doc("POL", a)
+		doc.submit()
+		print (a)
+
+def ss():
+	ss = ["GYAL22111/SSL/202203/00019"]
+	for a in ss:
+		doc = frappe.get_doc("Salary Slip", a)
+		doc.save()
+		print (a)
+
+def submit_se():
+	doc = frappe.get_doc("Stock Entry", "SEMI23064657")
+	doc.submit()
+	print doc.name
+
+def submit_ca():
+	doc = frappe.get_doc("Cost Appropriation", "CA2023000053")
+	doc.submit()
+	frappe.db.commit()
+	print (doc.name)
+
+def cancel_se():
+	doc = frappe.get_doc("Stock Entry", "SEMI23075690")
+	doc.cancel()
+	frappe.db.commit()
+	print (doc.name)
+
+def submit_je():
+	doc = frappe.get_doc("Journal Entry", "JEJV230800417")
+	doc.submit()
+	frappe.db.commit()
+	print (doc.name)
+
+def cancel_je():
+	doc = frappe.get_doc("Journal Entry", "JEBP230700130")
+	doc.cancel()
+	frappe.db.commit()
+	print (doc.name)
+
+def submit_pr():
+	doc = frappe.get_doc("Purchase Receipt", "PRSM22050115")
+	doc.cancel()
+	print doc.name
+
+def save_sm():
+	doc = frappe.get_doc("Supplier Monitoring", "SMT220001")
+	doc.save()
+	print doc.name
+
+def cancel_pi():
+	doc = frappe.get_doc("Purchase Invoice", "PISM23080222")
+	doc.cancel()
+	frappe.db.commit()
+	print(doc.name)
+
+def cancel_exp_allocation():
+	doc = frappe.get_doc("Expense Allocation", "EA2023000444")
+	doc.cancel()
+	frappe.db.commit()
+	print(doc.name)
+
+def submit_la():
+	doc = frappe.get_doc("Leave Application", "LAP221200224")
+	doc.submit()
+	print doc.name
+
+def email_test():
+	recipients = 'jairajrai@gyalsunginfra.bt'
+	subject = "testing"
+	doc = frappe.get_doc("Material Request", 'MRMR20120018')
+	message = """Dear Sir/Madam, <br>  {0} has requested you to verify the Material Request <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(frappe.get_desk_link("Material Request", doc.name)))
+	frappe.sendmail(recipients=recipients, sender=None, subject=subject, message=message)
+	print "message sent"
+
+def update_requested_by():
+	count = 0
+	for a in frappe.db.sql(""" select name, owner from `tabMaterial Request`""", as_dict = 1):
+		user = frappe.get_doc("Employee", {'user_id': a.owner})
+		frappe.db.sql(""" update `tabMaterial Request` set requested_by = "{0}({1})" where owner = '{2}' and name = '{3}'
+				""".format(user.employee_name, user.designation, a.owner, a.name), debug = 1)
+		count += 1
+		print a.name, count
+
+	
 
 def update_ot_acc():
-	for b in frappe.db.sql(" select name, branch from `tabProcess Overtime Payment`", as_dict =1):
-		expense_bank_account = frappe.get_doc("Branch", b.branch).expense_bank_account
-		frappe.db.sql(" update `tabProcess Overtime Payment` set expense_bank_account = '{0}' where name = '{1}'".format(expense_bank_account, b.name))
+	count = 0
+        for b in frappe.db.sql(" select name, branch from `tabProcess Overtime Payment`", as_dict =1):
+                expense_bank_account = frappe.get_doc("Branch", b.branch).expense_bank_account
+                frappe.db.sql(" update `tabProcess Overtime Payment` set expense_bank_account = '{0}' where name = '{1}'".format(expense_bank_account, b.name))
 
+	count += 1 
+	print b.name, count
 
 def update_ot_cc():
-	for b in frappe.db.sql(" select name, employee, branch from `tabOvertime Application` where docstatus = 1", as_dict = 1):
-		doc = frappe.get_doc("Overtime Application", b.name)
-		cc = frappe.get_doc("Cost Center", {'branch': b.branch}).name
-		#cc = frappe.get_doc("Employee", b.employee).bank_name
-		doc.db_set("cost_center", cc)
-		print doc.name, cc
+        for b in frappe.db.sql(" select name, employee, branch from `tabOvertime Application`", as_dict = 1):
+                doc = frappe.get_doc("Overtime Application", b.name)
+                #cc = frappe.get_doc("Cost Center", {'branch': b.branch}).name
+                cc = frappe.get_doc("Employee", b.employee).bank_name
+                doc.db_set("bank_name", cc)
+                print doc.name, cc
+
+def update_dfg_housing():
+	count = 0
+	for a in frappe.db.sql("select name from `tabDFG Housing`", as_dict = 1):
+		doc = frappe.get_doc("DFG Housing", a.name)
+		doc.on_update_after_submit()
+		count += 1
+
+		print a.name, count
 
 
 def update_tds():
-	count = 0
-	for a in frappe.db.sql("""
-		select name, account from `tabTDS Remittance` where docstatus = 1""", as_dict = 1):
-		branch = frappe.db.get_value("Branch", {'expense_bank_account': a.account}, "name")
-		cost_center = frappe.get_doc("Cost Center", {'branch': branch}).name
-		gl = frappe.db.sql(""" select name from `tabGL Entry` where voucher_type = 'TDS Remittance' and voucher_no = '{0}'
-		""".format(a.name), as_dict = 1)
-		for b in gl:
-			frappe.db.sql(""" update `tabGL Entry` set cost_center = '{0}' where name = '{1}' and voucher_type = 'TDS Remittance' and voucher_no = '{2}'""".format(cost_center, b.name, a.name))
+        count = 0
+        for a in frappe.db.sql("""
+                select name, account from `tabTDS Remittance` where docstatus = 1""", as_dict = 1):
+                branch = frappe.db.get_value("Branch", {'expense_bank_account': a.account}, "name")
+                cost_center = frappe.get_doc("Cost Center", {'branch': branch}).name
+                gl = frappe.db.sql(""" select name from `tabGL Entry` where voucher_type = 'TDS Remittance' and voucher_no = '{0}'
+                """.format(a.name), as_dict = 1)
+                for b in gl:
+                        frappe.db.sql(""" update `tabGL Entry` set cost_center = '{0}' where name = '{1}' and voucher_type = 'TDS Remittance' and voucher_no = '{2}'""".format(cost_center, b.name, a.name))
+                
 		count += 1
-	print count, a.name
-
+        	print count, a.name
 
 def upload_att():
         import csv
         with open('/home/frappe/erp/att1.csv','r')as f:
                 data = csv.reader(f)
-		count = 1
+                count = 1
                 for row in data:
-                	doc = frappe.new_doc("Attendance")
-                	doc.branch = 'NS-Head Office'
-                	doc.company = 'GYALSUNG INFRA'
-                	doc.employee = row[0]
-                	doc.employee_name = row[1]
-                	doc.status = row[3]
-                	doc.att_date = row[2]
-                	doc.save()
-                	doc.submit()
-			count += 1
-                	print count, doc.name	
+                        doc = frappe.new_doc("Attendance")
+                        doc.branch = 'NS-Head Office'
+                        doc.company = 'GYALSUNG INFRA'
+                        doc.employee = row[0]
+                        doc.employee_name = row[1]
+                        doc.status = row[3]
+                        doc.att_date = row[2]
+                        doc.save()
+                        doc.submit()
+                        count += 1
+                        print count, doc.name, doc.att_date
+
+def update_cc():
+	for a in frappe.db.sql("select name from `tabCost Center` where modified >= '2020-10-23'", as_dict = 1):
+		activity_code = a.name[0:4] + '0'
+		activity_sub_code = a.name[0:5]
+		
+		frappe.db.sql(""" update `tabCost Center` set activity_code = '{0}', activity_sub_code = '{1}' where name = '{2}'
+			""".format(activity_code, activity_sub_code, a.name))
+		print type(activity_code), activity_code, activity_sub_code, a.name
 
 def update_pe():
-	for b in frappe.db.sql("""
-		select pe.name from `tabPayment Entry` pe, `tabPayment Entry Deduction` ped where ped.parent = pe.name and pe.docstatus = 1""", as_dict = 1):	                
-		doc = frappe.get_doc("Payment Entry", b.name)
-		loss_and_gain = sum([flt(d.amount) for d in doc.get("deductions")])
-		frappe.db.sql("""
-			update `tabPayment Entry` set loss_and_gain = {0} where name = '{1}'""".format(loss_and_gain, b.name))
-		print b.name
+        for b in frappe.db.sql("""
+                select pe.name from `tabPayment Entry` pe, `tabPayment Entry Deduction` ped where ped.parent = pe.name and pe.docstatus = 1""", as_dict = 1):
+                doc = frappe.get_doc("Payment Entry", b.name)
+                loss_and_gain = sum([flt(d.amount) for d in doc.get("deductions")])
+                frappe.db.sql("""
+                        update `tabPayment Entry` set loss_and_gain = {0} where name = '{1}'""".format(loss_and_gain, b.name))
+                print b.name
+
+
+def update_tci():
+	for a in ('TC200800017', 'TC200800022', 'TC200800019', 'TC200800018'):
+		doc = frappe.get_doc("Travel Claim Item", {'parent': a}).name
+		doc.reload()
+
  
-def create_advance_tc():
-	obj = TravelAuthorization
-	obj1 = obj.validate_advance('TA200900005')
-	print dir(obj1)
-
-def same_branch_cc(branch = 'Football Ground (Without Turf) (NS-K)'):
-        parent = frappe.get_doc("Cost Center", {'branch': branch}).parent_cost_center
-        same_branch = frappe.get_list("Cost Center", filters = {'parent_cost_center': parent}, fields = ['name', 'branch'])
-	#same_branch = frappe.get_doc("Cost Center", {"parent" : parent}).branch
-        #same_cc = frappe.get_doc("Cost Center", {"parent" : parent}).name
-	for a in same_branch:
-		print parent, a.name, a.branch
-
-
-def add_vf_role():
-	for em in frappe.db.sql(""" select reports_to from `tabEmployee` where name = 'GYAL20246'  group by reports_to""", as_dict = 1):
-		count = 1
-		user = frappe.get_doc("Employee", em.reports_to).user_id
-	
-		if "Verifier" not in frappe.get_roles(user):
-                        user.add_roles("Verifier")
+def update_branch():
+	count = 0
+	for d in frappe.db.sql(" select name, branch from `tabEmployee` where status = 'Active'", as_dict =1):
+		doc = frappe.get_doc("Employee Internal Work History", {"parent": d.name})
+		frappe.db.sql(" update `tabEmployee Internal Work History` set branch = '{0}' where parent = '{1}'".format(d.branch, d.name))
 		count += 1
-		print count, em.reports_to
+		print count
 
 
-def add_approver_role():
-        for em in frappe.db.sql(""" select second_approver from `tabEmployee` group by second_approver""", as_dict = 1):
-                count = 1
-                user = frappe.get_doc("Employee", em.reports_to).user_id
+def update_cid_ss():
+	count = 0
+        for a in frappe.db.sql("select e.name, e.passport_number from tabEmployee e  where e.name = (select employee from `tabSalary Slip` s where e.name =s.employee)", as_dict=1):
+        	ss =frappe.get_doc("Salary Slip", {"employee" : a.name})
+	        frappe.db.sql("update `tabSalary Slip` set cid = '{0}' where employee = '{1}' and docstatus = 1" .format(a.passport_number, a.name))
+		count += 1
+		print count
 
-                if "Approver" not in user.get("user_roles"):
-                        user.add_roles("Approver")
-                count += 1
-                print count, em.reports_to
-
-	
 def update_emp():
 	count = 0
-	for emp in frappe.db.sql(" select name from `tabEmployee` where name = 'GYAL20083'", as_dict = True):
+	for emp in frappe.db.sql(" select name from `tabEmployee` where employment_type = 'GCE' and status = 'Active'", as_dict = True):
 		sal_doc = frappe.get_doc("Salary Structure", {'employee': emp.name})
-		emp_doc = frappe.get_doc("Employee", emp.name)
-		emp_doc.save()
+		# emp_doc = frappe.get_doc("Employee", emp.name)
+		# emp_doc.save()
 		#frappe.db.sql(" update `tabSalary Structure` set employee = '{0}' where employee = '{0}'".format(emp_doc.name, emp.name))
-		#sal_doc.save()
+		sal_doc.save()
 		count += 1
-		print count, emp.name, emp_doc.name, sal_doc.name
+		print count, sal_doc.name
 
 def save_ss():
 	count = 0
@@ -170,12 +561,22 @@ def save_ss():
 		count += 1
 
 		print ss.name, count
+	
+def update_oap():
+	count = 0
+	for a in frappe.db.sql(" select name from `tabOpen Air Prisoner` where status = 'Active'", as_dict = True):
+		doc = frappe.get_doc("Open Air Prisoner", a.name)
+		doc.save()
+		count += 1
+
+		print a.name, count
 
 
 def update_mr():
-	doc = frappe.get_doc("Process MR Payment", 'MRP200200016')
+	doc = frappe.get_doc("Process MR Payment", 'MRP220600007')
+	doc.submit()
 	print doc.name
-	doc.save(ignore_permissions = True)
+	
 
 
 

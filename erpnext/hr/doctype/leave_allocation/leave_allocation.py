@@ -46,29 +46,22 @@ class LeaveAllocation(Document):
 		
 		self.validate_against_leave_applications()
 
-        ##### Ver 3.0.190212 Begins, following method added by SHIV on 12/02/2019
+	##### Ver 3.0.190212 Begins, following method added by SHIV on 12/02/2019
         def on_cancel(self):
                 self.validate_back_dated_allocation(1)
         ##### Ver 3.0.190212 Ends
-        
+
 	def validate_period(self):
 		if date_diff(self.to_date, self.from_date) <= 0:
 			frappe.throw(_("To date cannot be before from date"))
 
 	def validate_new_leaves_allocated_value(self):
 		"""validate that leave allocation is in multiples of 0.5"""
-		round_of_leave = frappe.db.get_single_value("HR Settings", "round_of_leave")
-		if round_of_leave:
-			self.new_leaves_allocated = round5(self.new_leaves_allocated)
-		
-		balance = flt(self.new_leaves_allocated)
-		if self.carry_forward and round_of_leave:
+		self.new_leaves_allocated = round5(self.new_leaves_allocated)
+		balance = self.new_leaves_allocated
+		if self.carry_forward:
 			balance = round5(self.new_leaves_allocated) + round5(self.carry_forwarded_leaves)
-		else:
-			balance = flt(self.new_leaves_allocated) + flt(self.carry_forwarded_leaves)
-
-		self.total_leaves_allocated = flt(balance)
-
+		self.total_leaves_allocated = round5(balance)
 		#if flt(self.new_leaves_allocated) % 0.5:
 		#	frappe.throw(_("Leaves must be allocated in multiples of 0.5"), ValueMultiplierError)
 
@@ -107,11 +100,10 @@ class LeaveAllocation(Document):
 				.format(msg, future_allocation[0].name), 
 					BackDatedAllocationError)
                         ##### Ver 3.0.190212 Ends
-                        
+
 	def set_total_leaves_allocated(self):
 		self.carry_forwarded_leaves = get_carry_forwarded_leaves(self.employee, 
 			self.leave_type, self.from_date, self.carry_forward)
-
 		self.total_leaves_allocated = flt(self.carry_forwarded_leaves) + flt(self.new_leaves_allocated)
 
 		# Ver 1.0 Begins added by SSK on 22/08/2016, following block is added

@@ -13,8 +13,7 @@ def execute(filters=None):
 	else:
 		show_zero = 0
 	if filters.from_fiscal_year > filters.to_fiscal_year:
-		frappe.throw("From Year Cannot be greater than To Year")
-
+		frappe.throw("From Fiscal Year Cannot Be Greater Than To Fiscal Year")
 	period_list = get_period_list(filters.from_fiscal_year, filters.to_fiscal_year, filters.periodicity, filters.company)
 
 	income = get_data(filters.cost_center, filters.company, "Income", "Credit", period_list,

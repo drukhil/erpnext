@@ -2998,15 +2998,15 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2018-01-25 10:39:53.395788", 
- "modified_by": "siva@bt.bt", 
+ "modified": "2020-07-04 14:49:58.632711", 
+ "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Sales Order", 
  "owner": "Administrator", 
  "permissions": [
   {
    "amend": 0, 
-   "apply_user_permissions": 0, 
+   "apply_user_permissions": 1, 
    "cancel": 0, 
    "create": 0, 
    "delete": 0, 

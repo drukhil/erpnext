@@ -1,0 +1,21 @@
+{
+ "content": null, 
+ "creation": "2022-05-23 15:08:22.307255", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2022-05-23 15:08:22.307255", 
+ "modified_by": "Administrator", 
+ "module": "Priority Activities", 
+ "name": "target", 
+ "owner": "Administrator", 
+ "page_name": "Target", 
+ "roles": [
+  {
+   "role": "Administrator"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null
+}

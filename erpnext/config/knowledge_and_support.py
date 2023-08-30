@@ -10,15 +10,15 @@ def get_data():
                                         "type": "doctype",
                                         "name": "Issue List",
                                         "description": "Raise Tickets",
-					"label": "Raise Tickets",
+                                        "label": "Raise Tickets",
                                         "hide_count": False
                                 }
-		]
-		},
-		{
+                ]
+                },
+                {
                         "label": _("Ticket Status"),
                         "items": [
-				{
+                                {
                                         "type": "report",
                                         "is_query_report": True,
                                         "name": "Ticket Status",
@@ -28,5 +28,5 @@ def get_data():
                 ]
                 }
 
-	]
+        ]
 

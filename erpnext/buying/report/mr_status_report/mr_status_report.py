@@ -39,7 +39,7 @@ def get_data(filters):
     query = frappe.db.sql("""
             select distinct
 			mr.name                             as mr_name,
-			concat_ws('-', mr.branch,'CDCL')    as mr_cost_center,
+			mr.branch    			as mr_cost_center,
 			mr.creation_date                    as mr_create_date,
 			date(mr.submission)                 as mr_submit_date,
 			mr.workflow_state                   as mr_status,
@@ -57,6 +57,7 @@ def get_data(filters):
 			po.name                             as po_name,
 			date(po.creation)                   as po_create_date,
 			date(po.submission)                 as po_submit_date,
+                        
 			po.status                           as po_status,
 			po.owner                            as po_owner,
 			po.modified_by                      as po_modified_by,
@@ -110,6 +111,7 @@ def get_columns(filters):
                 ("PO Name") + ":Link/Purchase Order:120",
                 ("PO Create Date") + ":Date:100",
 		        ("PO Submit Date") + ":Date:100",
+                   
                 ("PO Status") + ":Data:100",
 		        ("PO Owner") + ":Link/User:140",
                 ("PO Updated By") + ":Link/User:140",

@@ -1,4 +1,5 @@
 {
+ "_seen": "[\"Administrator\"]", 
  "allow_copy": 1, 
  "allow_import": 0, 
  "allow_rename": 0, 
@@ -278,7 +279,7 @@
  "issingle": 1, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2020-05-04 16:01:39.035921", 
+ "modified": "2020-12-19 09:38:56.056763", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Employee Attendance Tool", 
@@ -414,6 +415,6 @@
  "read_only_onload": 0, 
  "sort_field": "modified", 
  "sort_order": "DESC", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }

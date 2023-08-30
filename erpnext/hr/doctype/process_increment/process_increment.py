@@ -22,7 +22,7 @@ class ProcessIncrement(Document):
                         emp_list = frappe.db.sql("""
                                 select t1.name, t1.date_of_joining
                                   from `tabEmployee` as t1
-                                 where t1.status = 'Active'
+                                 where t1.status = 'Active' 
                                 and t1.date_of_joining <= '{4}'   
 				and not exists(select 1
                                                    from `tabSalary Increment` as t3

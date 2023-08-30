@@ -1156,8 +1156,8 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2019-10-28 14:19:48.138629", 
- "modified_by": "kinzang.namgyal@cdcl.bt", 
+ "modified": "2022-05-25 17:51:07.198564", 
+ "modified_by": "Administrator", 
  "module": "Maintenance", 
  "name": "Hire Charge Invoice", 
  "name_case": "", 
@@ -1268,7 +1268,7 @@
   {
    "amend": 0, 
    "apply_user_permissions": 1, 
-   "cancel": 1, 
+   "cancel": 0, 
    "create": 1, 
    "delete": 0, 
    "email": 1, 
@@ -1279,7 +1279,7 @@
    "print": 1, 
    "read": 1, 
    "report": 1, 
-   "role": "Projects GM", 
+   "role": "Projects CTM", 
    "set_user_permissions": 0, 
    "share": 1, 
    "submit": 1, 
@@ -1355,6 +1355,6 @@
  "sort_field": "modified", 
  "sort_order": "DESC", 
  "title_field": "customer", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }

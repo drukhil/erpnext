@@ -495,9 +495,7 @@ def equipment_query(doctype, txt, searchfield, start, page_len, filters):
                                 e.equipment_type,
                                 e.equipment_number
                         from `tabEquipment` e
-                        where e.branch like %(branch)s
-                        and e.is_disabled != 1
-                        and e.not_cdcl = 0 
+                        where e.is_disabled != 1
                         and exists(select 1
                                      from `tabEquipment Type` t
                                     where t.name = e.equipment_type
@@ -525,7 +523,6 @@ def equipment_query(doctype, txt, searchfield, start, page_len, filters):
 				"txt": "%%%s%%" % txt,
 				"_txt": txt.replace("%", ""),
 				"start": start,
-				"page_len": page_len,
-                                "branch": filters['branch']
+				"page_len": page_len
 			})
 

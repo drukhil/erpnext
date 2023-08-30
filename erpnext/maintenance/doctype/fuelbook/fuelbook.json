@@ -1,7 +1,7 @@
 {
  "allow_copy": 0, 
  "allow_import": 1, 
- "allow_rename": 0, 
+ "allow_rename": 1, 
  "autoname": "field:account_number", 
  "beta": 0, 
  "creation": "2018-03-28 15:08:30.399978", 
@@ -199,7 +199,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2020-05-07 15:10:34.091417", 
+ "modified": "2022-04-05 17:23:07.923552", 
  "modified_by": "Administrator", 
  "module": "Maintenance", 
  "name": "Fuelbook", 
@@ -251,7 +251,7 @@
    "amend": 0, 
    "apply_user_permissions": 0, 
    "cancel": 0, 
-   "create": 0, 
+   "create": 1, 
    "delete": 0, 
    "email": 1, 
    "export": 1, 
@@ -265,7 +265,7 @@
    "set_user_permissions": 0, 
    "share": 1, 
    "submit": 0, 
-   "write": 0
+   "write": 1
   }, 
   {
    "amend": 0, 

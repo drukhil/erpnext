@@ -7,7 +7,7 @@
  "doctype": "Report", 
  "idx": 0, 
  "is_standard": "Yes", 
- "modified": "2020-03-26 14:15:30.446386", 
+ "modified": "2022-08-18 13:00:25.412706", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Expenditure Statement", 
@@ -54,6 +54,15 @@
   }, 
   {
    "role": "Asset Manager"
+  }, 
+  {
+   "role": "Project Engineer"
+  }, 
+  {
+   "role": "Purchase User"
+  }, 
+  {
+   "role": "Stock User"
   }
  ]
 }

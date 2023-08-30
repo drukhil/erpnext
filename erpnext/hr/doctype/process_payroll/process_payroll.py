@@ -58,7 +58,6 @@ class ProcessPayroll(Document):
                                 {2} {3}
                                 order by t1.branch, t1.name
                         """.format(self.fiscal_year, self.month, cond, emp_cond), as_dict=True)
-
 		return emp_list
 
 	def get_filter_condition(self):

@@ -11,14 +11,10 @@ class AutoBilling(Document):
 	def validate(self):
 		self.items = []
 		for a in self.get_period_date_ranges():
-			ref = self.ref_name
-			if not self.is_new():
-				ref = a.ref_name
-
 			self.append("items", {
 			"schedule_date": getdate(a),
 			"ref_doc": self.ref_doc,
-			"ref_name": ref,
+			"ref_name": self.ref_name,
 			"posted": 0
 			})
 	
@@ -31,8 +27,8 @@ class AutoBilling(Document):
 			total += flt(a.amount)
 		self.total_amount = total
 				
-	#def on_submit(self):
-	#	self.make_auto_entries()
+	def on_submit(self):
+		self.make_auto_entries()
 
 	def get_period_date_ranges(self):
                 from dateutil.relativedelta import relativedelta
@@ -50,7 +46,7 @@ class AutoBilling(Document):
                                 period_end_date = to_date
                         if period_end_date == to_date:
                                 break
-			schedule_date = from_date + relativedelta(day = 1)
+			schedule_date = from_date + relativedelta(day = 25)
 			periodic_daterange.append(schedule_date)
 			from_date = period_end_date + relativedelta(days=1)
                 return periodic_daterange

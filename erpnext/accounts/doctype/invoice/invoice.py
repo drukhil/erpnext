@@ -39,6 +39,9 @@ class Invoice(Document):
 				cc.setdefault(a.income_account, a.amount)
 		self.prepare_gl(cc)
 	
+	def on_cancel(self):
+		frappe.db.sql(""" delete from `tabGL Entry` where voucher_no = '{0}'""".format(self.name))
+
 	def prepare_gl(self, cc):
 		gl_entries = []
 		default_rv_account = frappe.get_doc("Company", self.company).default_receivable_account

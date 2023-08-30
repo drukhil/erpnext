@@ -42,6 +42,12 @@ def get_data():
 					"type": "doctype",
 					"name": "Purchase Invoice",
 					"description": _("Bills raised by Suppliers.")
+				},
+				{
+					"type": "doctype",
+					"name": "Supplier Monitoring",
+					"label": "Suppliers Monitoring Tool",
+					"description": _("Bills raised by Suppliers.")
 				}
 			]
 		},

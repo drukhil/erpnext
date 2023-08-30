@@ -113,44 +113,44 @@ def get_data():
 				},                                
 			]
 		},                
-		{
-			"label": _("Project Accounts"),
-			"items": [
-                                {
-					"type": "doctype",
-					"name": "Project Invoice",
-					"description": _("Bills raised to Customers.")
-				},
-                                {
-					"type": "doctype",
-					"name": "Project Payment",
-					"description": _("Payments agains Project Invoices.")
-				},
-                                {
-					"type": "doctype",
-					"name": "Deposit Work",
-				},
-				{	
-					"type": "report",
-					"name": "Deposit Work Report",
-					"doctype": "Deposit Work",
-					"is_query_report": True,
-				},
-			]
-		},
+		#{
+		#	"label": _("Project Accounts"),
+		#	"items": [
+        #                        {
+		#			"type": "doctype",
+		#			"name": "Project Invoice",
+		#			"description": _("Bills raised to Customers.")
+		#		},
+        #                       {
+		#			"type": "doctype",
+		#			"name": "Project Payment",
+		#			"description": _("Payments agains Project Invoices.")
+		#		},
+        #                       {
+		#			"type": "doctype",
+		#			"name": "Deposit Work",
+		#		},
+		#		{	
+		#			"type": "report",
+		#			"name": "Deposit Work Report",
+		#			"doctype": "Deposit Work",
+		#			"is_query_report": True,
+		#		},
+		#	]
+		#},
 		{
 			"label": _("Mechanical Accounts"),
 			"items": [
-				{
-					"type": "doctype",
-					"name": "Hire Charge Invoice",
-					"description": _("Hire Charge Invoice"),
-				},
-				{
-					"type": "doctype",
-					"name": "Mechanical Payment",
-					"description": _("Create Payment"),
-				},
+				#{
+				#	"type": "doctype",
+				#	"name": "Hire Charge Invoice",
+				#	"description": _("Hire Charge Invoice"),
+				#},
+				#{
+				#	"type": "doctype",
+				#	"name": "Mechanical Payment",
+				#	"description": _("Create Payment"),
+				#},
 				{
 					"type": "doctype",
 					"name": "HSD Payment",
@@ -229,6 +229,25 @@ def get_data():
 					"description": "Fund Requisition",
 					"hide_count": True
 				},
+			
+				{
+                                        "type": "doctype",
+                                        "name": "Process Overtime Payment",
+                                        "description": "Process Overtime Payment",
+                                        "hide_count": False
+                                },
+								{
+					"type": "doctype",
+					"name": "Expense Allocation",
+					"description": "Expense Allocation",
+					"hide_count": True
+				},
+				{
+					"type": "doctype",
+					"name": "Cost Appropriation",
+					"description": "Cost Appropriation",
+					"hide_count": True
+				},
 			]
 		},
 		{
@@ -246,6 +265,12 @@ def get_data():
 					"doctype": "Journal Entry",
 					"is_query_report": True
 				},
+				{
+                                        "type": "doctype",
+                                        "name": "TDS Remittance",
+                                        "description": "TDS Remittance Tool",
+                                        "hide_count": True
+                                },
 				{
 					"type": "report",
 					"name": "TDS Certificate",
@@ -298,13 +323,13 @@ def get_data():
 					"doctype": "GL Entry",
 					"is_query_report": True
 				},
-				# {
-				# 	"type": "report",
-				# 	"name": "Statement of Comprehensive Income",
-				# 	"label": "Statement of Comprehensive Income",
-				# 	"doctype": "GL Entry",
-				# 	"is_query_report": True
-				# },
+				 {
+				 	"type": "report",
+				 	"name": "R & P Report",
+				 	"label": "R & P Report",
+				 	"doctype": "GL Entry",
+				 	"is_query_report": True
+				 },
 				{
 					"type": "report",
 					"name": "Expenditure Statement",
@@ -566,13 +591,13 @@ def get_data():
                                         "label": _("Salary Payable Report"),
                                         "doctype": "Salary Slip"
                                 },
-				{
-                                        "type" : "report",
-                                        "is_query_report": True,
-                                        "name": "Other Recoveries",
-                                        "label": _("Other Recoveries"),
-                                        "doctype": "Salary Slip"
-                                },
+				#{
+                                #        "type" : "report",
+                                #        "is_query_report": True,
+                                #        "name": "Other Recoveries",
+                                #        "label": _("Other Recoveries"),
+                                #        "doctype": "Salary Slip"
+                                #},
 				 {
                                         "type": "report",
                                         "is_query_report": True,
@@ -594,19 +619,32 @@ def get_data():
                                         "label": _("Staff Welfare Scheme"),
                                         "doctype": "Salary Slip"
                                 },
-				 {
-                                        "type" : "report",
-                                        "is_query_report": True,
-                                        "name": "Adhoc Recoveries",
-                                        "label": _("Adhoc Recoveries"),
-                                        "doctype": "Salary Slip"
-                                },
+				 #{
+                                 #       "type" : "report",
+                                 #       "is_query_report": True,
+                                 #       "name": "Adhoc Recoveries",
+                                 #       "label": _("Adhoc Recoveries"),
+                                 #       "doctype": "Salary Slip"
+                                #},
 				{
                                         "type": "report",
                                         "is_query_report": True,
                                         "name": "Travel Report",
                                         "doctype": "Travel Claim"
-                                }
+                                },
+				{
+                                        "type": "report",
+                                        "is_query_report": True,
+                                        "name": "OT Detail Report",
+                              		"doctype": "Process Overtime Payment"
+                                },
+				{
+                                        "type": "report",
+                                        "is_query_report": True,
+                                        "name": "Payment Report",
+					"label": "Muster Roll Employee/Operator/Open Air Prisoner Payment Report",
+                                        "doctype": "Process MR Payment"
+                                },
 
 
 			]

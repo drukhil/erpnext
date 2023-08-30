@@ -38,7 +38,6 @@ class OfficiatingEmployee(Document):
 		emp = frappe.get_doc("Employee", self.officiate)
 		emp.db_set("reports_to", frappe.db.get_value("Employee", self.employee, "reports_to"))
 		emp.db_set("approver_name", frappe.db.get_value("Employee", self.employee, "approver_name"))
-		#self.sendmail()
 
 	def revoke_perm(self):
 		#for a in self.items:	
@@ -61,18 +60,6 @@ class OfficiatingEmployee(Document):
 		emp.db_set("approver_name", self.employee_name)			
 
 		frappe.msgprint("Permissions Revoked")
-
-
-	def sendmail(self):
-		designation = frappe.get_doc("Employee", self.employee).designation
-		message = " Mr/Ms <b> {0} </b> will officiate <b> {1} </b> from {2} to {3} as {4}""".format(self.officiate_name, self.employee_name, self.from_date, self.to_date, designation) 
-                for email in frappe.db.sql(""" select user_id from `tabEmployee` 
-			where reports_to = '{0}'""".format(self.employee), as_dict = 1):
-                	if email.user_id:
-                        	try:
-                                	frappe.sendmail(recipients=email.user_id, sender=None, subject=Officiating, message=message)
-                        	except:
-                                	pass
 
 def check_off_exp():
 	off = frappe.db.sql("""select name from `tabOfficiating Employee` 

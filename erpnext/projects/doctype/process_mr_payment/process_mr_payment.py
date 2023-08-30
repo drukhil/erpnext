@@ -33,7 +33,16 @@ class ProcessMRPayment(Document):
 
                                         if flt(total_days) == round(flt(a.number_of_days),2):
                                                 a.total_wage = flt(salary)
-                                if a.employee_type == 'Open Air Prisoner':
+                                if a.employee_type == 'DFG':
+					salary = frappe.db.get_value(a.employee_type, a.employee, "salary")
+					if flt(a.total_wage) > flt(salary):
+						a.total_wage = flt(salary)
+					if flt(total_days) == round(flt(a.number_of_days),2):
+						a.total_wage = flt(salary)
+					if round(flt(a.number_of_days),2) >= 21:
+						a.total_wage = flt(salary)
+
+				if a.employee_type == 'Open Air Prisoner':
 					salary = flt(total_days) * flt(a.daily_rate)
 					if flt(a.total_wage) > flt(salary):
                                                 a.total_wage = flt(salary)
@@ -66,7 +75,7 @@ class ProcessMRPayment(Document):
 			
 
 	def on_submit(self):
-		self.check_budget()
+		# self.check_budget()
 		self.post_journal_entry()
 
 	def before_cancel(self):
@@ -124,6 +133,9 @@ class ProcessMRPayment(Document):
 		if self.employee_type == "Operator":
 			query = "select 'Operator' as employee_type, name as employee, person_name, id_card, rate_per_day as daily_rate, rate_per_hour as hourly_rate from `tabOperator` where	status = 'Active'"
 		
+		elif self.employee_type == "DFG":
+			query = "select 'DFG' as employee_type, name as employee, person_name, id_card, rate_per_day as daily_rate, rate_per_hour as hourly_rate from `tabDFG` where status = 'Active'"
+
 		elif self.employee_type == "Open Air Prisoner":
                         query = "select 'Open Air Prisoner' as employee_type, name as employee, person_name, id_card, rate_per_day as daily_rate, rate_per_hour as hourly_rate, gratuity_fund as graduity from `tabOpen Air Prisoner` where status = 'Active'"
 
@@ -243,7 +255,15 @@ class ProcessMRPayment(Document):
                         if not wage_account:
                                 frappe.throw("Setup MR Wages Account in Projects Accounts Settings")
 
-                elif self.employee_type == "Operator":
+		elif self.employee_type =="DFG":
+			ot_account = frappe.db.get_single_value("Projects Accounts Settings", "dfg_overtime_account")
+			if not ot_account:
+				frappe.throw("Setup Overtime Account for DFG in Projects Accounts Settings")
+			wage_account = frappe.db.get_single_value("Projects Accounts Settings", "dfg_wage_account")
+			if not wage_account:
+				frappe.throw("Setup DFG Wage account in Projects Accounts Setting")                
+
+		elif self.employee_type == "Operator":
                         ot_account = frappe.db.get_single_value("Projects Accounts Settings", "operator_overtime_account")
                         if not ot_account:
                                 frappe.throw("Setup Operator Overtime Account in Projects Accounts Settings")
@@ -404,7 +424,7 @@ def get_records(employee_type, fiscal_year, fiscal_month, from_date, to_date, co
                 }))
 		if employee_type == "Muster Roll Employee":
 	        	update_mr_rates(employee_type, e.name, cost_center, from_date, to_date);
-		if employee_type in ('Operator', 'Open Air Prisoner'):
+		if employee_type in ('Operator', 'Open Air Prisoner', 'DFG'):
 		
 			frappe.db.sql("""
                         update `tabAttendance Others`

@@ -10,10 +10,14 @@ from erpnext.accounts.report.financial_statements1 import (get_period_list, get_
 def execute(filters=None):
 	period_list = get_period_list(filters.fiscal_year, filters.periodicity)
 	
-	income = get_data(filters.company, "Equity", "Credit", period_list, 
+	'''income = get_data(filters.company, "Equity", "Credit", period_list, 
 		accumulated_values=filters.accumulated_values, ignore_closing_entries=True)
+	'''
 	expense = get_data(filters.company, "Expense", "Debit", period_list, 
 		accumulated_values=filters.accumulated_values, ignore_closing_entries=True)
+
+	income = get_data(filters.company, "Equity", "Credit", period_list,
+                accumulated_values=filters.accumulated_values, ignore_closing_entries=True)
 	
 	net_profit_loss = get_net_profit_loss(income, expense, period_list, filters.company)
 
@@ -68,7 +72,7 @@ def get_chart_data(filters, columns, income, expense, net_profit_loss):
 			
 	columns = [x_intervals]
 	if income_data:
-		columns.append(["Equity"] + income_data)
+		columns.append(["Income"] + income_data)
 	if expense_data:
 		columns.append(["Expense"] + expense_data)
 	if net_profit:

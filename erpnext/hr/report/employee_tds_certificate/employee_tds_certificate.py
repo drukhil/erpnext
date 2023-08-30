@@ -70,7 +70,7 @@ def get_data(query, filters=None):
 
 def construct_query(filters=None):
 	query = """select a.month, a.gross_pay,
-	(select b.amount from `tabSalary Detail` b where salary_component = 'Basic Pay' and b.parent = a.name) as basic_pay,
+	(select b.amount from `tabSalary Detail` b where salary_component in ('Basic Pay', 'GCE Basic Pay') and b.parent = a.name) as basic_pay,
 	(select b.amount from `tabSalary Detail` b where salary_component = 'Salary Tax' and b.parent = a.name) as tds ,
 	(select b.amount from `tabSalary Detail` b where salary_component = 'PF' and b.parent = a.name) as nppf ,
 	(select b.amount from `tabSalary Detail` b where salary_component = 'Group Insurance Scheme' and b.parent = a.name) as gis ,

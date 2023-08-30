@@ -21,6 +21,7 @@ frappe.ui.form.on('Asset Movement', {
 	onload: function(frm) {
 		frm.add_fetch("asset", "warehouse", "source_warehouse");
 		frm.add_fetch("asset", "issued_to", "source_custodian");
+		frm.add_fetch("asset", "employee_name", "source_custodian_name");
 		frm.add_fetch("asset", "cost_center", "current_cost_center");
 		frm.add_fetch("asset", "asset_name", "asset_name");
 		

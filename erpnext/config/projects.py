@@ -13,6 +13,21 @@ def get_data():
 					"description": _("Project master."),
 				},
 				{
+					"type": "doctype",
+					"name": "Design",
+					"description": _("Design master."),
+				},
+				{
+					"type": "doctype",
+					"name": "DFG Housing",
+					"description": _("DFG Housing."),
+				},
+				{
+					"type": "doctype",
+					"name": "RBA Project",
+					"description": _("RBA Project."),
+				},
+				{
                                         "type": "doctype",
                                         "name": "Project Category",
                                         "description": _("Project Category."),
@@ -85,7 +100,7 @@ def get_data():
 				{
 					"type": "doctype",
 					"name": "Project Overtime Tool",
-					"label": "Overtime Tool for GEP & MR",
+					"label": "Overtime Tool for MR",
 					"description": _("Overtime Tool"),
 				},
 				{
@@ -169,10 +184,10 @@ def get_data():
                                 }, 
 
 				{       
-                                        "type": "report",
-                                        "is_query_report": True,
-                                        "name": "Project Register",
-                                        "doctype": "Project"
+                                       "type": "report",
+                                       "is_query_report": True,
+                                       "name": "Design Progress Report",
+                                       "doctype": "Design"
                                 }, 
 			]
 		},

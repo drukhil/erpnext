@@ -28,7 +28,7 @@ frappe.query_reports["HSD Consumption Report"] = {
 		},
 		{		
                         "fieldname": "not_cdcl",
-                        "label": ("Include Only CDCL Equipments"),
+                        "label": ("Others Equipments"),
                         "fieldtype": "Check",
                         "default": 1
                 },

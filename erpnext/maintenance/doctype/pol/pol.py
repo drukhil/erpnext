@@ -30,7 +30,7 @@ class POL(StockController):
 		self.validate_posting_time()
 		self.validate_uom_is_integer("stock_uom", "qty")
 		self.validate_item()
-
+#
 	def on_submit(self):
 		self.validate_dc()
 		self.validate_data()
@@ -45,7 +45,6 @@ class POL(StockController):
 		# Ver 2.0.190509, Following method added by SHIV on 2019/05/20
 		self.make_gl_entries()
 		""" ++++++++++ Ver 2.0.190509 Ends ++++++++++++ """
-		
 		self.make_pol_entry()
 
 	def on_cancel(self):
@@ -83,7 +82,7 @@ class POL(StockController):
                         self.validate_warehouse_branch(self.hiring_warehouse, self.hiring_branch)	
 
 	def set_warehouse(self):
-		cc = get_branch_cc(self.equipment_branch)
+		#cc = get_branch_cc(self.equipment_branch)
 		equipment_warehouse = frappe.db.get_value("Cost Center", cc, "warehouse")
 		if not equipment_warehouse:
 			frappe.throw("No Warehouse is linked with Cost Center <b>" + str(cc) + "</b>")
@@ -180,7 +179,7 @@ class POL(StockController):
                 # Stock entry for direct_consumption is disabled due to MAP related issues
 		if self.direct_consumption:
 			return
-		
+	
 		if self.hiring_warehouse:
                         wh = self.hiring_warehouse
                 else:
@@ -200,36 +199,6 @@ class POL(StockController):
 		self.make_sl_entries(sl_entries, self.amended_from and 'Yes' or 'No')
 
         # Ver 2.0.190509, Following method commented by SHIV on 2019/05/14
-        """
-	def update_stock_ledger(self):
-		if self.direct_consumption:
-			return
-		if self.hiring_warehouse:
-                        wh = self.hiring_warehouse
-                else:
-                        wh = self.equipment_warehouse
-
-		sl_entries = []
-		sl_entries.append(prepare_sl(self, 
-				{
-					"actual_qty": flt(self.qty), 
-					"warehouse": wh, 
-					"incoming_rate": round(flt(self.total_amount) / flt(self.qty) , 2)
-				}))
-
-		if self.direct_consumption:
-			sl_entries.append(prepare_sl(self,
-					{
-						"actual_qty": -1 * flt(self.qty), 
-						"warehouse": wh, 
-						"incoming_rate": 0
-					}))
- 
-		if self.docstatus == 2:
-			sl_entries.reverse()
-
-		self.make_sl_entries(sl_entries, self.amended_from and 'Yes' or 'No')
-	"""
 
         # Ver 2.0.190509, Following method created by SHIV on 2019/05/20
         def get_gl_entries(self, warehouse_account):
@@ -297,76 +266,6 @@ class POL(StockController):
 		return gl_entries
         
         # Ver 2.0.190509, following code commented by SHIV on 2019/05/21
-        """
-	def update_general_ledger(self, post=None):
-		gl_entries = []
-		
-		creditor_account = frappe.db.get_value("Company", self.company, "default_payable_account")
-		if not creditor_account:
-			frappe.throw("Set Default Payable Account in Company")
-
-		expense_account = self.get_expense_account()
-
-		if self.hiring_cost_center:
-                        cost_center = self.hiring_cost_center
-                else:
-                        cost_center = get_branch_cc(self.equipment_branch)
-
-		gl_entries.append(
-			prepare_gl(self, {"account": expense_account,
-					 "debit": flt(self.total_amount),
-					 "debit_in_account_currency": flt(self.total_amount),
-					 "cost_center": cost_center,
-					})
-			)
-
-		gl_entries.append(
-			prepare_gl(self, {"account": creditor_account,
-					 "credit": flt(self.total_amount),
-					 "credit_in_account_currency": flt(self.total_amount),
-					 "cost_center": self.cost_center,
-					 "party_type": "Supplier",
-					 "party": self.supplier,
-					 "against_voucher": self.name,
-                                         "against_voucher_type": self.doctype,
-					})
-			)
-
-		if self.hiring_branch:
-                        comparing_branch = self.hiring_branch
-                else:
-                        comparing_branch = self.equipment_branch
-
-		if comparing_branch != self.fuelbook_branch:
-			ic_account = frappe.db.get_single_value("Accounts Settings", "intra_company_account")
-			if not ic_account:
-				frappe.throw("Setup Intra-Company Account in Accounts Settings")
-
-			customer_cc = get_branch_cc(comparing_branch)
-
-			gl_entries.append(
-				prepare_gl(self, {"account": ic_account,
-						 "credit": flt(self.total_amount),
-						 "credit_in_account_currency": flt(self.total_amount),
-						 "cost_center": customer_cc,
-						})
-				)
-
-			gl_entries.append(
-				prepare_gl(self, {"account": ic_account,
-						 "debit": flt(self.total_amount),
-						 "debit_in_account_currency": flt(self.total_amount),
-						 "cost_center": self.cost_center,
-						})
-				)
-
-		from erpnext.accounts.general_ledger import make_gl_entries
-		if post:
-			make_gl_entries(gl_entries, cancel=(self.docstatus == 2), update_outstanding="No", merge_entries=False)
-		else:
-			return gl_entries
-	"""
-        """ ++++++++++ Ver 2.0.190509 Ends ++++++++++++ """
 
 	def get_expense_account(self):
 		if self.direct_consumption or getdate(self.posting_date) <= getdate("2018-03-31"):

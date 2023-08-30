@@ -20,7 +20,7 @@ frappe.query_reports["MR Status Report"] = {
 		},
 		{
                         "fieldname":"cost_center",
-                        "label": __("Cost Center"),
+                        "label": __("Branch"),
                         "fieldtype": "Link",
                         "options": "Branch",
                         "default": frappe.session.user.cost_center,

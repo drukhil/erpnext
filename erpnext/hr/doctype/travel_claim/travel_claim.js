@@ -69,7 +69,7 @@ frappe.ui.form.on('Travel Claim', {
 			var total = 0.0;
 
 			frm.doc.items.forEach(function(d) {
-				if(!d.quarantine) {
+				if(!d.quarantine) { 
 				total += parseFloat(d.actual_amount || 0.0)}
 			})
 			
@@ -123,8 +123,8 @@ frappe.ui.form.on("Travel Claim Item", {
 	"actual_amount": function(frm, cdt, cdn) {
 		var total = 0;
 		frm.doc.items.forEach(function(d) {
-			if(!d.quarantine){ 
-			total += d.actual_amount	}
+			if(!d.quarantine) { 
+			total += d.actual_amount }
 		})
 		frm.set_value("claim_amount", total)
 	}

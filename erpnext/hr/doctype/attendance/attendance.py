@@ -58,3 +58,8 @@ class Attendance(Document):
 
 	def on_submit(self):
 		self.db_set("branch", frappe.db.get_value("Employee", self.employee, "branch"))
+
+	#def on_cancel(self):
+	#	user = frappe.session.user
+        #       if "HR Manager" not in frappe.get_roles(user):
+        #                frappe.throw("Only HR Manager Can Cancel the document")                                  		

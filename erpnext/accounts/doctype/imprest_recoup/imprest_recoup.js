@@ -35,6 +35,8 @@ frappe.ui.form.on('Imprest Recoup', {
 				frappe.route_options = {
 					voucher_no: frm.doc.name,
 					company: frm.doc.company,
+					from_date: frm.doc.posting_date,
+					to_date: frm.doc.posting_date,
 					group_by_voucher: false
 				};
 				frappe.set_route("query-report", "General Ledger");
@@ -84,7 +86,8 @@ frappe.ui.form.on('Imprest Recoup', {
 		frm.fields_dict['items'].grid.get_field('cost_center').get_query = function(){
                         return{
                                 filters: {
-                                        'parent_cost_center': frm.doc.cost_center
+                                        // 'parent_cost_center': frm.doc.cost_center,
+										'is_group' : 0
                                 }
                         }
                 };
@@ -116,7 +119,8 @@ frappe.ui.form.on('Imprest Recoup', {
 				args: {
 					doctype: 'Cost Center',
 					filters: {
-						'branch': frm.doc.branch
+						'branch': frm.doc.branch,
+						'is_group': 0
 					},
 					fieldname: ['name']
 				},
@@ -349,3 +353,14 @@ frappe.ui.form.on("Imprest Recoup","items_on_form_rendered", function(frm, grid_
 	}
 	
 })
+cur_frm.fields_dict['items'].grid.get_field('item').get_query = function(frm, cdt, cdn) {
+	var d = locals[cdt][cdn];
+	
+		return {
+			filters: [
+			['Item', 'is_stock_item', '=', 1],
+			['Item', 'disabled', '=', 0],
+			
+			]
+		}
+	}

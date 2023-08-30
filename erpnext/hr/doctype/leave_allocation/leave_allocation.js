@@ -4,7 +4,6 @@
 cur_frm.add_fetch('employee','employee_name','employee_name');
 cur_frm.add_fetch('employee','employment_type','employee_type');
 
-
 var le = 0.00;
 
 frappe.ui.form.on("Leave Allocation", {

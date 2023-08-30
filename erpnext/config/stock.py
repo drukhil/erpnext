@@ -80,17 +80,22 @@ def get_data():
 					"label": _("Unit of Measure") + " (UOM)",
 					"description": _("e.g. Kg, Unit, Nos, m")
 				},
-				{
-					"type": "doctype",
-					"name": "Quality Inspection",
-					"description": _("Incoming quality inspection.")
-				}
+				#{
+				#	"type": "doctype",
+				#	"name": "Quality Inspection",
+				#	"description": _("Incoming quality inspection.")
+				#}
 			]
 		},
 		{
 			"label": _("Tools"),
 			"icon": "icon-wrench",
 			"items": [
+				{
+					"type": "doctype",
+					"name": "Material Return",
+					"description": _("Return materials.")
+				},
 				{
 					"type": "doctype",
 					"name": "Stock Reconciliation",
@@ -144,33 +149,33 @@ def get_data():
 					"is_query_report": True,
 					"name": "Stock Balance Report",
 					"doctype": "Stock Ledger Entry",
-					"label": _("Stock Balance")
+					"label": _("Stock Balance Report")
 				},
-				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "Stock Projected Quantity",
-					"doctype": "Item",
-				},
-				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "Stock Ageing Report",
-					"doctype": "Item",
-					"label": _("Stock Ageing")
-				},
-				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "Material Shortage Report",
-					"doctype": "Bin",
-				},
-				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "Requested Materials To Be Transferred",
-					"doctype": "Material Request"
-				},
+				#{
+				#	"type": "report",
+				#	"is_query_report": True,
+				#	"name": "Stock Projected Quantity",
+				#	"doctype": "Item",
+				#},
+				#{
+				#	"type": "report",
+				#	"is_query_report": True,
+				#	"name": "Stock Balance Report",
+				#	"doctype": "Item",
+				#	"label": _("Stock Ageing")
+				#},
+				#{
+				#	"type": "report",
+				#	"is_query_report": True,
+				#	"name": "Stock Balance Report",
+				#	"doctype": "Bin",
+				#},
+				#{
+				#	"type": "report",
+				#	"is_query_report": True,
+				#	"name": "Requested Materials To Be Transferred",
+				#	"doctype": "Material Request"
+				#},
 				{
 					"type": "report",
 					"is_query_report": True,

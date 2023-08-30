@@ -67,11 +67,11 @@ def post_leave_credits(today=None):
 			t2.leave_type, t2.credits_per_month, t2.credits_per_year,
 			t3.is_carry_forward
 		from `tabEmployee` as t1, `tabEmployee Group Item` as t2, `tabLeave Type` as t3
-		where t1.status = 'Active'
+		where t1.status = 'Active' and t1.employment_type != 'GCE'
 		and t1.date_of_joining <= '{0}'
 		and t1.employee_group = t2.parent
 		and (t2.credits_per_month > 0 or t2.credits_per_year > 0)
-		and t3.name = t2.leave_type and t1.employee = 'GYAL201242'
+		and t3.name = t2.leave_type
 		order by t1.name, t2.leave_type
 	""".format(str(today)), as_dict=1)
 
@@ -324,5 +324,4 @@ def get_officiating_employee(employee):
                                 officiate = temp
                         else:
                                 flag = False
-	return officiate
-
+        return officiate

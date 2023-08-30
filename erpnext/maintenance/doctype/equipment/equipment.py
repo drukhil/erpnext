@@ -21,8 +21,11 @@ class Equipment(Document):
 			self.equipment_number = self.name
 		'''if self.equipment_history:
 			self.set("equipment_history", {})'''
-		#if not self.equipment_history:
-                self.create_equipment_history(branch = self.branch, on_date = self.from_date, ref_doc = self.name, purpose = 'Submit')
+		if not self.from_date:
+			self.from_date = nowdate()
+
+		if not self.equipment_history:
+                        self.create_equipment_history(branch = self.branch, on_date = self.from_date, ref_doc = self.name, purpose = 'Submit')
 		
 		if len(self.operators) > 1:
 			for a in range(len(self.operators)-1):
@@ -37,27 +40,33 @@ class Equipment(Document):
 			if not self.asset_code:
 				frappe.throw("Asset Code is mandatory, Please Fill the Asset Code!")
 		self.set_name()
-		if self.not_cdcl == 1 and not self.operators:
-                        frappe.throw("Operator/Owner Detail is Required")
-		if self.maintain_in_others_asset:
-			others = frappe.db.sql(""" select name from `tabAsset Others` where serial_number = '{0}'""".format(self.name))
-			if not others:
-				self.create_asset_others()
-
+                if self.maintain_in_others_asset:
+			if not self.custodian:
+				frappe.theow("Custodian is Required For Others Equipment")
+                        others = frappe.db.sql(""" select name from `tabAsset Others` where serial_number = '{0}'""".format(self.name))
+                        if not others:
+                                self.create_asset_others()
+		
 	def create_asset_others(self):
+                if not frappe.db.exists("Organization", self.owned_by):
+			org = frappe.new_doc("Organization")
+			org.organization = self.owned_by
+			org.save()
+
 		doc = frappe.new_doc("Asset Others")
                 doc.asset_category = 'Machinery & Equipment(6 Years)'
                 doc.asset_name = self.equipment_number
-		doc.model = self.equipment_model
+                doc.model = self.equipment_model
                 doc.brand = self.equipment_type
                 doc.serial_number = self.name
                 doc.from_date = self.from_date
                 doc.owned_by = self.owned_by
-		doc.status = 'In-Use'
-		doc.branch = self.branch
-		doc.issued_to = self.get("operators")[0].operator
+                doc.status = 'In-Use'
+                doc.branch = self.branch
+                #doc.issued_to = self.get("operators")[0].operator
+                doc.issued_to = self.custodian
 		doc.save()
-		frappe.msgprint("Added In Others Asset List")
+                frappe.msgprint("Added In Others Asset List")
 
 	def create_equipment_history(self, branch, on_date, ref_doc, purpose):
                 from_date = on_date
@@ -80,7 +89,7 @@ class Equipment(Document):
                 else:
                         #doc = frappe.get_doc(self.doctype,self.name)
                         ln = len(self.equipment_history)-1	
-                        if self.branch != self.equipment_history[ln].branch and self.not_cdcl == 1:
+                        if self.branch != self.equipment_history[ln].branch:
                                 self.append("equipment_history",{
                                                 "branch": self.branch,
                                                 "from_date": from_date,

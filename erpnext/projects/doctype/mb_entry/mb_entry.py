@@ -42,16 +42,12 @@ class MBEntry(Document):
                 
         def default_validations(self):
                 for rec in self.mb_entry_boq:
-                        entry_amount = flt(rec.entry_quantity)*flt(rec.entry_rate)
                         if flt(rec.entry_quantity) > flt(rec.act_quantity):
                                 frappe.throw(_("Row{0}: Entry Quantity cannot be greater than Balance Quantity").format(rec.idx))
                         elif flt(rec.entry_amount) > flt(rec.act_amount):
                                 frappe.throw(_("Row{0}: Entry Amount cannot be greater than Balance Amount").format(rec.idx))
                         elif flt(rec.entry_quantity) < 0 or flt(rec.entry_amount) < 0:
-                                frappe.throw(_("Row{0}: Value cannot be in negative").format(rec.idx))
-                        else:
-                                if self.boq_type != "Milestone Based" and flt(rec.entry_amount) != flt(entry_amount):
-                                        frappe.throw(_("Row{0}: Entry Amount should be {1}").format(rec.idx, flt(entry_amount)))
+                                frappe.throw(_("Row{0}: Value cannot be in negative.").format(rec.idx))
 
         def set_defaults(self):
                 if self.project:
@@ -71,9 +67,6 @@ class MBEntry(Document):
                         self.boq_type         = base_boq.boq_type
                         
         def validate_boq_items(self):
-                source_table = "Subcontract" if self.subcontract else "BOQ"
-                source       = self.subcontract if self.subcontract else self.boq
-                
                 for rec in self.mb_entry_boq:
                         if rec.is_selected == 1 and flt(rec.entry_amount) > 0:
                                 item = frappe.db.sql("""
@@ -81,18 +74,17 @@ class MBEntry(Document):
                                                         ifnull(balance_quantity,0) as balance_quantity,
                                                         ifnull(balance_amount,0) as balance_amount
                                                 from
-                                                        `tab{1} Item`
+                                                        `tabBOQ Item`
                                                 where   name = '{0}'
-                                                """.format(rec.boq_item_name, source_table), as_dict=1)[0]
+                                                """.format(rec.boq_item_name), as_dict=1)[0]
 
-                                if (flt(rec.entry_quantity) > flt(item.balance_quantity)) or \
-                                   (flt(rec.entry_amount) > flt(item.balance_amount)):
-                                        frappe.throw(_('Row{0}: Insufficient Balance. Please refer to {1}# <a href="#Form/{1}/{2}">{2}</a>').format(rec.idx, source_table,source))
-                                  
+                                if flt(rec.entry_quantity) > flt(item.balance_quantity):
+                                        frappe.throw(_('Row{0}: Insufficient Balance. Please refer to BOQ# <a href="#Form/BOQ/{1}">{1}</a>').format(rec.idx, self.boq))
+                                elif flt(rec.entry_amount) > flt(item.balance_amount):
+                                        frappe.throw(_('Row{0}: Insufficient Balance. Please refer to BOQ# <a href="#Form/BOQ/{1}">{1}</a>').format(rec.idx, self.boq))
+                                        
+                        
         def update_boq(self):
-                source_table = "Subcontract" if self.subcontract else "BOQ"
-                source       = self.subcontract if self.subcontract else self.boq
-
                 # Updating `tabBOQ Item`
                 boq_list = frappe.db.sql("""
                                 select
@@ -121,15 +113,15 @@ class MBEntry(Document):
 
                 for item in boq_list:
                         frappe.db.sql("""
-                                update `tab{3} Item`
+                                update `tabBOQ Item`
                                 set
                                         booked_quantity  = ifnull(booked_quantity,0) + ifnull({1},0),
                                         booked_amount    = ifnull(booked_amount,0) + ifnull({2},0),
                                         balance_quantity = ifnull(balance_quantity,0) - ifnull({1},0),
                                         balance_amount   = ifnull(balance_amount,0) - ifnull({2},0)
                                 where name = '{0}'
-                                """.format(item.boq_item_name, flt(item.entry_quantity), flt(item.entry_amount), source_table))
-        
+                                """.format(item.boq_item_name, flt(item.entry_quantity), flt(item.entry_amount)))
+
 @frappe.whitelist()
 def make_mb_invoice(source_name, target_doc=None):
         def update_master(source_doc, target_doc, source_partent):

@@ -7,8 +7,8 @@
  "doctype": "Report", 
  "idx": 0, 
  "is_standard": "Yes", 
- "modified": "2019-01-30 09:07:11.099255", 
- "modified_by": "kinzang.namgyal@cdcl.bt", 
+ "modified": "2023-06-21 14:32:13.269058", 
+ "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Stock Balance Report", 
  "owner": "Administrator", 
@@ -51,6 +51,18 @@
   }, 
   {
    "role": "Asset User"
+  }, 
+  {
+   "role": "Projects User"
+  }, 
+  {
+   "role": "Accounts User"
+  }, 
+  {
+   "role": "Project Engineer"
+  }, 
+  {
+   "role": "Project Manager"
   }
  ]
 }

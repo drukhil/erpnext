@@ -4,26 +4,24 @@
 frappe.query_reports["Equipment Register"] = {
 	"filters": [
 		{
-			"fieldname": "company",
-			"label": __("Company"),
+			"fieldname": "branch",
+			"label": __("Branch"),
 			"fieldtype": "Link",
-			"options": "Company",
-			"default": frappe.defaults.get_user_default("Company"),
-			"reqd": 1
+			"options": "Branch"
 		},
 		{
-			"fieldname": "fiscal_year",
-			"label": __("Purchase Year"),
-			"fieldtype": "Link",
-			"options": "Fiscal Year",
+			"fieldname": "owner",
+			"label": __("Owned By"),
+			"fieldtype": "Select",
+			"options": ['', "Own", "Others"]
 		},
 
-		{
-			"fieldname": "cost_center",
-			"label": __("Cost Center"),
-			"fieldtype": "Link",
-			"options": "Cost Center",
-		},
+		//{
+		//	"fieldname": "include_disabled",
+		//	"label": __("Include Disabled"),
+		//	"fieldtype": "Check",
+		//	"default": 0,
+		//},
 
 	]
 }

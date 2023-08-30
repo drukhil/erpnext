@@ -26,11 +26,13 @@ def execute(filters=None):
 		total_p = total_a = 0.0
 		for day in range(filters["total_days_in_month"]):
 			status = att_map.get(emp).get(day + 1, "None")
-			status_map = {"Present": "P", "Absent": "A", "None": ""}
+			status_map = {"Present": "P", "Absent": "A", "Half Day": "Hd", "None": ""}
 			row.append(status_map[status])
 
 			if status == "Present":
 				total_p += 1
+			elif status == 'Half Day':
+				total_p += 0.5
 			elif status == "Absent":
 				total_a += 1
 
@@ -86,6 +88,11 @@ def get_employee_details(employee_type):
 	elif employee_type == "Operator":
 		for d in frappe.db.sql("""select name, '{0}' as employment_type, person_name, id_card
 			from `tabOperator`""".format(employee_type), as_dict=1):
+			if d:
+				emp_map.setdefault(d.name, d)
+	elif employee_type == "DFG":
+		for d in frappe.db.sql("""select name, '{0}' as employment_type, person_name, id_card
+			from `tabDFG`""".format(employee_type), as_dict=1):
 			if d:
 				emp_map.setdefault(d.name, d)
 	

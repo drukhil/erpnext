@@ -8,7 +8,7 @@
  "docstatus": 0, 
  "doctype": "DocType", 
  "document_type": "", 
- "editable_grid": 0, 
+ "editable_grid": 1, 
  "fields": [
   {
    "allow_on_submit": 0, 
@@ -29,7 +29,7 @@
    "precision": "", 
    "print_hide": 0, 
    "print_hide_if_no_value": 0, 
-   "read_only": 1, 
+   "read_only": 0, 
    "report_hide": 0, 
    "reqd": 1, 
    "search_index": 0, 
@@ -222,8 +222,8 @@
  "issingle": 0, 
  "istable": 1, 
  "max_attachments": 0, 
- "modified": "2019-10-25 15:51:00.945489", 
- "modified_by": "dorji2392@bt.bt", 
+ "modified": "2021-12-03 09:43:42.176862", 
+ "modified_by": "Administrator", 
  "module": "Maintenance", 
  "name": "HSD Payment Item", 
  "name_case": "", 
@@ -234,6 +234,6 @@
  "read_only_onload": 0, 
  "sort_field": "modified", 
  "sort_order": "DESC", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }

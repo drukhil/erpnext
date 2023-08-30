@@ -133,8 +133,8 @@ def get_entries(filters):
 		select 
 			"Payment Entry" as payment_document, name as payment_entry, 
 			reference_no, reference_date as ref_date, 
-			if(paid_to=%(account)s, received_amount - loss_and_gain, 0) as debit, 
-			if(paid_from=%(account)s, paid_amount - loss_and_gain, 0) as credit, 
+			if(paid_to=%(account)s, received_amount + loss_and_gain, 0) as debit, 
+			if(paid_from=%(account)s, paid_amount + loss_and_gain, 0) as credit, 
 			posting_date, party as against_account, clearance_date,
 			if(paid_to=%(account)s, paid_to_account_currency, paid_from_account_currency) as account_currency
 		from `tabPayment Entry`
@@ -209,19 +209,46 @@ def get_entries(filters):
 		and ifnull(clearance_date, '4000-01-01') > %(report_date)s
 	""", filters, as_dict=1)
 
+	tds_remittance_entries = frappe.db.sql ("""
+                        select
+                                "TDS Remittance" as payment_document, name as payment_entry,
+                                cheque_no as reference_no, cheque_date as ref_date,
+                                total_tds as credit, 0 as debit,
+                                posting_date, branch as against_account, clearance_date
+                        from `tabTDS Remittance`
+                        where account = %(account)s
+                        and docstatus =1
+                        and posting_date <= %(report_date)s
+                        and ifnull(clearance_date, '4000-01-01') > %(report_date)s
+                """,filters, as_dict=1)
+
+
+
 	ot_payment = frappe.db.sql("""
                         select
                                 "Process Overtime Payment" as payment_document, name as payment_entry,
                                 cheque_no as reference_no, cheque_date as ref_date,
-                                total_amount as debit, 0 as credit,
+                                total_amount as credit, 0 as debit,
                                 posting_date, branch as against_account, clearance_date, 'BTN' as account_currency
                         from `tabProcess Overtime Payment`
                         where expense_bank_account = %(account)s
                         and docstatus = 1
                         and posting_date <= %(report_date)s and ifnull(clearance_date, '4000-01-01') > %(report_date)s
                 """, filters, as_dict=1)
+
+	sales_payment = frappe.db.sql("""
+                        select
+                                "Sales Payment" as payment_document, name as payment_entry,
+                                cheque_no as reference_no, cheque_date as ref_date,
+                                total_amount as debit, 0 as credit,
+                                posting_date, branch as against_account, clearance_date, 'BTN' as account_currency
+                        from `tabSales Payment`
+                        where revenue_bank_account = %(account)s
+                        and docstatus = 1
+                        and posting_date <= %(report_date)s and ifnull(clearance_date, '4000-01-01') > %(report_date)s
+                """, filters, as_dict=1)
 	
-	return sorted(list(payment_entries)+list(journal_entries)+list(hsd_entries)+list(imprest_entries)+list(mechanical_entries)+list(project_entries)+list(direct_payment_entries)+list(ot_payment), 
+	return sorted(list(payment_entries)+list(journal_entries)+list(hsd_entries)+list(imprest_entries)+list(mechanical_entries)+list(project_entries)+list(direct_payment_entries)+list(tds_remittance_entries)+list(ot_payment) +list(sales_payment), 
 		key=lambda k: k['posting_date'] or getdate(nowdate()))
 
 		

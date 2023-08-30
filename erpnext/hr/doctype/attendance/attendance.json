@@ -301,31 +301,6 @@
    "search_index": 0, 
    "set_only_once": 0, 
    "unique": 0
-  }, 
-  {
-   "allow_on_submit": 0, 
-   "bold": 0, 
-   "collapsible": 0, 
-   "fieldname": "reference_name", 
-   "fieldtype": "Data", 
-   "hidden": 1, 
-   "ignore_user_permissions": 0, 
-   "ignore_xss_filter": 0, 
-   "in_filter": 0, 
-   "in_list_view": 0, 
-   "label": "Reference Name", 
-   "length": 0, 
-   "no_copy": 0, 
-   "permlevel": 0, 
-   "precision": "", 
-   "print_hide": 0, 
-   "print_hide_if_no_value": 0, 
-   "read_only": 0, 
-   "report_hide": 0, 
-   "reqd": 0, 
-   "search_index": 0, 
-   "set_only_once": 0, 
-   "unique": 0
   }
  ], 
  "hide_heading": 0, 
@@ -339,7 +314,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2020-08-16 13:11:54.543111", 
+ "modified": "2021-04-29 11:11:22.231147", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Attendance", 
@@ -431,7 +406,7 @@
   {
    "amend": 1, 
    "apply_user_permissions": 1, 
-   "cancel": 1, 
+   "cancel": 0, 
    "create": 1, 
    "delete": 0, 
    "email": 1, 
@@ -533,7 +508,7 @@
   {
    "amend": 1, 
    "apply_user_permissions": 0, 
-   "cancel": 1, 
+   "cancel": 0, 
    "create": 1, 
    "delete": 0, 
    "email": 1, 
@@ -551,9 +526,9 @@
    "write": 1
   }, 
   {
-   "amend": 0, 
+   "amend": 1, 
    "apply_user_permissions": 1, 
-   "cancel": 0, 
+   "cancel": 1, 
    "create": 1, 
    "delete": 0, 
    "email": 1, 
@@ -599,6 +574,6 @@
  "sort_field": "modified", 
  "sort_order": "DESC", 
  "title_field": "employee_name", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }

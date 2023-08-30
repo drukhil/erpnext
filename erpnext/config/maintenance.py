@@ -51,11 +51,11 @@ def get_data():
 					"name": "Hire Charge Parameter",
 					"description": _("Hire Charge Parameter"),
 				},
-				 {
-				 	"type": "doctype",
-				 	"name": "Branch Fleet Manager",
-				 	"label": "Mechanical Notification Settings",
-				 },
+				# {
+				# 	"type": "doctype",
+				# 	"name": "Branch Fleet Manager",
+				# 	"label": "Mechanical Notification Settings",
+				# },
 				 {
 				 	"type": "doctype",
 				 	"name": "Tender Hire Rate",

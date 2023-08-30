@@ -11,14 +11,15 @@ from frappe.utils.data import get_first_day, get_last_day, add_days
 
 class Operator(Document):
 	def validate(self):
-		#self.check_status()
+		self.check_status()
 		self.calculate_rates()
-		#self.populate_work_history()
+		self.populate_work_history()
 
 	def calculate_rates(self):
-		if not self.rate_per_day:
+		pass
+		'''if not self.rate_per_day:
 			self.rate_per_day = flt(self.salary) / 30
-		'''if not self.rate_per_hour:
+		if not self.rate_per_hour:
 			self.rate_per_hour = (flt(self.salary) * 1.5) / (30 * 8)
 		'''
 	def check_status(self):
@@ -31,13 +32,10 @@ class Operator(Document):
 			self.cost_center = ''
 			self.branch = ''
 		'''
-	def get_series(self):
-		self.db_set("status", 'Active')
 
 	# Following method introducted by SHIV on 04/10/2017
         def populate_work_history(self):
-		frappe.db.sql(""" update `tabOperator` set docsatus = 0 where name = '{0}'""".format(self.name))
-                '''if not self.internal_work_history:
+                if not self.internal_work_history:
                         self.append("internal_work_history",{
                                                 "branch": self.branch,
                                                 "cost_center": self.cost_center,
@@ -97,5 +95,3 @@ class Operator(Document):
                                                         "modified_by": frappe.session.user,
                                                         "modified": nowdate()
                                 })
-		'''
-		frappe.msgprint("i cam called from server")

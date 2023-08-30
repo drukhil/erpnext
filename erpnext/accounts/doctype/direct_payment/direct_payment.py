@@ -23,8 +23,10 @@ class DirectPayment(AccountsController):
 		branch_name = frappe.db.get_value("Cost Center", self.cost_center, "branch")
 		if branch_name != self.branch:
 			frappe.throw(_("Branch {0} and Cost Center {1} doest not belong to each other".format(self.party)))
+	
 		set_user(self)
-		
+
+	
 	def set_status(self):
                 self.status = {
                         "0": "Draft",
@@ -84,184 +86,199 @@ class DirectPayment(AccountsController):
 		total_amount    = 0.0
 		#self.posting_date = nowdate()
 		
-		total_amt = flt(self.net_amount) + flt(self.tds_amount) + flt(self.deduction_amount)
-		if total_amt == self.amount:
-			if self.payment_type == "Receive":
-				account_type = frappe.db.get_value("Account", self.debit_account, "account_type") or ""
-				if account_type == "Receivable" or account_type == "Payable":
-					gl_entries.append(
-						self.get_gl_dict({
-							"account": self.debit_account,
-							"debit": self.net_amount,
-							"debit_in_account_currency": self.net_amount,
-							"voucher_no": self.name,
-							"voucher_type": self.doctype,
-							"cost_center": self.cost_center,
-							'party': self.party,
-							'party_type': self.party_type,						
-							"company": self.company,
-							"remarks": self.remarks
-							})
-						)
-				else:
-					gl_entries.append(
-						self.get_gl_dict({
-							"account": self.debit_account,
-							"debit": self.net_amount,
-							"debit_in_account_currency": self.net_amount,
-							"voucher_no": self.name,
-							"voucher_type": self.doctype,
-							"cost_center": self.cost_center,
-							"company": self.company,
-							"remarks": self.remarks
-							})
-						)
-				if self.tds_amount > 0:
-					gl_entries.append(
-						self.get_gl_dict({
-							"account": self.tds_account,
-							"debit": self.tds_amount,
-							"debit_in_account_currency": self.tds_amount,
-							"voucher_no": self.name,
-							"voucher_type": self.doctype,
-							"cost_center": self.cost_center,
-							"company": self.company,
-							"remarks": self.remarks
-							})
-						)
-				if self.deduction_amount > 0:
-                                        for d in self.get("deduct"):
-                                                gl_entries.append(
-                                                        self.get_gl_dict({
-                                                        "account": d.account,
-                                                        "debit": d.amount,
-                                                        "debit_in_account_currency": d.amount,
-                                                        "voucher_no": self.name,
-                                                        "voucher_type": self.doctype,
-                                                        "cost_center": self.cost_center,
-                                                        "company": self.company,
-                                                        "remarks": self.remarks
-                                                        })
-                                                )
-				account_type1 = frappe.db.get_value("Account", self.credit_account, "account_type") or ""
-				if account_type1 == "Receivable" or account_type1 == "Payable":
-					gl_entries.append(
-						self.get_gl_dict({
-							"account": self.credit_account,
-							"credit": self.amount,
-							"credit_in_account_currency": self.amount,
-							"voucher_no": self.name,
-							"voucher_type": self.doctype,
-							"cost_center": self.cost_center,
-							'party': self.party,
-							'party_type': self.party_type,					
-							"company": self.company,
-							"remarks": self.remarks
-							})
-						)
-				else:
-					gl_entries.append(
-						self.get_gl_dict({
-							"account": self.credit_account,
-							"credit": self.amount,
-							"credit_in_account_currency": self.amount,
-							"voucher_no": self.name,
-							"voucher_type": self.doctype,
-							"cost_center": self.cost_center,
-							"company": self.company,
-							"remarks": self.remarks
-							})
-						)
+		# total_amt = flt(self.net_amount) + flt(self.tds_amount) + flt(self.deduction_amount)
+		# if total_amt == self.amount:
+		if self.payment_type == "Receive":
+			account_type = frappe.db.get_value("Account", self.debit_account, "account_type") or ""
+			if account_type == "Receivable" or account_type == "Payable":
+				gl_entries.append(
+					self.get_gl_dict({
+						"account": self.debit_account,
+						"debit": self.net_amount,
+						"debit_in_account_currency": self.net_amount,
+						"voucher_no": self.name,
+						"voucher_type": self.doctype,
+						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,						
+						"company": self.company,
+						"remarks": self.remarks
+						})
+					)
 			else:
-				account_type = frappe.db.get_value("Account", self.debit_account, "account_type") or ""
-				if account_type == "Payable" or account_type == "Receivable":
-					gl_entries.append(
-						self.get_gl_dict({
-							"account": self.debit_account,
-							"debit": self.amount,
-							"debit_in_account_currency": self.amount,
-							"voucher_no": self.name,
-							"voucher_type": self.doctype,
-							"cost_center": self.cost_center,
-							'party': self.party,
-							'party_type': self.party_type,						
-							"company": self.company,
-							"remarks": self.remarks
-							})
-						)
-				else:
-					gl_entries.append(
-						self.get_gl_dict({
-							"account": self.debit_account,
-							"debit": self.amount,
-							"debit_in_account_currency": self.amount,
-							"voucher_no": self.name,
-							"voucher_type": self.doctype,
-							"cost_center": self.cost_center,						
-							"company": self.company,
-							"remarks": self.remarks
-							})
-						)
-				if self.tds_amount > 0:
-					gl_entries.append(
-						self.get_gl_dict({
-							"account": self.tds_account,
-							"credit": self.tds_amount,
-							"credit_in_account_currency": self.tds_amount,
-							"voucher_no": self.name,
-							"voucher_type": self.doctype,
-							"cost_center": self.cost_center,
-							"company": self.company,
-							"remarks": self.remarks
-							})
-						)
-				if self.deduction_amount > 0:
-                                        for d in self.get("deduct"):
-                                                gl_entries.append(
-                                                        self.get_gl_dict({
-                                                        "account": d.account,
-                                                        "credit": d.amount,
-                                                        "credit_in_account_currency": d.amount,
-                                                        "voucher_no": self.name,
-                                                        "voucher_type": self.doctype,
-                                                        "cost_center": self.cost_center,
-                                                        "company": self.company,
-                                                        "remarks": self.remarks
-                                                        })
-                                                )
-				account_type1 = frappe.db.get_value("Account", self.credit_account, "account_type") or ""
-				if account_type1 == "Payable" or account_type1 == "Receivable":
-					gl_entries.append(
-						self.get_gl_dict({
-							"account": self.credit_account,
-							"credit": self.net_amount,
-							"credit_in_account_currency": self.net_amount,
-							"voucher_no": self.name,
-							"voucher_type": self.doctype,
-							"cost_center": self.cost_center,
-							'party': self.party,
-							'party_type': self.party_type,
-							"company": self.company,
-							"remarks": self.remarks
-							})
-						)
-				else:
-					gl_entries.append(
-						self.get_gl_dict({
-							"account": self.credit_account,
-							"credit": self.net_amount,
-							"credit_in_account_currency": self.net_amount,
-							"voucher_no": self.name,
-							"voucher_type": self.doctype,
-							"cost_center": self.cost_center,
-							"company": self.company,
-							"remarks": self.remarks
-							})
-						)
-
-			make_gl_entries(gl_entries, cancel=(self.docstatus == 2),update_outstanding="No", merge_entries=False)
-			#else:
-			#frappe.throw("Total Debit is not equal to Total Credit. It should be equal")
+				gl_entries.append(
+					self.get_gl_dict({
+						"account": self.debit_account,
+						"debit": self.net_amount,
+						"debit_in_account_currency": self.net_amount,
+						"voucher_no": self.name,
+						"voucher_type": self.doctype,
+						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,
+						"company": self.company,
+						"remarks": self.remarks
+						})
+					)
+			if self.tds_amount > 0:
+				gl_entries.append(
+					self.get_gl_dict({
+						"account": self.tds_account,
+						"debit": self.tds_amount,
+						"debit_in_account_currency": self.tds_amount,
+						"voucher_no": self.name,
+						"voucher_type": self.doctype,
+						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,
+						"company": self.company,
+						"remarks": self.remarks
+						})
+					)
+			if self.deduction_amount > 0:
+									for d in self.get("deduct"):
+											gl_entries.append(
+													self.get_gl_dict({
+													"account": d.account,
+													"debit": d.amount,
+													"debit_in_account_currency": d.amount,
+													"voucher_no": self.name,
+													"voucher_type": self.doctype,
+													"cost_center": self.cost_center,
+													'party': self.party,
+						'party_type': self.party_type,
+													"company": self.company,
+													"remarks": self.remarks
+													})
+											)
+			account_type1 = frappe.db.get_value("Account", self.credit_account, "account_type") or ""
+			if account_type1 == "Receivable" or account_type1 == "Payable":
+				gl_entries.append(
+					self.get_gl_dict({
+						"account": self.credit_account,
+						"credit": self.amount,
+						"credit_in_account_currency": self.amount,
+						"voucher_no": self.name,
+						"voucher_type": self.doctype,
+						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,					
+						"company": self.company,
+						"remarks": self.remarks
+						})
+					)
+			else:
+				gl_entries.append(
+					self.get_gl_dict({
+						"account": self.credit_account,
+						"credit": self.amount,
+						"credit_in_account_currency": self.amount,
+						"voucher_no": self.name,
+						"voucher_type": self.doctype,
+						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,
+						"company": self.company,
+						"remarks": self.remarks
+						})
+					)
+		else:
+			account_type = frappe.db.get_value("Account", self.debit_account, "account_type") or ""
+			if account_type == "Payable" or account_type == "Receivable":
+				gl_entries.append(
+					self.get_gl_dict({
+						"account": self.debit_account,
+						"debit": self.amount,
+						"debit_in_account_currency": self.amount,
+						"voucher_no": self.name,
+						"voucher_type": self.doctype,
+						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,						
+						"company": self.company,
+						"remarks": self.remarks
+						})
+					)
+			else:
+				gl_entries.append(
+					self.get_gl_dict({
+						"account": self.debit_account,
+						"debit": self.amount,
+						"debit_in_account_currency": self.amount,
+						"voucher_no": self.name,
+						"voucher_type": self.doctype,
+						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,						
+						"company": self.company,
+						"remarks": self.remarks
+						})
+					)
+			if self.tds_amount > 0:
+				gl_entries.append(
+					self.get_gl_dict({
+						"account": self.tds_account,
+						"credit": self.tds_amount,
+						"credit_in_account_currency": self.tds_amount,
+						"voucher_no": self.name,
+						"voucher_type": self.doctype,
+						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,
+						"company": self.company,
+						"remarks": self.remarks
+						})
+					)
+			if self.deduction_amount > 0:
+									for d in self.get("deduct"):
+											gl_entries.append(
+													self.get_gl_dict({
+													"account": d.account,
+													"credit": d.amount,
+													"credit_in_account_currency": d.amount,
+													"voucher_no": self.name,
+													"voucher_type": self.doctype,
+													"cost_center": self.cost_center,
+													'party': self.party,
+						'party_type': self.party_type,
+													"company": self.company,
+													"remarks": self.remarks
+													})
+											)
+			account_type1 = frappe.db.get_value("Account", self.credit_account, "account_type") or ""
+			if account_type1 == "Payable" or account_type1 == "Receivable":
+				gl_entries.append(
+					self.get_gl_dict({
+						"account": self.credit_account,
+						"credit": self.net_amount,
+						"credit_in_account_currency": self.net_amount,
+						"voucher_no": self.name,
+						"voucher_type": self.doctype,
+						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,
+						"company": self.company,
+						"remarks": self.remarks
+						})
+					)
+			else:
+				gl_entries.append(
+					self.get_gl_dict({
+						"account": self.credit_account,
+						"credit": self.net_amount,
+						"credit_in_account_currency": self.net_amount,
+						"voucher_no": self.name,
+						"voucher_type": self.doctype,
+						"cost_center": self.cost_center,
+						'party': self.party,
+						'party_type': self.party_type,
+						"company": self.company,
+						"remarks": self.remarks
+						})
+					)
+		make_gl_entries(gl_entries, cancel=(self.docstatus == 2),update_outstanding="No", merge_entries=False)
+		#else:
+		#frappe.throw("Total Debit is not equal to Total Credit. It should be equal")
 
 @frappe.whitelist()
 def get_tds_account(percent, payment_type):

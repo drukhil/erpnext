@@ -1,0 +1,30 @@
+{
+ "content": null, 
+ "creation": "2021-08-04 00:36:57.189671", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2022-05-23 11:43:28.469960", 
+ "modified_by": "Administrator", 
+ "module": "Management Dashboard", 
+ "name": "human-resource", 
+ "owner": "Administrator", 
+ "page_name": "Human Resource", 
+ "roles": [
+  {
+   "role": "Administrator"
+  }, 
+  {
+   "role": "Management"
+  }, 
+  {
+   "role": "HR Manager"
+  }, 
+  {
+   "role": "Employee"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null
+}

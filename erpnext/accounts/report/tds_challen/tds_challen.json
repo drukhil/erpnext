@@ -1,5 +1,5 @@
 {
- "add_total_row": 1, 
+ "add_total_row": 0, 
  "apply_user_permissions": 1, 
  "creation": "2016-06-21 16:28:47.891579", 
  "disabled": 0, 
@@ -7,7 +7,7 @@
  "doctype": "Report", 
  "idx": 0, 
  "is_standard": "Yes", 
- "modified": "2019-05-29 10:24:17.817738", 
+ "modified": "2023-06-05 17:55:09.936157", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "TDS Challen", 
@@ -17,13 +17,13 @@
  "report_type": "Script Report", 
  "roles": [
   {
-   "role": "Accounts Manager"
+   "role": "Administrator"
   }, 
   {
    "role": "Accounts User"
   }, 
   {
-   "role": "Administrator"
+   "role": "Asset Manager"
   }
  ]
 }

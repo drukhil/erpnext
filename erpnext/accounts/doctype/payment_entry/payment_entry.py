@@ -32,6 +32,8 @@ import datetime
 from frappe.model.naming import make_autoname
 from erpnext.custom_autoname import get_auto_name
 from frappe import msgprint
+from erpnext.custom_workflow import set_user
+
 
 class InvalidPaymentEntry(ValidationError): pass
 
@@ -73,7 +75,8 @@ class PaymentEntry(AccountsController):
 		self.set_title()
 		self.set_remarks()
 		self.loss_and_gain = sum([flt(d.amount) for d in self.get("deductions")])
-
+		set_user(self)
+	
 	def set_status(self):
                 self.status = {
                         "0": "Draft",

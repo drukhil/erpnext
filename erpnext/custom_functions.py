@@ -42,16 +42,16 @@ def segregrate(master_set):
 				doc_list[a.approver].append(a.name)
 	return doc_list
 
-def send_email(email, doc_list, doctype):
+def send_email(email = None, doc_list = None, doctype = None):
 	message = "The following " + str(doctype) + " has been waiting your approval: <br />"
 	num = 1
 	subject = str(doctype) + " Pending your Approval"
 
-	
 	for a in doc_list:
-		message += str(num) + "  <a href='https://erpdev.ns.bt/desk#Form/"+str(doctype)+"/"+str(a)+"'>" + str(a) + "</a> <br />" 
+		message += str(num) + "  <a href='https://erp.ns.bt/desk#Form/"+str(doctype)+"/"+str(a)+"'>" + str(a) + "</a> <br />" 
 		num = num + 1
 	message += "<br /><br />"
 	try:
 		frappe.sendmail(recipients=email, sender=None, subject=subject, message=message)
 	except:
+		pass

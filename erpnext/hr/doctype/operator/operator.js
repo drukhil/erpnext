@@ -16,11 +16,11 @@ frappe.ui.form.on('Operator', {
 		}	
 	},
 
-	salary: function(frm) {
-		cur_frm.set_value("rate_per_day", ((frm.doc.salary)/ (30)))
+	/*salary: function(frm) {
+		//cur_frm.set_value("rate_per_day", ((frm.doc.salary)/ (30)))
 		//cur_frm.set_value("rate_per_hour", ((frm.doc.salary * 1.5)/ (30 * 8)))
 	},
-
+	*/
 	"status": function(frm) {
 		cur_frm.toggle_reqd("date_of_separation", frm.doc.status == "Left")
 	},
@@ -44,41 +44,14 @@ frappe.ui.form.on('Operator', {
                         });
                 }
         },
-
-
-       	cost_center: function(frm) {
-		var title = "This is testing"
-		var d = frappe.prompt({
-			fieldtype: "Date",
-			fieldname: "date_of_transfer",
-			reqd: 1,
-			description: __("*This information shall be recorded in employee internal work history.")},
-			function(data) {
-				return frappe.call({
-				method: "get_series",
-				doc: frm.doc,
-				callback: function(r, rt) {
-					frm.reload_doc();
-                        		}
-                		});
-                                                                
-			},
-			title,
-			__("Save")
-		);
-
+	
+	cost_center: function(frm){
+		if(!frm.doc.__islocal){
+			cur_frm.set_value("date_of_transfer",frappe.datetime.nowdate());
+			refresh_many(["date_of_transfer"]);
+			validate_prev_doc(frm,__("Please select date of transfer to new cost center"));		
+		}
 	},
-
-
-	rejoin: function(frm) {
-		return frappe.call({
-		method: "get_series",
-		doc: frm.doc,
-		callback: function(r, rt) {
-			frm.reload_doc();
-			}
-		});
-	}
 });
 
 frappe.ui.form.on("Operator", "refresh", function(frm) {
@@ -91,3 +64,26 @@ frappe.ui.form.on("Operator", "refresh", function(frm) {
         };
     });
 })
+
+function validate_prev_doc(frm, title){
+	return frappe.call({
+				method: "erpnext.custom_utils.get_prev_doc",
+				args: {doctype: frm.doctype, docname: frm.docname, col_list: "cost_center,branch"},
+				callback: function(r) {
+					if(frm.doc.cost_center && (frm.doc.cost_center !== r.message.cost_center)){
+						var d = frappe.prompt({
+							fieldtype: "Date",
+							fieldname: "date_of_transfer",
+							reqd: 1,
+							description: __("*This information shall be recorded in employee internal work history.")},
+							function(data) {
+								cur_frm.set_value("date_of_transfer",data.date_of_transfer);
+								refresh_many(["date_of_transfer"]);
+							},
+							title, 
+							__("Update")
+						);
+					}
+				}
+		});
+}

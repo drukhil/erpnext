@@ -333,10 +333,10 @@ class SalarySlip(TransactionBase):
                 absentes = frappe.db.sql("""
                         select count(*) as ab
                         from `tabAttendance`
-                        where status = 'Absent'
+                        where status = 'Absent' and docstatus = 1
                         and employee = %s
                         and att_date between %s and %s
-                """, (self.employee, start_date, end_date) )
+                """, (self.employee, start_date, end_date))
                 if absentes:
                         absent = absentes[0][0]
                 return absent

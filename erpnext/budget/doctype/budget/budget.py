@@ -21,11 +21,12 @@ class Budget(Document):
 		self.validate_duplicate()
 		self.validate_accounts()
 		self.calculate_budget()
-		self.update_project()
+		self.calculate_total()
+
 
 	def validate_duplicate(self):
 		existing_budget = frappe.db.get_value("Budget", {"cost_center": self.cost_center,
-			"fiscal_year": self.fiscal_year, "company": self.company,
+			"company": self.company,
 			"name": ["!=", self.name], "docstatus": ["!=", 2]})
 		if existing_budget:
 			frappe.throw(_("Another Budget record {0} already exists against {1} for fiscal year {2}")
@@ -73,12 +74,17 @@ class Budget(Document):
 				acc.db_set("budget_amount", acc.budget_amount)
 
 
-	def update_project(self):
-		doc = frappe.db.get_value("Project", {'project_name': self.cost_center}, 'name')
-		if doc:
-			frappe.get_doc("Project", doc).db_set("reference_budget", self.name)
-			frappe.get_doc("Project", doc).db_set("estimated_budget", self.actual_total)
-			frappe.msgprint("Budget Updated for Activity <b> `{0}` </b>".format(doc))
+	def calculate_total(self):
+        	init_amount = 0.0;
+        	actual_amount = 0.0;
+        	sup_amount = 0.0;
+        	for a in self.get("accounts"):
+                        init_amount += flt(a.initial_budget)
+                        actual_amount += flt(a.budget_amount)
+                        sup_amount += flt(a.supplementary_budget)
+		self.initial_total = flt(init_amount)
+		self.actual_total = flt(actual_amount)
+		self.supp_total = flt(sup_amount)
 
 def validate_expense_against_budget(args):
 	args = frappe._dict(args)

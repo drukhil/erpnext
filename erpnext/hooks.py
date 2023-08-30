@@ -8,19 +8,14 @@ app_publisher = "Frappe Technologies Pvt. Ltd."
 app_description = """ERP made simple"""
 app_icon = "icon-th"
 app_color = "#e74c3c"
-app_email = "erpnext@dhi.bt"
+app_email = "jigme@gyalsunginfra.bt"
 app_license = "GNU General Public License (v3)"
 source_link = "https://github.com/frappe/erpnext"
 
-error_report_email = "erpnext@dhi.bt"
+error_report_email = "jigme@gyalsunginfra.bt"
 
 app_include_js = "assets/js/erpnext.min.js"
-#app_include_css = "assets/css/erpnext.css"
-app_include_css = [
-        "assets/css/erpnext.css",
-        "assets/css/nrdcl.custom.css"
-]
-
+app_include_css = "assets/css/erpnext.css"
 web_include_js = "assets/js/erpnext-web.min.js"
 web_include_css = "assets/erpnext/css/website.css"
 
@@ -50,8 +45,8 @@ email_append_to = ["Job Applicant", "Opportunity", "Issue"]
 calendars = ["Task", "Production Order", "Leave Application", "Sales Order", "Holiday List"]
 
 #fixtures = []
-#fixtures = ["Property Setter"]
 fixtures = ["Web Form", "Custom Field", "Property Setter"]
+
 website_generators = ["Item Group", "Item", "Sales Partner", "Job Opening"]
 
 website_context = {
@@ -123,12 +118,15 @@ has_website_permission = {
 
 permission_query_conditions = {
 	"Contact": "erpnext.utilities.address_and_contact.get_permission_query_conditions_for_contact",
-	"Address": "erpnext.utilities.address_and_contact.get_permission_query_conditions_for_address"
+	"Address": "erpnext.utilities.address_and_contact.get_permission_query_conditions_for_address",
+	"Meeting": "erpnext.hr.doctype.meeting.meeting.get_permission_query_conditions"
 }
 
 has_permission = {
 	"Contact": "erpnext.utilities.address_and_contact.has_permission",
-	"Address": "erpnext.utilities.address_and_contact.has_permission"
+	"Address": "erpnext.utilities.address_and_contact.has_permission",
+	"Meeting": "erpnext.hr.doctype.meeting.meeting.has_record_permission"
+    
 }
 
 dump_report_map = "erpnext.startup.report_data_map.data_map"
@@ -138,8 +136,6 @@ before_tests = "erpnext.setup.utils.before_tests"
 """standard_queries = {
 	"Customer": "erpnext.selling.doctype.customer.customer.get_customer_list"
 }"""
-
-
 
 doc_events = {
 	"Stock Entry": {
@@ -180,7 +176,6 @@ scheduler_events = {
 		"erpnext.assets.doctype.asset.asset.sync_cc_branch",
 		#"erpnext.maintenance.doctype.equipment.equipment.sync_branch_asset",
 		"erpnext.selling.doctype.customer.customer.check_cc_branch",
-		"erpnext.accounts.doctype.auto_billing.auto_billing.post_billing_entries",
 		#"erpnext.hr.doctype.leave_application.leave_application.check_cancelled_leaves"    # Ver 2.0.190225 Commented by SHIV on 25/02/2019
 	],
 	"daily": [
@@ -189,14 +184,16 @@ scheduler_events = {
 		"erpnext.support.doctype.issue.issue.auto_close_tickets",
 		"erpnext.accounts.doctype.fiscal_year.fiscal_year.auto_create_fiscal_year",
 		"erpnext.hr.doctype.employee.employee.send_birthday_reminders",
+		"erpnext.projects.doctype.task.task.set_tasks_as_overdue",
 		"erpnext.assets.doctype.asset.depreciation.post_depreciation_entries",
 		"erpnext.hr.doctype.officiating_employee.officiating_employee.check_off_exp",
-		#"erpnext.maintenance.maintenance_utils.check_hire_end",
+		"erpnext.maintenance.maintenance_utils.check_hire_end",
 		#"erpnext.hr.hr_custom_functions.post_earned_leaves",
 		#"erpnext.hr.hr_custom_functions.post_casual_leaves",
 		"erpnext.hr.hr_custom_functions.post_leave_credits",
 		"erpnext.custom_functions.check_pending_approvers",
-		"erpnext.accounts.doctype.auto_billing.auto_billing.post_billing_entries"
+		"erpnext.projects.doctype.priority_project.priority_project.update_priority",
+        "erpnext.projects.doctype.bmt_project.bmt_project.update_bmt"
 	],
 }
 

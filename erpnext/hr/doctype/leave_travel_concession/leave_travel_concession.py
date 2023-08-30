@@ -6,11 +6,11 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt, getdate, cint
-from frappe.utils.data import nowdate, add_years, add_days, date_diff, month_diff
+from frappe.utils.data import nowdate, add_years, add_days, date_diff
 
 class LeaveTravelConcession(Document):
 	def validate(self):
-		self.validate_duplicate()
+		#self.validate_duplicate()
 		self.calculate_values()
 
 	def on_submit(self):
@@ -25,7 +25,7 @@ class LeaveTravelConcession(Document):
 		self.post_journal_entry(cc_amount)
 
 	def validate_duplicate(self):
-		doc = frappe.db.sql("select name from `tabLeave Travel Concession` where docstatus != 2 and fiscal_year = \'"+str(self.fiscal_year)+"\' and name != \'"+str(self.name)+"\'" )		
+		doc = frappe.db.sql("select name from `tabLeave Travel Concession` where docstatus != 2 and fiscal_year = \'"+str(self.fiscal_year)+"\' and employment_type = \'"+str(self.employment_type)+"\' and name != \'"+str(self.name)+"\'" )		
 		if doc:
 			frappe.throw("Cannot create multiple LTC for the same year")
 
@@ -88,9 +88,11 @@ class LeaveTravelConcession(Document):
 	#@frappe.whitelist()
 	def get_ltc_details(self):
 		start, end = frappe.db.get_value("Fiscal Year", self.fiscal_year , ["year_start_date", "year_end_date"])
-		query = "select e.date_of_joining, b.employee, b.employee_name, b.branch, a.amount, e.bank_name, e.bank_ac_no  from `tabSalary Detail` a, `tabSalary Structure` b, `tabEmployee` e where a.parent = b.name and b.employee = e.name and a.salary_component = 'Basic Pay' and (b.is_active = 'Yes' or e.relieving_date between \'"+str(start)+"\' and \'"+str(end)+"\') and b.eligible_for_ltc = 1 "
+		query = "select e.date_of_joining, b.employee, b.employee_name, b.branch, a.amount, e.bank_name, e.bank_ac_no  from `tabSalary Detail` a, `tabSalary Structure` b, `tabEmployee` e where a.parent = b.name and b.employee = e.name and a.salary_component = 'Basic Pay' and b.is_active = 'Yes' and b.eligible_for_ltc = 1 "
 		if self.employment_type:
 			query += " and e.employment_type = '{0}'".format(self.employment_type)
+		if self.employee:
+			query += " and e.name = '{0}'".format(self.employee)
 		query += " order by b.branch;"
 		entries = frappe.db.sql(query, as_dict=True)
 		self.set('items', [])
@@ -100,7 +102,7 @@ class LeaveTravelConcession(Document):
 			if getdate(date_of_joining) < getdate(start):
 				date_of_joining = start
 			if (date_of_joining) < getdate(str(self.fiscal_year) + "-10-01"):
-				no_of_days = date_diff(end, date_of_joining) 
+				no_of_days = date_diff(end , date_of_joining) 
 				d.basic_pay = d.amount
 				amount = d.amount
 				if flt(amount) > 15000:

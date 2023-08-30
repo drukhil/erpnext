@@ -12,7 +12,7 @@ def execute(filters=None):
 def get_data(filters):
 	data = frappe.db.sql("""
 		select 
-			a.name as asset, a.asset_category, a.status, 
+			a.name as asset, a.asset_name as asset_name, a.asset_category, a.status, 
 			a.depreciation_method, a.purchase_date, a.gross_purchase_amount,
 			ds.schedule_date as depreciation_date, ds.depreciation_amount, 
 			ds.accumulated_depreciation_amount, 
@@ -53,6 +53,12 @@ def get_columns():
 			"options": "Asset",
 			"width": 120
 		},
+		{
+                        "label": _("Asset Name"),
+                        "fieldname": "asset_name",
+                        "fieldtype": "Data",
+                        "width": 170
+                },
 		{
 			"label": _("Depreciation Date"),
 			"fieldname": "depreciation_date",

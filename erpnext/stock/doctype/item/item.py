@@ -33,8 +33,8 @@ class Item(WebsiteGenerator):
 			asset = frappe.db.get_all("Asset", filters={"item_code": self.name, "docstatus": 1}, limit=1)
 			self.set_onload("asset_exists", True if asset else False)
 
-
 	def autoname(self):
+		#self.item_code = "800001"
                 ##### Ver 2.0.190226, following code replaced by subsequent by SHIV on 26/02/2019
                 '''
                 if not self.item_code:
@@ -42,7 +42,6 @@ class Item(WebsiteGenerator):
                 '''
                 self.item_code = self.get_current_item_code()
                 ##### Ver 2.0.190226
-
                 if not self.item_code:
                         msgprint(_("Item Code is mandatory because Item is not automatically numbered"), raise_exception=1)
 
@@ -58,7 +57,7 @@ class Item(WebsiteGenerator):
                         base = frappe.db.get_value("Item Group", self.item_group, "item_code_base")
                         if not base:
                                 frappe.throw("Setup Item Code Base in Item Group")
-                        return str(base)
+			return base
 
 
 	def before_insert(self):

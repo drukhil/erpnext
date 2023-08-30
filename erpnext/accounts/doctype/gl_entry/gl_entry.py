@@ -121,27 +121,38 @@ class GLEntry(Document):
 		if not self.fiscal_year:
 			self.fiscal_year = get_fiscal_year(self.posting_date, company=self.company)[0]
 
+
 	def get_expense(self):
-		total_exp = 0.0
-        	if frappe.db.sql(""" select 1 from `tabAccount`  where root_type = 'Expense' and 
-			name = "{0}" """.format(self.account)):
-			if frappe.db.exists("Project", self.cost_center):
-				doc = frappe.get_doc("Project", self.cost_center)
-				total_exp = frappe.db.sql(""" select sum(debit) - sum(credit) as expense 
-					from `tabGL Entry` where cost_center = "{0}" and 
-				account in (select name from `tabAccount` where root_type = 'Expense')""".format(doc.name), as_dict = 1)
-				frappe.db.sql(""" update `tabProject` set expense = {0} where 
-				name = "{1}" """.format(flt(total_exp[0].expense), doc.name))
-				if not doc.is_group:
-					parent = frappe.get_doc("Project", doc.parent_project)
-					total_exp = frappe.db.sql(""" select sum(debit) - sum(credit) as expense 
-                                        from `tabGL Entry` where cost_center in ( select name from `tabCost Center` 
-					where parent_cost_center  = "{0}") and
-                                	account in (select name from `tabAccount` where root_type = 'Expense')""".format(parent.name), as_dict = 1)
-					frappe.db.sql(""" update `tabProject` set expense = {0}
-					where name = "{1}" """.format(flt(total_exp[0].expense), parent.name))
-					
-	
+                total_exp = 0.0
+                if frappe.db.sql(""" select 1 from `tabAccount`  where root_type = 'Expense' and 
+                        name = "{0}" """.format(self.account)):
+                        if frappe.db.exists("Project", self.cost_center):
+                                doc = frappe.get_doc("Project", self.cost_center)
+                                from erpnext.accounts.accounts_custom_functions import get_child_cost_centers
+                                parent_cc = frappe.get_doc("Cost Center", self.cost_center).parent_cost_center
+                                cost_centers = get_child_cost_centers(parent_cc)
+
+                                total_exp = frappe.db.sql(""" select sum(debit) - sum(credit) as expense from `tabGL Entry` 
+                                where cost_center IN %(cost_center)s  and account in (select name from `tabAccount` 
+                                where root_type = 'Expense') and docstatus = 1""", {"cost_center": cost_centers}, as_dict = 1)
+
+                                if not doc.is_group:
+                                        total_exp = frappe.db.sql(""" select sum(debit) - sum(credit) as expense 
+                                                from `tabGL Entry` where cost_center = "{0}" and 
+                                        account in (select name from `tabAccount` where root_type = 'Expense')""".format(doc.name), as_dict = 1)
+                                        frappe.db.sql(""" update `tabProject` set expense = {0} where 
+                                        name = "{1}" """.format(flt(total_exp[0].expense), doc.name))
+
+                                        '''if total_exp:
+                                        doc = frappe.get_doc("Project", parent)
+                                        doc.db_set('expense', flt(total_exp[0].expense))'''
+
+                                        frappe.db.sql(""" update `tabProject` set expense = {0}
+                                                where name = "{1}" """.format(flt(total_exp[0].expense), doc.parent_project))
+                                else:
+                                        frappe.db.sql(""" update `tabProject` set expense = {0}
+                                                where name = "{1}" """.format(flt(total_exp[0].expense), doc.name))
+
 def validate_balance_type(account, adv_adj=False):
 	if not adv_adj and account:
 		balance_must_be = frappe.db.get_value("Account", account, "balance_must_be")

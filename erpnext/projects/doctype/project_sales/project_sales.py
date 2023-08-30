@@ -50,11 +50,9 @@ class ProjectSales(Document):
 				
 	
 	def post_journal_entry(self):
-		allow_inter_company_transaction = frappe.db.get_single_value("Accounts Settings", "auto_accounting_for_inter_company")
-		if allow_inter_company_transaction:
-			ic_account = frappe.db.get_single_value("Accounts Settings", "intra_company_account")
-			if not ic_account:
-				frappe.throw("Setup Intra-Company Account in Accounts Settings")
+		ic_account = frappe.db.get_single_value("Accounts Settings", "intra_company_account")
+		if not ic_account:
+			frappe.throw("Setup Intra-Company Account in Accounts Settings")	
 		sale_account = frappe.db.get_single_value("Projects Accounts Settings", "inventory_account")
 		if not sale_account:
 			frappe.throw("Setup Sale of Inventory Account in Maintenance Accounts Settings")	
@@ -87,24 +85,18 @@ class ProjectSales(Document):
 						"debit": flt(cc_amount[acc]),
 					})
 
-			allow_inter_company_transaction = frappe.db.get_single_value("Accounts Settings", "auto_accounting_for_inter_company")
-			if allow_inter_company_transaction:
-				ic_account = frappe.db.get_single_value("Accounts Settings", "intra_company_account")
-				if not ic_account:
-					frappe.throw("Setup Intra-Company Account in Accounts Settings")
-				je.append("accounts", {
-						"account": ic_account,
-						"cost_center": self.buying_cost_center,
-						"credit_in_account_currency": flt(total_amount),
-						"credit": flt(total_amount),
-					})
-				je.append("accounts", {
-						"account": ic_account,
-						"cost_center": self.selling_cost_center,
-						"debit_in_account_currency": flt(total_amount),
-						"debit": flt(total_amount),
-					})
-
+			je.append("accounts", {
+					"account": ic_account,
+					"cost_center": self.buying_cost_center,
+					"credit_in_account_currency": flt(total_amount),
+					"credit": flt(total_amount),
+				})
+			je.append("accounts", {
+					"account": ic_account,
+					"cost_center": self.selling_cost_center,
+					"debit_in_account_currency": flt(total_amount),
+					"debit": flt(total_amount),
+				})
 			je.append("accounts", {
 					"account": sale_account,
 					"reference_type": "Project Sales",

@@ -103,23 +103,23 @@ frappe.ui.form.on('Travel Authorization', {
 		frm.toggle_reqd("estimated_amount", frm.doc.need_advance==1);
 		frm.toggle_reqd("currency", frm.doc.need_advance==1);
 		frm.toggle_reqd("advance_amount", frm.doc.need_advance==1);
-        	calculate_advance(frm);
-		},
+		calculate_advance(frm);
+	},
 	"advance_amount": function(frm) {
 		if(frm.doc.advance_amount && !frm.doc.estimated_amount){
 			msgprint("Total Estimated Amount required for advance request");
-		} else if (frm.doc.advance_amount > frm.doc.estimated_amount * 0.9) {
-			msgprint("Advance amount cannot be greater than 90% of the estimated amount");
-			//frm.set_value("advance_amount", 0)
+		}
+		// if (frm.doc.advance_amount > frm.doc.estimated_amount * 0.9) {
+		// 	msgprint("Advance amount cannot be greater than 90% of the estimated amount");
+		// 	//frm.set_value("advance_amount", 0)
+		// }
+		if(frm.doc.currency == "BTN") {
+			frm.set_value("advance_amount_nu", flt(frm.doc.advance_amount))
 		}
 		else {
-			if(frm.doc.currency == "BTN") {
-				frm.set_value("advance_amount_nu", flt(frm.doc.advance_amount))
-			}
-			else {
-				update_advance_amount(frm)
-			}
+			update_advance_amount(frm)
 		}
+		calculate_advance(frm);
 	},
 	"document_status": function(frm) {
 		if(frm.doc.document_status == "Rejected") {
@@ -177,8 +177,9 @@ frappe.ui.form.on("Travel Authorization Item", {
 		}
 		*/
 		if(frm.doc.need_advance) {
-			calculate_advance(frm);
-		}
+                        calculate_advance(frm);
+                }
+
 	},
 		
 	"till_date": function(frm, cdt, cdn) {
@@ -191,9 +192,6 @@ frappe.ui.form.on("Travel Authorization Item", {
 				msgprint("Till Date cannot be earlier than From Date")
 				frappe.model.set_value(cdt, cdn, "till_date", "")
 			}
-		}
-		if(frm.doc.need_advance) {
-			calculate_advance(frm);
 		}
 	},
 	
@@ -218,20 +216,22 @@ frappe.ui.form.on("Travel Authorization Item", {
 		}
 	},
 	items_remove: function(frm)
-		{
-		if(frm.doc.need_advance) {
-			calculate_advance(frm);
-		}
-	}
+                {
+                if(frm.doc.need_advance) {
+                        calculate_advance(frm);
+                }
+        }
+
 });
 
 
 function calculate_advance(frm) {
-	 frm.call({
+         frm.call({
                         method: "set_estimate_amount",
                         doc: frm.doc
                 });
-	}
+        }
+
 function update_advance_amount(frm) {
 	frappe.call({
 		method: "erpnext.hr.doctype.travel_authorization.travel_authorization.get_exchange_rate",

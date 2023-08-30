@@ -49,7 +49,7 @@
    "label": "Employee Type", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "\nMuster Roll Employee\nOperator\nOpen Air Prisoner", 
+   "options": "\nMuster Roll Employee\nOperator\nOpen Air Prisoner\nDFG", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -73,7 +73,7 @@
    "in_filter": 0, 
    "in_list_view": 0, 
    "label": "Employee", 
-   "length": 20, 
+   "length": 50, 
    "no_copy": 0, 
    "options": "employee_type", 
    "permlevel": 0, 
@@ -124,7 +124,7 @@
    "in_filter": 0, 
    "in_list_view": 0, 
    "label": "CID", 
-   "length": 0, 
+   "length": 50, 
    "no_copy": 0, 
    "permlevel": 0, 
    "precision": "", 
@@ -135,7 +135,8 @@
    "reqd": 0, 
    "search_index": 0, 
    "set_only_once": 0, 
-   "unique": 0
+   "unique": 0, 
+   "width": "50"
   }, 
   {
    "allow_on_submit": 0, 
@@ -723,7 +724,7 @@
  "issingle": 0, 
  "istable": 1, 
  "max_attachments": 0, 
- "modified": "2021-01-14 20:04:39.672927", 
+ "modified": "2023-06-17 16:18:23.005192", 
  "modified_by": "Administrator", 
  "module": "Projects", 
  "name": "MR Payment Item", 
@@ -735,6 +736,6 @@
  "read_only_onload": 0, 
  "sort_field": "modified", 
  "sort_order": "DESC", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }

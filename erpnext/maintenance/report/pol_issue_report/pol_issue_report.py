@@ -36,7 +36,7 @@ def get_data(filters):
                 query += " and is_disabled = 0"
 
 	items = frappe.db.sql("select item_code, item_name, stock_uom from tabItem where is_pol_item = 1", as_dict=True)
-
+	row = []
         for eq in frappe.db.sql(query, as_dict=True):
 		for item in items:
 			own_cc = 0

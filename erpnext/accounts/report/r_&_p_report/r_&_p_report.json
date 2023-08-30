@@ -7,7 +7,7 @@
  "doctype": "Report", 
  "idx": 0, 
  "is_standard": "Yes", 
- "modified": "2020-07-29 08:24:11.665776", 
+ "modified": "2020-08-27 03:43:27.631699", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "R & P Report", 
@@ -24,6 +24,9 @@
   }, 
   {
    "role": "Management"
+  }, 
+  {
+   "role": "Accounts User"
   }
  ]
 }

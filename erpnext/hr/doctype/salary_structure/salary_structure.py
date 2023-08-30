@@ -60,6 +60,7 @@ class SalaryStructure(Document):
 		set_employee_name(self)
 		self.check_multiple_active()
 		self.update_salary_structure()
+                self.get_employee_details()
 	
 		if self.employment_type == 'GEP':
 			self.depend_salary_on_attendance = 1
@@ -86,6 +87,8 @@ class SalaryStructure(Document):
         
 	def get_employee_details(self):
                 emp = frappe.get_doc("Employee", self.employee)
+                for a in emp.external_work_history:
+                        self.parent_organization = a.company_name
                 self.employee_name      = emp.employee_name
 		self.branch             = emp.branch
 		self.designation        = emp.designation
@@ -423,6 +426,10 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
                                                 calc_amount = round(flt(amount)*(flt(working_days)/flt(days_in_month)))
 
                                 
+                                # following condition added by SHIV on 2021/05/28
+                                if not flt(calc_amount):
+                                        continue
+
                                 calc_map.setdefault(key,[]).append({
                                         'salary_component'         : d.salary_component,
                                         'depends_on_lwp'           : d.depends_on_lwp,
@@ -545,6 +552,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 							gross_amt1 = gross_amt - deput_amt 
 							tax_amt1 = get_salary_tax(flt(gross_amt1) - flt(gis) - flt(pf) -(flt(comm_amt) * 0.5))  
 							tax_amt = tax_amt - tax_amt1	
+                                                        
 
 						d['amount'] = flt(tax_amt)
                                                 tax_included = 1
@@ -554,12 +562,12 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
                 #[target.append('deductions',m) for m in calc_map['deductions']]
 		for m in calc_map['earnings']:
 			#frappe.msgprint("hhh {0} {1}".format(m['salary_component'], source.employment_type))
-			if source.employment_type == 'Deputation' and m['salary_component'] not in ['Deputation Allowance', 'Communication Allowance', 'Salary Arrears']:
+			if source.employment_type == 'Deputation' and m['salary_component'] not in ['Deputation Allowance','Communication Allowance', 'Salary Arrears', 'Contract Allowance CDCL', 'PSA']:
 				continue 
 			else:
 				target.append('earnings', m)
 		for m in calc_map['deductions']:
-			if source.employment_type == 'Deputation' and m['salary_component'] not in ['SWS', 'Salary Tax', 'Health Contribution', 'Other deduction', 'Other Recoveries']:
+			if source.employment_type == 'Deputation' and m['salary_component'] not in ['SWS', 'Salary Tax','Health Contribution', 'Other deduction','Other Recoveries']:
 				continue
 			else:
 				target.append('deductions', m)

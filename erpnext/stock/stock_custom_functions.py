@@ -22,6 +22,7 @@ def getItemCode(item_group):
 		"Spareparts": 300000,
 		"Services Miscellaneous": 400000,
 		"Services Works": 500000,
+		"Locally Extract Material": 800000,
 		"Sales Product": 600000
 	}.get(item_group, 000000)
 

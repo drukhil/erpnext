@@ -99,7 +99,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2017-11-17 20:00:14.963754", 
+ "modified": "2021-11-25 11:30:43.997636", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Gewogs", 
@@ -152,6 +152,6 @@
  "read_only_onload": 0, 
  "sort_field": "modified", 
  "sort_order": "DESC", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }

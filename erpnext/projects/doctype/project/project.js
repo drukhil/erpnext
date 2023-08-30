@@ -12,7 +12,9 @@ cur_frm.add_fetch("reference_budget", "actual_total", "estimated_budget" );
 
 frappe.ui.form.on("Project", {
 	setup: function(frm) {
-		frm.get_docfield("activity_tasks").allow_bulk_edit = 1;			
+		frm.get_docfield("activity_tasks").allow_bulk_edit = 1;		
+		frm.get_docfield("additional_tasks").allow_bulk_edit = 1;		
+		
 		frm.get_field('activity_tasks').grid.editable_fields = [
 			{fieldname: 'task', columns: 3},
 			{fieldname: 'is_milestone', columns: 1},
@@ -168,6 +170,7 @@ frappe.ui.form.on("Project", {
 	expected_start_date: function(cur_frm) {
 		if(cur_frm.doc.expected_end_date) {
 			calculate_duration(cur_frm, cur_frm.doc.expected_start_date, cur_frm.doc.expected_end_date);
+	//cur_frm.set_value('total_duration', frappe.datetime.get_day_diff(cur_frm.doc.expected_end_date, cur_frm.doc.expected_start_date) + 1)
 		}
 	},
 	
@@ -175,6 +178,7 @@ frappe.ui.form.on("Project", {
 	expected_end_date: function() {
 		if(cur_frm.doc.expected_start_date) {
 			calculate_duration(cur_frm, cur_frm.doc.expected_start_date, cur_frm.doc.expected_end_date);
+	//cur_frm.set_value('total_duration', frappe.datetime.get_day_diff(cur_frm.doc.expected_end_date, cur_frm.doc.expected_start_date) + 1)
 		}
 	},
 	mandays: function() {
@@ -187,10 +191,19 @@ frappe.ui.form.on("Project", {
 	total_duration: function() {
 		cur_frm.set_value("man_power_required", Math.round(parseFloat(cur_frm.doc.mandays)/parseFloat(cur_frm.doc.total_duration)))
 	},
+	physical_progress_weightage: function() {
+		//cur_frm.set_value("percent_completed", (parseFloat(cur_frm.doc.physical_progress)/parseFloat(cur_frm.doc.physical_progress_weightage) *100).toFixed(4))
+		//cur_frm.set_value("physical_progress", (parseFloat(cur_frm.doc.percent_completed)/100 * parseFloat(cur_frm.doc.physical_progress_weightage)).toFixed(4))
+	},
+	//percent_completed: function() {
+		//cur_frm.set_value("physical_progress", (parseFloat(cur_frm.doc.percent_completed)/100 * parseFloat(cur_frm.doc.physical_progress_weightage)).toFixed(4))
+	//}
 });
 
 
 
+// ++++++++++++++++++++ Ver 1.0 BEGINS ++++++++++++++++++++
+// Following block of code added by SHIV on 11/08/2017
 frappe.ui.form.on("Activity Tasks", {
 	
 	task_category: function(frm, doctype, name) {
@@ -212,11 +225,10 @@ frappe.ui.form.on("Activity Tasks", {
 			calculate_duration1(frm, doctype, name, item.start_date, item.end_date);
 		}
 		for(var i=0; i<at.length; i++){
-			if(!at[i].is_milestone) {
-                        	task_duration += parseFloat(at[i].task_duration || 0.0);
-			}
+                        task_duration += parseFloat(at[i].task_duration || 0.0);
                 }
 		cur_frm.set_value('duration_sum', task_duration)
+		//frappe.model.set_value(doctype, name, "task_weightage", (parseFloat(item.task_duration)/parseFloat(task_duration) * parseFloat(cur_frm.doc.physical_progress_weightage)).toFixed(7));
 		frappe.model.set_value(doctype, name, "task_weightage", (parseFloat(item.task_duration)/parseFloat(task_duration)*100).toFixed(7));
 		frappe.model.set_value(doctype, name, "one_day_weightage", (parseFloat(item.task_weightage)/parseFloat(item.task_duration)).toFixed(7))
 	},
@@ -228,11 +240,10 @@ frappe.ui.form.on("Activity Tasks", {
 			calculate_duration1(frm, doctype, name, item.start_date, item.end_date);
 		}
                 for(var i=0; i<at.length; i++){
-			if(!at[i].is_milestone) {
-                        	task_duration += parseFloat(at[i].task_duration || 0.0);
-                	}	
-		}
+                        task_duration += parseFloat(at[i].task_duration || 0.0);
+                }
 		cur_frm.set_value('duration_sum', task_duration);
+                //frappe.model.set_value(doctype, name, "task_weightage", (parseFloat(item.task_duration)/parseFloat(task_duration)* parseFloat(cur_frm.doc.physical_progress_weightage)).toFixed(7));
                 frappe.model.set_value(doctype, name, "task_weightage", (parseFloat(item.task_duration)/parseFloat(task_duration)*100).toFixed(7));
 		frappe.model.set_value(doctype, name, "one_day_weightage", (parseFloat(item.task_weightage)/parseFloat(item.task_duration)).toFixed(7))
 
@@ -243,14 +254,14 @@ frappe.ui.form.on("Activity Tasks", {
 		frappe.model.set_value(doctype, name, "one_day_achievement", (parseFloat(item.task_achievement_percent)/parseFloat(item.task_duration).toFixed(7)))
 	
 	},
+	task_duration: function(frm, doctype, name) {
+	},
 	task_achievement_percent: function(frm, doctype, name) {
 	var at = frm.doc.activity_tasks || [];
         var task_achievement_percent1 = 0.0
         for(var i=0; i<at.length; i++){
-			if(!at[i].is_milestone) {
                         task_achievement_percent1 += parseFloat(at[i].task_achievement_percent || 0.0);
                 }
-	}
         cur_frm.set_value("percent_completed", (parseFloat(task_achievement_percent1)).toFixed(4))
 	cur_frm.set_value("physical_progress", (parseFloat(cur_frm.doc.percent_completed)/100 * parseFloat(cur_frm.doc.physical_progress_weightage)).toFixed(4))
 	}
@@ -344,14 +355,16 @@ var calculate_work_quantity = function(frm){
 	total_add_work_quantity_complete = 0.0;
 
 	for(var i=0; i<at.length; i++){
-		if (at[i].work_quantity && !at[i].is_milestone){
+		//console.log(at[i].is_group);
+		if (at[i].work_quantity && !at[i].is_group){
 			total_work_quantity += at[i].work_quantity || 0;
 			total_work_quantity_complete += at[i].work_quantity_complete || 0;
 		}
 	}
 	
 	for(var i=0; i<adt.length; i++){
-		if (adt[i].work_quantity && !adt[i].is_milestone){
+		//console.log(at[i].is_group);
+		if (adt[i].work_quantity && !adt[i].is_group){
 			total_add_work_quantity += adt[i].work_quantity || 0;
 			total_add_work_quantity_complete += adt[i].work_quantity_complete || 0;
 		}

@@ -28,6 +28,7 @@ class AssetMovement(Document):
 
 	def assign_data(self):
 		self.source_custodian = frappe.db.get_value("Asset", self.asset, "issued_to")
+		self.source_custodian_name = frappe.db.get_value("Asset", self.asset, "employee_name")
 		self.current_cost_center = frappe.db.get_value("Asset", self.asset, "cost_center")
 
 	def validate_asset(self):
@@ -130,7 +131,8 @@ class AssetMovement(Document):
                         cost_center = self.target_custodian_cost_center
 
 		frappe.db.set_value("Asset", self.asset, "issued_to", custodian)
-		
+		frappe.db.set_value("Asset", self.asset, "employee_name", frappe.get_doc("Employee", custodian).employee_name)
+	
 		if self.current_cost_center != self.target_custodian_cost_center:
 			branch = frappe.db.get_value("Cost Center", cost_center, "branch")
 			frappe.db.set_value("Asset", self.asset, "cost_center", frappe.db.get_value("Employee", custodian, "cost_center"))
@@ -165,12 +167,12 @@ class AssetMovement(Document):
 		frappe.db.set_value("Asset", self.asset, "cost_center", cc)
 		frappe.db.set_value("Asset", self.asset, "branch", branch)
 
-		equipment = frappe.db.get_value("Equipment", {"asset_code": self.asset}, "name")
-                if equipment:
-                        save_equipment(equipment, branch, self.posting_date, self.name, purpose)
+# 		equipment = frappe.db.get_value("Equipment", {"asset_code": self.asset}, "name")
+#                 if equipment:
+#                         save_equipment(equipment, branch, self.posting_date, self.name, purpose)
 
-def save_equipment(equipment, branch, posting_date, ref_doc, purpose):
-                equip = frappe.get_doc("Equipment", equipment)
-                equip.branch = branch
-                equip.create_equipment_history(branch, posting_date, ref_doc, purpose)
-                equip.save()
+# def save_equipment(equipment, branch, posting_date, ref_doc, purpose):
+#                 equip = frappe.get_doc("Equipment", equipment)
+#                 equip.branch = branch
+#                 equip.create_equipment_history(branch, posting_date, ref_doc, purpose)
+#                 equip.save()

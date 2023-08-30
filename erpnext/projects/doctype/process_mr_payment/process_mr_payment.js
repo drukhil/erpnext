@@ -76,6 +76,11 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 			"employee_type": employee_type,
 			"dn": dn
 		},
+		//refresh: function(frm) {
+		//	console.log("ISNIDE")
+	//	},
+	//	freeze: 1,
+	//	freeze_message: "Processing.....Please Wait",
 		callback: function(r) {
 			if(r.message) {
 				var total_overall_amount = 0;
@@ -83,6 +88,7 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 				var wages_amount = 0;
 				var gratuity_amount = 0;
 				//cur_frm.clear_table("items");
+				console.log(r.message);
 				r.message.forEach(function(mr) {
 					if(mr['number_of_days'] > 0 || mr['number_of_hours'] > 0) {
 						var row = frappe.model.add_child(cur_frm.doc, "MR Payment Item", "items");
@@ -100,11 +106,15 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 						row.designation = mr['designation'];
 						if(mr['type'] == 'Operator'){
 							row.daily_rate      = parseFloat(mr['salary'])/parseFloat(mr['noof_days_in_month']);
+							//row.daily_rate  = 300.00
 							row.hourly_rate     = parseFloat(mr['salary']*1.0)/parseFloat(mr['noof_days_in_month']*8);
 							row.total_ot_amount = parseFloat(row.number_of_hours) * parseFloat(row.hourly_rate);
 							row.total_wage      = parseFloat(row.daily_rate) * parseFloat(row.number_of_days);
 							if((parseFloat(row.total_wage) > parseFloat(mr['salary']))||(parseFloat(mr['noof_days_in_month']) == parseFloat(mr['number_of_days']))){
 								row.total_wage = parseFloat(mr['salary']);
+								if(row.total_wage> 9000) {
+									row.total_wage = 9000
+								}
 							}
 							row.gratuity_amount = 0
 						}
@@ -119,13 +129,14 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 							row.gratuity_amount = mr['gratuity']
 						}
 						 else {
-							//row.daily_rate 	= mr['rate_per_day'];
+							row.daily_rate 	= mr['rate_per_day'];
 							//row.hourly_rate 	= mr['rate_per_hour'];
 							row.gratuity_amount = 0
 							row.total_ot_amount = parseFloat(mr['total_ot']);
 							//row.total_wage 		= parseFloat(mr['total_wage']);
 							row.total_wage = parseFloat(mr['rate_per_day'])*parseFloat(mr['number_of_days'])
 						}
+						
 						
 						row.total_amount 	= parseFloat(row.total_ot_amount) + parseFloat(row.total_wage) - parseFloat(row.gratuity_amount);
 						refresh_field("items");

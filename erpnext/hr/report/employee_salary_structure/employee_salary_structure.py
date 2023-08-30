@@ -32,7 +32,7 @@ def execute(filters=None):
 		row = [ss.employee, ss.employee_name, ss.cid,
                         ss.bank_name, ss.bank_account_no, 
 			ss.company, ss.branch, ss.department,
-                        ss.division, ss.section, ss.employee_grade, ss.designation, ss.employment_type,
+                        ss.division, ss.section, ss.employee_grade, ss.designation, ss.employment_type, ss.parent_organization,
                         status,
                         ss.from_date, ss.to_date]
 			
@@ -56,13 +56,23 @@ def execute(filters=None):
 	
 def get_columns(salary_structures):
 	columns = [
-		_("Employee") + ":Link/Employee:80", _("Employee Name") + "::140",_("CID") + "::100",
-		_("Bank Name")+ "::80", _("Bank A/C#")+"::100", 
+		_("Employee") + ":Link/Employee:80",
+                 _("Employee Name") + "::140",
+                 _("CID") + "::100",
+		_("Bank Name")+ "::80", 
+                _("Bank A/C#")+"::100", 
 		_("Company") + ":Link/Company:120",
-                _("Branch") + ":Link/Branch:120", _("Department") + ":Link/Department:120", _("Division") + ":Link/Division:120",
-                _("Section") + ":Link/Section:120",_("Grade") + "::80", _("Designation") + ":Link/Designation:120", _("Employment Type") + "::100",
+                _("Branch") + ":Link/Branch:120", 
+                _("Department") + ":Link/Department:120", 
+                _("Division") + ":Link/Division:120",
+                _("Section") + ":Link/Section:120",
+                _("Grade") + "::80",
+                 _("Designation") + ":Link/Designation:120",
+                  _("Employment Type") + "::100",
+                  _("Parent Organization") + "::100",
 		_("Status") + "::100",
-                _("From Date") + ":Date:80", _("To Date") + ":Date:80"
+                _("From Date") + ":Date:80",
+                 _("To Date") + ":Date:80"
 	]
 	earning_types = []
 	ded_types     = []

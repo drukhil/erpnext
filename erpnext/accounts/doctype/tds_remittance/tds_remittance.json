@@ -22,7 +22,11 @@
    "ignore_user_permissions": 0, 
    "ignore_xss_filter": 0, 
    "in_filter": 0, 
+<<<<<<< HEAD
    "in_list_view": 0, 
+=======
+   "in_list_view": 1, 
+>>>>>>> 481acce0b0473e02e508b18258351a662b38a341
    "label": "Branch", 
    "length": 0, 
    "no_copy": 0, 
@@ -43,8 +47,13 @@
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "cost_center", 
+<<<<<<< HEAD
    "fieldtype": "Read Only", 
    "hidden": 0, 
+=======
+   "fieldtype": "Data", 
+   "hidden": 1, 
+>>>>>>> 481acce0b0473e02e508b18258351a662b38a341
    "ignore_user_permissions": 0, 
    "ignore_xss_filter": 0, 
    "in_filter": 0, 
@@ -97,7 +106,11 @@
    "fieldname": "tds_account", 
    "fieldtype": "Link", 
    "hidden": 0, 
+<<<<<<< HEAD
    "ignore_user_permissions": 1, 
+=======
+   "ignore_user_permissions": 0, 
+>>>>>>> 481acce0b0473e02e508b18258351a662b38a341
    "ignore_xss_filter": 0, 
    "in_filter": 0, 
    "in_list_view": 0, 
@@ -151,7 +164,11 @@
    "ignore_user_permissions": 0, 
    "ignore_xss_filter": 0, 
    "in_filter": 0, 
+<<<<<<< HEAD
    "in_list_view": 0, 
+=======
+   "in_list_view": 1, 
+>>>>>>> 481acce0b0473e02e508b18258351a662b38a341
    "label": "Posting Date", 
    "length": 0, 
    "no_copy": 0, 
@@ -345,7 +362,11 @@
    "fieldname": "account", 
    "fieldtype": "Link", 
    "hidden": 0, 
+<<<<<<< HEAD
    "ignore_user_permissions": 1, 
+=======
+   "ignore_user_permissions": 0, 
+>>>>>>> 481acce0b0473e02e508b18258351a662b38a341
    "ignore_xss_filter": 0, 
    "in_filter": 0, 
    "in_list_view": 0, 
@@ -543,7 +564,11 @@
    "fieldname": "select_cheque_lot", 
    "fieldtype": "Link", 
    "hidden": 0, 
+<<<<<<< HEAD
    "ignore_user_permissions": 1, 
+=======
+   "ignore_user_permissions": 0, 
+>>>>>>> 481acce0b0473e02e508b18258351a662b38a341
    "ignore_xss_filter": 0, 
    "in_filter": 0, 
    "in_list_view": 0, 
@@ -694,7 +719,11 @@
    "fieldname": "company", 
    "fieldtype": "Link", 
    "hidden": 1, 
+<<<<<<< HEAD
    "ignore_user_permissions": 1, 
+=======
+   "ignore_user_permissions": 0, 
+>>>>>>> 481acce0b0473e02e508b18258351a662b38a341
    "ignore_xss_filter": 0, 
    "in_filter": 0, 
    "in_list_view": 0, 
@@ -724,7 +753,11 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
+<<<<<<< HEAD
  "modified": "2020-11-04 10:10:12.185511", 
+=======
+ "modified": "2022-01-13 14:25:59.446755", 
+>>>>>>> 481acce0b0473e02e508b18258351a662b38a341
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "TDS Remittance", 
@@ -776,7 +809,11 @@
    "apply_user_permissions": 0, 
    "cancel": 1, 
    "create": 1, 
+<<<<<<< HEAD
    "delete": 1, 
+=======
+   "delete": 0, 
+>>>>>>> 481acce0b0473e02e508b18258351a662b38a341
    "email": 1, 
    "export": 1, 
    "if_owner": 0, 
@@ -797,6 +834,10 @@
  "read_only_onload": 0, 
  "sort_field": "modified", 
  "sort_order": "DESC", 
+<<<<<<< HEAD
  "track_changes": 0, 
+=======
+ "track_changes": 1, 
+>>>>>>> 481acce0b0473e02e508b18258351a662b38a341
  "track_seen": 0
 }

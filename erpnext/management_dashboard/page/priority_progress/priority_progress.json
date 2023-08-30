@@ -1,0 +1,30 @@
+{
+ "content": null, 
+ "creation": "2022-05-19 13:15:00.619256", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2022-05-23 11:21:17.388810", 
+ "modified_by": "Administrator", 
+ "module": "Management Dashboard", 
+ "name": "priority-progress", 
+ "owner": "Administrator", 
+ "page_name": "Priority Progress", 
+ "roles": [
+  {
+   "role": "Administrator"
+  }, 
+  {
+   "role": "Employee"
+  }, 
+  {
+   "role": "Projects User"
+  }, 
+  {
+   "role": "Employee"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null
+}

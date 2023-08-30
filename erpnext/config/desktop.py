@@ -265,11 +265,11 @@ def get_data():
 			"type": "list"
 		},
 		{
-			"module_name": "Schools",
+			"module_name": "test",
 			"color": "#DE2B37",
 			"icon": "octicon octicon-mortar-board",
-			"type": "module",
-			"label": _("Schools")
+			"type": "page",
+			"label": _("Test")
 		},
 		{
 			"module_name": "Management Dashboard",
@@ -277,13 +277,6 @@ def get_data():
 			"icon": "octicon octicon-broadcast",
 			"type": "module",
 		},
-		{
-                        "module_name": "Knowledge And Support",
-                        "color": "#2c3e50",
-                        "icon": "icon-phone",
-                        "icon": "octicon octicon-issue-opened",
-                        "type": "module"
-                },
 		{
                         "module_name": "Assets",
                         "color": "#4286f4",
@@ -299,5 +292,26 @@ def get_data():
                         "hidden": 1,
                         "label": _("Budget Management"),
                         "type": "module"
+                },
+				  {
+			"module_name": "Priority Activites",
+			"color": "#FFA500",
+			"icon": "icon-puzzle-piece",
+			"label": _("Priority Activities"),
+			"type": "module"
+		},
+		{
+                        "module_name": "Knowledge And Support",
+                        "color": "#2c3e50",
+                        "icon": "icon-file-text-alt",
+                        "label": _("Knowledge And Support"),
+                        "type": "module"
+                },
+				{
+                        "module_name": "Phone",
+                        "color": "#2c3e50",
+                        "icon": "icon-phone",
+                        "label": _("Phone Directory"),
+                        "type": "link"
                 },
 	]

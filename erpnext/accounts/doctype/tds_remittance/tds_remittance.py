@@ -21,6 +21,7 @@ class TDSRemittance(AccountsController):
 				self.total_amount= total_bill	
 		self.validate_tds_account()
 		#self.duplication_entry_check()
+	
 	def duplication_entry_check(self):
 		for i in self.items:
 			check_dup = frappe.db.sql("""
@@ -55,11 +56,13 @@ class TDSRemittance(AccountsController):
 
 	
 	def get_details(self):
-		branch = frappe.get_doc("Branch", {'expense_bank_account': self.account}).name
-		query = """ select d.posting_date, d.party, d.name as invoice_no, d.taxable_amount as bill_amount, d.tds_amount from 
+		#branch = frappe.get_doc("Branch", {'expense_bank_account': self.account}).name
+		branch = self.branch
+		query = """
+			select d.posting_date, d.party, d.name as invoice_no, d.taxable_amount as bill_amount, d.tds_amount from 
                                 `tabDirect Payment` d  where tds_percent = '{0}' 
                                 and d.posting_date >= '{1}' and d.posting_date <= '{2}' 
-                                and docstatus = 1 and branch = '{3}' 
+                                and docstatus = 1 and branch = "{3}" 
                                 and not exists (
                                         select 1 from `tabTDS Remittance Item` i
                                         inner join `tabTDS Remittance` t
@@ -67,26 +70,35 @@ class TDSRemittance(AccountsController):
                                         where i.invoice_no = d.name
                                         and t.docstatus = 1
                                 )
-				union all 
+                                union all 
                                 select p.posting_date, p.supplier, p.name,  p.tds_taxable_amount as bill_amount, p.tds_amount 
-                                from `tabPurchase Invoice` p where tds_rate = '{0}' and docstatus =1
-				and branch = '{3}'
-				and not exists (
+                                from `tabPurchase Invoice` p where tds_rate = '{0}' and docstatus =1 
+                                and branch = "{3}"
+                                and not exists (
                                         select 1 from `tabTDS Remittance Item` i
                                         inner join `tabTDS Remittance` t
                                         on i.parent = t.name
                                         where i.invoice_no = p.name
                                         and t.docstatus = 1
                                 ) 
-				and exists (
-					select 1 from `tabPayment Entry` pe, 
-					`tabPayment Entry Reference` per
-					where per.parent = pe.name and pe.docstatus = 1 
-					and per.reference_name = p.name and 
-					pe.posting_date >= '{1}' and pe.posting_date <= '{2}')""".format(self.tds_rate, self.from_date, self.to_date, branch)	
+                                and exists (
+                                        select 1 from `tabPayment Entry` pe, 
+                                        `tabPayment Entry Reference` per
+                                        where per.parent = pe.name and pe.docstatus = 1 
+                                        and per.reference_name = p.name and 
+                                        pe.posting_date >= '{1}' and pe.posting_date <= '{2}')
+                                union all
+                                select pe.posting_date, pe.party as supplier, pe.name, pe.paid_amount as bill_amount, 
+                                -1* ped.amount as tds_amount  from
+                                `tabPayment Entry` pe, `tabPayment Entry Deduction` ped where ped.parent = pe.name 
+                                and ped.account = '{4}' and pe.docstatus = 1 and pe.branch = "{3}" and pe.posting_date between '{1}' and '{2}' 
+                                and not exists( select 1 from `tabTDS Remittance Item` i inner join `tabTDS Remittance` t
+                                on i.parent = t.name
+                                where i.invoice_no = pe.name
+		 and t.docstatus = 1)
+                        """.format(self.tds_rate, self.from_date, self.to_date, branch, self.tds_account) 
 		
-
-		entries = frappe.db.sql(query, as_dict=True)
+		entries = frappe.db.sql(query, as_dict=True, debug =1)
 		if not entries:
 			frappe.msgprint("No Record Found")
 
@@ -97,10 +109,8 @@ class TDSRemittance(AccountsController):
 			row.update(d)	
 
         def post_gl_entry(self):
-		branch = frappe.get_doc("Branch", {'expense_bank_account': self.account}).name
-		cost_center = frappe.db.get_value("Cost Center", {'branch': branch}, "name")
 		#cost_center = frappe.db.get_value("Branch", self.branch, "cost_center")
-		frappe.msgprint("cost {0}".format(cost_center))
+		cost_center  = frappe.db.get_value("Cost Center", {'branch': self.branch}, "name")
                 gl_entries   = []
                	if self.total_tds > 0:
 			gl_entries.append(

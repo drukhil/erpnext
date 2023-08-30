@@ -16,12 +16,12 @@ frappe.ui.form.on('Open Air Prisoner', {
 		}	
 	},
 
-	/*salary: function(frm) {
-		cur_frm.set_value("rate_per_day", ((frm.doc.salary)/ (30)))
-		cur_frm.set_value("gratuity_fund", (frm.doc.salary) * 0.75);
+	salary: function(frm) {
+		//cur_frm.set_value("rate_per_day", ((frm.doc.salary)/ (30)))
+		//cur_frm.set_value("gratuity_fund", (frm.doc.salary) * 0.75);
 		//cur_frm.set_value("rate_per_hour", ((frm.doc.salary * 1.5)/ (30 * 8)))
 	},
-	*/
+
 	"status": function(frm) {
 		cur_frm.toggle_reqd("date_of_separation", frm.doc.status == "Left")
 	},

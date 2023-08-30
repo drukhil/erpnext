@@ -44,7 +44,13 @@ class PurchaseInvoice(BuyingController):
 
 	def validate(self):
 		check_future_date(self.posting_date)
+		self.validate_branch_perm()
 		self.set_status()
+		if self.lds:
+			total = 0
+			for d in self.lds:
+				total += flt(d.total)
+				self.ld_total= total
 		self.adjust_add_ded()
 		if not self.buying_cost_center:
 			frappe.throw("Buying Cost Center is Mandatory")
@@ -83,6 +89,9 @@ class PurchaseInvoice(BuyingController):
 		self.validate_fixed_asset_account()
 		self.create_remarks()
 
+		if self.type and not self.tds_account:
+			frappe.throw("TDS Account is not Pulled")
+
 	def set_status(self):
                 self.status = {
                         "0": "Draft",
@@ -91,9 +100,32 @@ class PurchaseInvoice(BuyingController):
                 }[str(self.docstatus or 0)]
 
 	def adjust_add_ded(self):
-                self.total_add_ded = flt(self.freight_and_insurance_charges) - flt(self.discount) + flt(self.royalty) + flt(self.tax) + flt(self.other_charges)
+                self.total_add_ded = flt(self.freight_and_insurance_charges) - flt(self.discount) + flt(self.royalty) + flt(self.tax) + flt(self.other_charges)-flt(self.ld_total)
                 self.discount_amount = -1 * flt(self.total_add_ded)
 	
+	def pull_ld(self):
+		
+		# query = """ select sm.name as smt, sm.purchase_order, sm.total from `tabSupplier Monitoring` sm, `tabPurchase Invoice Item` b,
+		# 			 `tabPurchase Invoice` c  where  b.parent = '{0}' and sm.purchase_order = b.purchase_order and sm.docstatus = 1 group by sm.name
+        #              """.format(self.name)	
+		
+		query = """ select sm.name as smt, sm.purchase_order, sm.total from `tabSupplier Monitoring` sm, `tabPurchase Invoice Item` b,
+					 `tabPurchase Invoice` c  where  b.parent = '{0}' and sm.purchase_order = b.purchase_order and sm.docstatus = 1 and (sm.purchase_invoice is null or sm.purchase_invoice = '') group by sm.name
+                     """.format(self.name)	
+		
+		entries = frappe.db.sql(query, as_dict=True)
+		if not entries:
+			frappe.msgprint("No LD Record Found")
+
+		total_ld = 0
+		self.set('lds', [])
+
+		for d in entries:
+			total_ld += flt(d.total)
+			row = self.append('lds', {})
+			row.update(d)
+		
+		return total_ld
 
 	def validate_tds(self):
 		if not self.type:
@@ -130,7 +162,7 @@ class PurchaseInvoice(BuyingController):
 		if not default_currency:
 			throw(_('Please enter default currency in Company Master'))
 		if (self.currency == default_currency and flt(self.conversion_rate) != 1.00) or not self.conversion_rate or (self.currency != default_currency and flt(self.conversion_rate) == 1.00):
-			if self.currency != 'INR':
+			if self.currency not in ('INR', 'Nu'):
 				throw(_("Conversion rate cannot be 0 or 1"))
 
 	def validate_credit_to_acc(self):
@@ -320,10 +352,19 @@ class PurchaseInvoice(BuyingController):
 		# this sequence because outstanding may get -negative
 		self.make_gl_entries()
 
-		self.update_project()
+		#self.update_project()
 		self.update_fixed_asset()
 		self.consume_budget()
 		self.update_rrco_receipt()
+		self.update_smt_ld()
+
+	def update_smt_ld(self):
+		if self.get("lds"):
+			for d in self.get("lds"):
+				if self.docstatus != 2:
+					frappe.db.sql("update `tabSupplier Monitoring` set purchase_invoice='{0}' where name='{1}'".format(self.name, str(d.smt)))
+				else:
+					frappe.db.sql("update `tabSupplier Monitoring` set purchase_invoice='' where name='{0}'".format(str(d.smt)))
 
 	def check_po_closed(self):
                 for a in self.items:
@@ -723,9 +764,10 @@ class PurchaseInvoice(BuyingController):
 			self.update_stock_ledger()
 
 		self.make_gl_entries_on_cancel()
-		self.update_project()
+		#self.update_project()
 		self.update_fixed_asset()
 		self.cancel_consumed()
+		self.update_smt_ld()
 
 	def update_project(self):
 		project_list = []
@@ -827,6 +869,22 @@ class PurchaseInvoice(BuyingController):
 			if rrco:
 				obj = frappe.get_doc("RRCO Receipt Entries", rrco)
 				obj.db_set("purchase_invoice", self.name)
+
+	def validate_branch_perm(self):
+		user = frappe.session.user
+		user_roles = frappe.get_roles(user)
+		if user == "Administrator" or "System Manager" in user_roles: 
+			return
+	
+		branch_assign = frappe.db.sql("""select bi.branch from `tabAssign Branch` ab, `tabBranch Item` bi
+						where ab.user = '{user}'
+						and bi.parent = ab.name""".format(user=user), as_dict=1)
+		branch_list = [d.branch for d in branch_assign]
+		# frappe.throw(str(branch_list))
+		if self.branch not in branch_list:
+			frappe.throw("You do not have Branch access for {}, through Assign Branch".format(str(self.branch)))
+		if not self.is_new() and frappe.db.get_value(self.doctype, self.name, "branch") not in branch_list:
+			frappe.throw("You do not have Branch access for {} to update to new branch {}, through Assign Branch".format(frappe.db.get_value("Purchase Invoice", self.name, "branch"), self.branch))
 
 @frappe.whitelist()
 def make_debit_note(source_name, target_doc=None):

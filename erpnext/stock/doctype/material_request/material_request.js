@@ -24,6 +24,7 @@ frappe.ui.form.on('Material Request', {
 		}
 	},
 	setup: function(frm) {
+		frm.get_docfield("items").allow_bulk_edit = 1;	
 		frm.get_field('items').grid.editable_fields = [
 			{fieldname: 'item_code', columns: 2},
 			{fieldname: 'item_name', columns: 2},
@@ -46,17 +47,18 @@ frappe.ui.form.on('Material Request', {
 	}, */
 	title1: function(frm) {
                         if(frm.doc.title1 == 'Stock Request'){
-				frm.set_value("material_request_type", "Purchase");
-			}
-			else if (frm.doc.title1 = 'Material Request') {
-				frm.set_value("material_request_type", "Material Issue");
-			}
-			else
-				{
-				frm.set_value("material_request_type", frm.doc.material_request_type);
-				}
-				
+                                frm.set_value("material_request_type", "Purchase");
+                        }
+                        else if (frm.doc.title1 = 'Material Request') {
+                                frm.set_value("material_request_type", "Material Issue");
+                        }
+                        else
+                                {
+                                frm.set_value("material_request_type", frm.doc.material_request_type);
+                                }
+
                 },
+
 
 	onload: function(frm) {
 		if(!frm.doc.creation_date) {
@@ -71,6 +73,7 @@ frappe.ui.form.on('Material Request', {
 			
 			return value + ': ' + doc.item_name;
 		}
+		
 		
 		/*
 		if(frm.doc.__islocal) {

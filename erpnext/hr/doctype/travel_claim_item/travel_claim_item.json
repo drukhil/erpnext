@@ -856,7 +856,7 @@
  "issingle": 0, 
  "istable": 1, 
  "max_attachments": 0, 
- "modified": "2020-12-26 17:34:53.013605", 
+ "modified": "2020-12-26 17:35:17.106073", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Travel Claim Item", 
@@ -868,6 +868,6 @@
  "read_only_onload": 0, 
  "sort_field": "modified", 
  "sort_order": "DESC", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }

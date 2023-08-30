@@ -15,7 +15,6 @@ def execute(filters=None):
 	columns = get_columns(filters)
 	att_map = get_attendance_list(conditions, filters)
 	emp_map = get_employee_details()
-
 	data = []
 	for emp in sorted(att_map):
 		emp_det = emp_map.get(emp)
@@ -71,7 +70,7 @@ def get_columns(filters):
 def get_attendance_list(conditions, filters):
 	attendance_list = frappe.db.sql("""select employee, day(att_date) as day_of_month,
 		status from tabAttendance where docstatus = 1 %s order by employee, att_date""" %
-		conditions, filters, as_dict=1)
+		conditions, filters, as_dict=1, debug =1)
 
 	att_map = {}
 	for d in attendance_list:

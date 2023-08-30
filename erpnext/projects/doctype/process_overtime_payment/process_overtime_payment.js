@@ -2,6 +2,7 @@
 // For license information, please see license.txt
 
 cur_frm.add_fetch("cost_center", "branch", "branch")
+cur_frm.add_fetch("branch", "expense_bank_account", "expense_bank_account");
 frappe.ui.form.on('Process Overtime Payment', {
 	setup: function (frm) {
 	    frm.get_field("items").grid.editable_fields = [
@@ -33,6 +34,16 @@ frappe.ui.form.on('Process Overtime Payment', {
                                         group_by_voucher: false
                                 };
                                 frappe.set_route("query-report", "General Ledger");
+                        }, __("View"));
+			cur_frm.add_custom_button(__('OT Details'), function() {
+                                frappe.route_options = {
+                                        ot_reference: frm.doc.name,
+                                        from_date: frm.doc.posting_date,
+                                        to_date: frm.doc.posting_date,
+                                        company: frm.doc.company,
+                                        group_by_voucher: false
+                                };
+                                frappe.set_route("query-report", "OT Detail Report");
                         }, __("View"));
                 }
 

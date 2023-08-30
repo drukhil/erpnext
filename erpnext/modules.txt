@@ -18,4 +18,6 @@ Management Dashboard
 Assets
 Budget
 Knowledge And Support
-Selling Management
+test
+Priority Activities
+Phone Directory

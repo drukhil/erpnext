@@ -1,6 +1,6 @@
 {
  "allow_copy": 0, 
- "allow_import": 1, 
+ "allow_import": 0, 
  "allow_rename": 0, 
  "autoname": "field:sub_category_name", 
  "beta": 0, 
@@ -98,8 +98,8 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2021-03-16 09:53:21.413736", 
- "modified_by": "Administrator", 
+ "modified": "2019-08-28 10:22:29.623015", 
+ "modified_by": "dorji2392@bt.bt", 
  "module": "Projects", 
  "name": "Project Sub Category", 
  "name_case": "", 

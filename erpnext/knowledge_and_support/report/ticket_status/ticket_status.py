@@ -11,14 +11,15 @@ def execute(filters=None):
 
 def get_columns():
         return [
-                ("Name") + ":Link/Issue List:200",
-                ("Issue Name") + ":Data:270",
+                ("Name") + ":Link/Issue List:100",
+                ("Issue Name") + ":Data:250",
                 ("Posting Date")+ ":Date:140",
-                ("Module") + ":Data:120",
-		("Priority") + ":Data:120",
+                ("Module") + ":Data:140",
+		("Priority") + ":Data:80",
                 ("Requested By") + ":Data:120",
-		("Status") + ":Data:120",
-		("Resolved By") + ":Data:120"
+		("Status") + ":Data: 50",
+		("Resolved By") + ":Data:120",
+		("Designation") + ":Data:160",
         ]
 
 def get_data(filters):
@@ -36,6 +37,6 @@ def get_data(filters):
 		cond += " and status = '{0}'".format(filters.get("status")) 	
 		
         data =  frappe.db.sql("""select il.name, il.issue_name, il.posting_date, il.module, il.priority, il.requested_by_name, 
-			il.status, il.resolved_by_name from `tabIssue List` as il  where {0}""".format(cond))
+			il.status, il.resolved_by_name, il.designation from `tabIssue List` as il  where {0}""".format(cond))
         return data
 

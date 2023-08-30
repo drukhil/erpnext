@@ -17,10 +17,13 @@ class IssueList(Document):
 				
                         self.resolved_by = doc.name
 			self.resolved_by_name = doc.employee_name
-			self.resolver = frappe.session.user 
+			self.resolver = frappe.session.user
+			self.designation = doc.designation
+			self.contact = doc.phone_number 
                         frappe.db.sql(""" update `tabIssue List` set docstatus = 1 where name ='{0}'""".format(self.name))
                         frappe.msgprint("Thanks, This issue is closed!")
                         self.db_set("docstatus", 1)
+			self.db_set("workflow_state", "Resolved")
 			frappe.sendmail(recipients= self.owner, sender='ERP System', subject="Ticket Resolved" , message="Your Ticket No {0} is closed.".format(self.name))
                 if not self.requested_by:
 			doc = frappe.get_doc("Employee", {'user_id': frappe.session.user})
@@ -33,9 +36,9 @@ class IssueList(Document):
 	
 	def notify_ctm(self):
                 subject = "ERP Issue Management"
-                message = "Issue Related to '{0}' Module is raised in the System,  Check ERP system for details".format(self.module)
+                message = "Issue({1}) Related to <b> {0} </b>  Module is raised in the System,  Check ERP system for details".format(self.module, self.name)
 		user = []
-		user.append('tashidorji@gyalsunginfra.bt')
+		user.append('jigme@gyalsunginfra.bt')
 		module_user = frappe.get_doc("Support Module", self.module).module_ctm
 		user.append(module_user)
                 if user:

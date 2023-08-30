@@ -99,9 +99,10 @@ erpnext.MarkedEmployee = Class.extend({
 
 			$(repl('<div class="col-sm-3 %(color_class)s">\
 				<label class="marked-employee-label"><span class="%(icon)s"></span>\
-				%(employee)s</label>\
+				%(employee)s (%(id)s)</label>\
 				</div>', {
 					employee: m.employee_name,
+					id: m.employee,
 					icon: attendance_icon,
 					color_class: color_class
 				})).appendTo(row);
@@ -262,8 +263,8 @@ erpnext.EmployeeSelector = Class.extend({
 			$(repl('<div class="col-sm-3 unmarked-employee-checkbox">\
 				<div class="checkbox">\
 				<label><input type="checkbox" class="employee-check" employee="%(employee)s"/>\
-				%(employee)s</label>\
-				</div></div>', {employee: m.employee_name})).appendTo(row);
+				%(employee)s (%(id)s)</label>\
+				</div></div>', {employee: m.employee_name, id:m.employee})).appendTo(row);
 		});
 
 		mark_employee_toolbar.appendTo($(this.wrapper));

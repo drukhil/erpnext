@@ -1,0 +1,18 @@
+{
+ "creation": "2020-11-13 10:48:43.526129", 
+ "custom_format": 1, 
+ "disabled": 0, 
+ "doc_type": "Process Overtime Payment", 
+ "docstatus": 0, 
+ "doctype": "Print Format", 
+ "font": "Default", 
+ "html": "\n<div style=\"position: relative; top:-0.15cm; font-size:20px;\">\n\t<div style=\"width:20.5cm;height:9.3cm;\">\n\t\t<span style=\"top:1.0cm; left:9.0cm;\n\t\t\tborder-bottom: solid 1px;border-top:solid 1px; position: absolute;\">\n\t\t\t\t<!-- Account Pay Only -->\n\t\t</span>\n\t\t<span style=\"top:0.0cm; left:16.9cm;\n\t\t\tposition: absolute; letter-spacing:0.5cm\">\n\t\t\t<!-- { doc.reference_date or '' } -->\n\t\t\t{%- if doc.doctype == 'Payment Entry' -%}\n                                {{frappe.utils.formatdate(doc.reference_date,'ddMMYYYY') if doc.reference_date else '' }}\n                        {%- else -%}\n                                {{frappe.utils.formatdate(doc.cheque_date,'ddMMYYYY') if doc.cheque_date else '' }}\n                        {%- endif -%}\n\t\t</span>\n\t\t<span style=\"top:.8cm;left:4.5cm;\n\t\t\tposition: absolute;\">\n\t\t\t<b><i>{{ 'ACCOUNT PAYEE' }}</i></b>\n\t\t</span>\n\t\t<span style=\"top:5.0cm;left:4.0cm;\n\t\t\tposition: absolute;\">\n\t\t\t{{ doc.account_no or '' }}\n\t\t</span>\n\t\t<span style=\"top:2.3cm;left: 1.8cm;\n\t\t\tposition: absolute;\">\n\t\t\t<!-- { doc.party } -->\n\t\t\t{{ 'BOBL' }}\n\t\t</span>\n\t\t<span style=\"top:3.3cm; left:2.6cm;\n\t\t\tposition: absolute; display: block; width: 9.5cm;\n\t\t\tline-height:1.19cm; word-wrap: break-word;\">\n\t\t\t\t{{frappe.utils.money_in_words(doc.total_amount)}}\n\t\t\t\t\n                                       \n\t\t\t\t\n\t\t</span>\n\t\t<span style=\"top:4.8cm;left: 16.0cm;\n\t\t\tposition: absolute;\">\n\t\t\t{{doc.get_formatted(\"total_amount\") }}\n\t\t\t\n\t\t</span>\n\t\t<span style=\"top:6.9cm;left: 2.0cm;\n\t\t\tposition: absolute;\">\n\t\t\t\n\t\t\t\n\t\t\t{% set account = doc.expense_bank_account %}\n {% set acc = account.split(' ') %} <b style=\"font-size:3vw;\">{{acc[4] }}</b>\n\t\t\t\n\t\t\t\n\t\t</span>\n\t\t<span style=\"top:9.0cm;left: 15.0cm;\n\t\t\tposition: absolute; width: 9.5cm;\">\n\t\t<!--\t<b>{{ 'Authorized Signature'}} <br>\n \t\t {{doc.company }}</b> -->\n\t\t</span>\n\t</div>\n</div>", 
+ "idx": 0, 
+ "modified": "2022-08-04 16:22:06.411515", 
+ "modified_by": "Administrator", 
+ "name": "OT(BOB)", 
+ "owner": "Administrator", 
+ "print_format_builder": 0, 
+ "print_format_type": "Server", 
+ "standard": "Yes"
+}

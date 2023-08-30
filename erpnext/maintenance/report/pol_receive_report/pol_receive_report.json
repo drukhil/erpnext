@@ -7,8 +7,8 @@
  "doctype": "Report", 
  "idx": 0, 
  "is_standard": "Yes", 
- "modified": "2019-02-07 11:38:10.729665", 
- "modified_by": "kinzang.namgyal@cdcl.bt", 
+ "modified": "2022-04-19 11:36:52.575007", 
+ "modified_by": "Administrator", 
  "module": "Maintenance", 
  "name": "POL Receive Report", 
  "owner": "Administrator", 
@@ -36,6 +36,9 @@
   }, 
   {
    "role": "Stock User"
+  }, 
+  {
+   "role": "POL Manager"
   }
  ]
 }

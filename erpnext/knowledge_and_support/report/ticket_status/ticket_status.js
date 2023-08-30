@@ -38,7 +38,7 @@ frappe.query_reports["Ticket Status"] = {
                         "options" : [
 					"",
 					"Open", 
-					"Closed"
+					"Close"
 				]
 
                 },

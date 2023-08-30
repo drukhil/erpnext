@@ -48,6 +48,10 @@ class PurchaseOrder(BuyingController):
 	def validate(self):
 		check_future_date(self.transaction_date)
 		super(PurchaseOrder, self).validate()
+		self.validate_branch_perm()
+		cc  = frappe.db.sql(""" select name from `tabCost Center` where branch = "{0}" """.format(self.branch), as_dict = 1)
+                if cc:
+                        self.cost_center = cc[0].name
 
 		self.set_status()
 		pc_obj = frappe.get_doc('Purchase Common')
@@ -191,6 +195,11 @@ class PurchaseOrder(BuyingController):
 		clear_doctype_notifications(self)
 
 	def on_submit(self):
+		owner_branch = frappe.db.sql("select branch from `tabEmployee` where user_id = '{0}'".format(self.owner), as_dict=True)
+		boss_branch = frappe.db.sql("select branch from `tabEmployee` where user_id = '{0}'".format(frappe.session.user), as_dict=True)
+		if owner_branch != boss_branch:
+			frappe.throw ("This Purchase order is created by someone from different Branch than You. Kindly check if you should approve it. ")
+			
 		self.check_budget_available()
 
 		if self.is_against_so():
@@ -201,9 +210,11 @@ class PurchaseOrder(BuyingController):
 		self.update_prevdoc_status()
 		self.update_requested_qty()
 		self.update_ordered_qty()
+
 		#if self.naming_series not in ('Services Miscellaneous', 'Services Works'):
-		#	if frappe.session.user != 'headpnl@gyalsunginfra.bt':
-		#		frappe.throw("Only Head, Procurement & Liaison <b> Col. Karma Dorji </b> Can Submit Purchase Order for Material Purchase")
+                #        if frappe.session.user not in ('headpnl@gyalsunginfra.bt', 'jigmechoejur@gyalsunginfra.bt'):
+                #                frappe.throw("Only Head, Procurement & Liaison <b> Col. Karma Dorji </b> Can Submit Purchase Order for Material Purchases")
+
 
 		frappe.get_doc('Authorization Control').validate_approving_authority(self.doctype,
 			self.company, self.base_grand_total)
@@ -358,6 +369,22 @@ class PurchaseOrder(BuyingController):
                                         })
                                 bud_obj.flags.ignore_permissions = 1
                                 bud_obj.submit()
+				
+	def validate_branch_perm(self):
+		user = frappe.session.user
+		user_roles = frappe.get_roles(user)
+		if user == "Administrator" or "System Manager" in user_roles or "Purchase Master" in user_roles: 
+			return
+	
+		branch_assign = frappe.db.sql("""select bi.branch from `tabAssign Branch` ab, `tabBranch Item` bi
+						where ab.user = '{user}'
+						and bi.parent = ab.name""".format(user=user), as_dict=1)
+		branch_list = [d.branch for d in branch_assign]
+		# frappe.throw(str(branch_list))
+		if self.branch not in branch_list:
+			frappe.throw("You do not have Branch access for {}, through Assign Branch".format(str(self.branch)))
+		if not self.is_new() and frappe.db.get_value(self.doctype, self.name, "branch") not in branch_list:
+			frappe.throw("You do not have Branch access for {} to update to new branch {}, through Assign Branch".format(frappe.db.get_value("Purchase Order", self.name, "branch"), self.branch))
 
 @frappe.whitelist()
 def close_or_unclose_purchase_orders(names, status):
@@ -396,6 +423,7 @@ def make_purchase_receipt(source_name, target_doc=None):
 			"doctype": "Purchase Receipt",
 			"field_map": {
 				"naming_series": "naming_series",
+				"transaction_date": "transaction_date",
 			},
 			"validation": {
 				"docstatus": ["=", 1],

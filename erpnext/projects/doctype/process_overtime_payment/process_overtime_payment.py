@@ -21,22 +21,22 @@ class ProcessOvertimePayment(Document):
 	
 		if not self.branch:
 			frappe.throw(" Branch is Mandiatory")
-
-		#set up expense Bank Account
+	
+		#set up expense bank account	
 		expense_bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
 		self.expense_bank_account = expense_bank_account
 		if not self.expense_bank_account:
 			frappe.throw("Expense Bank Account is Missing!. Refresh Cost Center Field")
-			
+
 		#set up Expense Account
-		ot_account = frappe.db.get_single_value("HR Accounts Settings", "overtime_account")
-		self.ot_account = ot_account
-		if not self.ot_account:
-			frappe.throw("Expense Account Not Found, Kindly set up Overtime Account in HR Accounts Settings")
+                ot_account = frappe.db.get_single_value("HR Accounts Settings", "overtime_account")
+                self.ot_account = ot_account
+                if not self.ot_account:
+                        frappe.throw("Expense Account Not Found, Kindly set up Overtime Account in HR Accounts Settings")
 
 		self.check_duplicate_entries()
-		#Custom Custom to add the footprint
 		set_user(self)
+
 
 	def check_duplicate_entries(self):
                 not_found = []
@@ -51,6 +51,13 @@ class ProcessOvertimePayment(Document):
 	def on_submit(self):
 		self.post_general_ledger()
 		#self.update_ot()
+		# if self.get("items"):
+		# 	processed = []
+		# 	for a in self.get("items"):
+		# 		doc = frappe.get_doc("Overtime Application", a.reference_doc).payment_jv
+		# 		if doc.payment_jv:
+		# 			processed.append(a.reference_doc)
+		# 	frappe.throw("Payment Already Processed for Following OT {0}".format(processed))
 
 	def on_cancel(self):
 		if self.clearance_date:
@@ -65,11 +72,11 @@ class ProcessOvertimePayment(Document):
 		query = """select name as reference_doc, employee, employee_name, rate as hourly_rate, total_hours, 
 			total_amount as total_ot_amount
 			from `tabOvertime Application` where docstatus = 1 and workflow_state = 'Approved' 
-			and ifnull(payment_jv, '') = '' and posting_date between '{0}' and '{1}' and  
+			and ifnull(payment_jv, '') = '' and  
 			bank_name = '{3}' and 
 			cost_center in (select name from `tabCost Center` where parent_cost_center = '{2}') order by employee desc
 		""".format(from_date, to_date, self.cost_center, self.bank_name)
-		
+	
 		entries = frappe.db.sql(query, as_dict=True)
                 if not entries:
                         frappe.msgprint("OT Payment is already processed or there is no Approved OT to process")

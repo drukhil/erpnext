@@ -81,11 +81,6 @@ class Lead(SellingController):
 	def has_opportunity(self):
 		return frappe.db.get_value("Opportunity", {"lead": self.name, "status": ["!=", "Lost"]})
 
-
-@frappe.whitelist()
-def make_api():
-        return frappe.session.user
-
 @frappe.whitelist()
 def make_customer(source_name, target_doc=None):
 	return _make_customer(source_name, target_doc)

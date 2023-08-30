@@ -212,7 +212,6 @@ var process_salary = function(frm, process_type){
 					frm.set_value("progress", "Processing "+counter+"/"+r.message.length+" salary slip(s) ["+Math.round((counter/r.message.length)*100)+"% completed]");
 					frm.refresh_field("progress");
 					frm.refresh_field("activity_log");
-					
 					cur_frm.call({
 						method: "process_salary",
 						doc: frm.doc,

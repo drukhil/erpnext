@@ -91,12 +91,12 @@ class Employee(Document):
                         
 		self.validate_date()
 		self.validate_email()
-		#self.validate_status()
+		self.validate_status()
+		#self.post_casual_leave()
 		# Following method introduced by SHIV on 04/10/2018
 		self.validate_employment()
 		self.validate_employee_leave_approver()
 		self.validate_reports_to()
-		self.status = 'Active'
 	
 		if self.user_id:
 			self.company_email = self.user_id
@@ -115,33 +115,7 @@ class Employee(Document):
 		self.populate_family_details()
                 # Following method introduced by SHIV on 08/04/2019
                 self.update_retirement_age()
-		if self.employment_type == 'Deputation' and not self.external_work_history:
-			frappe.throw("Work History In Required for Employment type Deputation")
     
-		self.update_contract_detail()
-
-	def update_contract_detail(self):
-		if self.renew:
-			for a in self.get("internal_work_history"):
-				if getdate(self.renew_date) != getdate(a.from_date):
-					self.append("internal_work_history",{
-                                                        "branch": self.branch,
-                                                        "cost_center": self.cost_center,
-                                                        "department": self.department,
-                                                        "designation": self.designation,
-                                                        "from_date": self.renew_date,
-                                                        "owner": frappe.session.user,
-                                                        "creation": nowdate(),
-                                                        "modified_by": frappe.session.user,
-                                                        "modified": nowdate()
-                                	})
-
-					if len(self.internal_work_history) > 1:
-                        			for a in range(len(self.internal_work_history)-1):
-                                			self.internal_work_history[a].end_date =  self.contract_end_date
-					#frappe.utils.data.add_days(getdate(self.operators[a + 1].start_date), -1)
-                        		#self.operators[len(self.operators) - 1].end_date = ''
-	
 	def before_save(self):
 		if self.branch != self.get_db_value("branch") and  self.user_id:
 			frappe.permissions.remove_user_permission("Branch", self.get_db_value("branch"), self.user_id)           
@@ -331,6 +305,12 @@ class Employee(Document):
 		elif self.contract_end_date and self.date_of_joining and (getdate(self.contract_end_date) <= getdate(self.date_of_joining)):
 			throw(_("Contract End Date must be greater than Date of Joining"))
 
+		if self.employment_type == 'Contract' and not self.increment_date:
+			frappe.throw("Incremet Date is Mandatory for Contract Employees </b> ")
+		
+		if self.employment_type == 'Deputation' and not self.external_work_history:
+                        frappe.throw("Work History In Required for Employees on Deputation")  
+
 	def validate_email(self):
 		if self.company_email:
 			validate_email_add(self.company_email, True)
@@ -418,22 +398,22 @@ class Employee(Document):
                                 new_leaves_allocated = round5((flt(no_of_months)/12)*flt(credits_per_year))
                                 new_leaves_allocated = new_leaves_allocated if new_leaves_allocated <= flt(credits_per_year) else flt(credits_per_year)
 
-                                
 				if self.employment_type == 'GCE':
-					to_date = self.contract_end_date
-					new_leaves_allocated = cint(5)
+                        		to_date = self.contract_end_date
+                        		new_leaves_allocated = cint(5)
 
 				if flt(new_leaves_allocated):
-                                        la = frappe.new_doc("Leave Allocation")
-                                        la.employee = self.employee
-                                        la.employee_name = self.employee_name
-                                        la.leave_type = "Casual Leave"
-                                        la.from_date = str(from_date)
-                                        la.to_date = str(to_date)
-                                        la.carry_forward = cint(0)
-                                        la.new_leaves_allocated = flt(new_leaves_allocated)
-                                        la.submit()
-                                        self.db_set("casual_leave_allocated", 1)
+        	                	la = frappe.new_doc("Leave Allocation")
+                	        	la.employee = self.employee
+                        	 	la.employee_name = self.employee_name
+                           		la.leave_type = "Casual Leave"
+                              	 	la.from_date = str(from_date)
+                             		la.to_date = str(to_date)
+       		                       	la.carry_forward = cint(0)
+                	            	la.new_leaves_allocated = flt(new_leaves_allocated)
+                        	     	la.submit()
+                             		self.db_set("casual_leave_allocated", 1)
+					frappe.db.commit()
 			                
                 '''
 		if not self.casual_leave_allocated:
@@ -511,11 +491,11 @@ def make_salary_structure(source_name, target=None):
 
 @frappe.whitelist()
 def get_overtime_rate(employee):
-		basic = frappe.db.sql("select a.amount as basic_pay from `tabSalary Detail` a, `tabSalary Structure` b where a.parent = b.name and a.salary_component = 'Basic Pay' and b.is_active = 'Yes' and b.employee = \'" + str(employee) + "\'", as_dict=True)
+		basic = frappe.db.sql("select a.amount as basic_pay from `tabSalary Detail` a, `tabSalary Structure` b where a.parent = b.name and a.salary_component in ('GCE Basic Pay', 'Basic Pay') and b.is_active = 'Yes' and b.employee = \'" + str(employee) + "\'", as_dict=True)
 		if basic:
 			return ((flt(basic[0].basic_pay) * 1) / (30 * 8))
 		else:
-			frappe.throw("No Salary Structure foudn for the employee")
+			frappe.throw("No Salary Structure found for the employee")
 
 
 def validate_employee_role(doc, method):

@@ -1,0 +1,33 @@
+{
+ "content": null, 
+ "creation": "2022-12-06 11:46:08.584418", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2023-05-23 14:36:57.939721", 
+ "modified_by": "Administrator", 
+ "module": "Management Dashboard", 
+ "name": "dfg-housing", 
+ "owner": "Administrator", 
+ "page_name": "dfg-housing", 
+ "roles": [
+  {
+   "role": "Administrator"
+  }, 
+  {
+   "role": "Management"
+  }, 
+  {
+   "role": "Employee"
+  }, 
+  {
+   "role": "Project Engineer"
+  }, 
+  {
+   "role": "Projects Readonly"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null
+}

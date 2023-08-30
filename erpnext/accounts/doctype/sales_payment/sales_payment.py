@@ -17,18 +17,23 @@ class SalesPayment(Document):
 			frappe.throw("Party Is Required")
 		if not self.get("references"):
 			frappe.throw("Pull the Invoices")
+		tot = 0.0
+		for d in self.get("references"):
+			tot += flt(d.total_amount)
+                self.total_amount = tot
+
 
 	def get_invoices(self):
                 query = frappe.db.sql("""select name as reference_name, "Invoice" as reference_doctype, posting_date, 
-		net_receivable as total_amount from  tabInvoice where docstatus = 1 and paid = 0 
+		total_amount from  tabInvoice where docstatus = 1 and paid = 0 
 		and cost_center = "{0}" and customer = "{1}"  order by posting_date""".format(self.cost_center, self.party), as_dict = 1)
                 self.set('references', [])
 
                 total_amt = 0
                 for d in query:
-                        total_amt+=flt(d.total_amount)
                         row = self.append('references', {})
                         row.update(d)
+			total_amt+=flt(d.total_amount)
                 self.total_amount = total_amt
 
 
@@ -37,6 +42,9 @@ class SalesPayment(Document):
 		for a in self.get("references"):
 			doc = frappe.get_doc("Invoice", a.reference_name)
 			doc.db_set("paid", 1)
+
+	def on_cancel(self):
+                frappe.db.sql(""" delete from `tabGL Entry` where voucher_no = '{0}'""".format(self.name))
 
 	def prepare_gl(self):
                 gl_entries = []

@@ -25,7 +25,6 @@ frappe.ui.form.on('MB Entry', {
 		//if(!frm.doc.__islocal){
 				
 			
-		/*
 		if(frm.doc.project){
 			if(frappe.model.can_read("Project")) {
 				frm.add_custom_button(__("Project"), function() {
@@ -50,8 +49,7 @@ frappe.ui.form.on('MB Entry', {
 					frm.trigger("make_mb_invoice")},
 					__("Make"), "icon-file-alt");
 			}
-		}
-		*/
+		}		
 		
 		/*
 		if(frm.doc.boq_type=="Item Based"){
@@ -95,15 +93,10 @@ frappe.ui.form.on("MB Entry BOQ",{
 		//}
 	},
 	entry_amount: function(frm, cdt, cdn){
-		var child = locals[cdt][cdn];
-		var amount = flt(child.entry_quantity || 0.00)*flt(child.entry_rate || 0.00);
+		child = locals[cdt][cdn];
 		
 		if(child.entry_amount > child.act_amount){
 			msgprint(__("Invoice Amount cannot be greater than balance amount."));
-		} else {
-			if(frm.doc.boq_type !== "Milestone Based" && flt(child.amount) != flt(amount)) {
-				frappe.model.set_value(cdt, cdn, 'entry_amount', flt(amount));
-			}
 		}
 		calculate_totals(frm);
 	},
@@ -114,7 +107,7 @@ frappe.ui.form.on("MB Entry BOQ",{
 
 var calculate_totals = function(frm){
 	var me = frm.doc.mb_entry_boq || [];
-	var total_entry_amount = 0.00, net_entry_amount =0.00;
+	var total_entry_amount = 0.0, net_entry_amount =0.0;
 	
 	if(frm.doc.docstatus != 1)
 	{

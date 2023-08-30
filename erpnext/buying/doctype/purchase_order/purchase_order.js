@@ -6,6 +6,10 @@ frappe.provide("erpnext.buying");
 {% include 'erpnext/buying/doctype/purchase_common/purchase_common.js' %};
 
 frappe.ui.form.on("Purchase Order", {
+	setup: function(frm) {
+		frm.get_docfield("items").allow_bulk_edit = 1;			
+		
+	},
 	onload: function(frm) {
 		erpnext.queries.setup_queries(frm, "Warehouse", function() {
 			return erpnext.queries.warehouse(frm.doc);
@@ -47,7 +51,7 @@ frappe.ui.form.on("Purchase Order", {
 	tax: function(frm) {
 		calculate_discount(frm)
 	},
-	naming_series: function(frm) {
+	/*naming_series: function(frm) {
                 cur_frm.fields_dict['items'].grid.get_field('item_code').get_query = function(doc, cdt, cdn) {
                 var d = locals[cdt][cdn]
                 return {
@@ -57,7 +61,7 @@ frappe.ui.form.on("Purchase Order", {
 
                         }
                 }
-        },
+        },*/
 	annual_tender: function(frm) {
 		cur_frm.set_df_property("buying_price_list", "read_only", frm.doc.annual_tender != 1)
 		if(frm.doc.annual_tender == 1) {

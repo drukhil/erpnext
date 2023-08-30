@@ -426,7 +426,7 @@
  "issingle": 1, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2020-09-25 20:10:09.404635", 
+ "modified": "2020-12-18 21:27:27.904371", 
  "modified_by": "Administrator", 
  "module": "Projects", 
  "name": "Project Overtime Tool", 
@@ -499,6 +499,6 @@
  "read_only_onload": 0, 
  "sort_field": "modified", 
  "sort_order": "DESC", 
- "track_changes": 0, 
- "track_seen": 0
+ "track_changes": 1, 
+ "track_seen": 1
 }

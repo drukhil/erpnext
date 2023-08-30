@@ -15,6 +15,11 @@ class MusterRollEmployee(Document):
 		if len(self.musterroll) > 1:
 			for a in range(len(self.musterroll)-1):
 				self.musterroll[a].to_date = frappe.utils.data.add_days(getdate(self.musterroll[a + 1].from_date), -1)
+		
+
+		if self.musterroll:
+			for a in range(len(self.musterroll)):
+               			self.rate_per_day = self.musterroll[a].rate_per_day
 		#self.calculate_rates()
 		self.check_status()
 		self.populate_work_history()
@@ -42,9 +47,10 @@ class MusterRollEmployee(Document):
         	for a in self.get('musterroll'):
 			if a.rate_per_day:
 				a.rate_per_hour = flt(a.rate_per_day * 1) / 8
+	
 		rat = frappe.db.sql(""" select rate_per_day from `tabMusterroll` where parent = '{0}' and docstatus <= 1 order by from_date desc limit 1""".format(self.name), as_dict = 1)
-		if rat:
-			self.rate_per_day = rat[0].rate_per_day
+                if rat:
+                        self.rate_per_day = rat[0].rate_per_day
 
 	def check_status(self):
                 if self.status == "Left" and self.separation_date:

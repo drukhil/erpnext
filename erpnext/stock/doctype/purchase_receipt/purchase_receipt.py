@@ -61,6 +61,7 @@ class PurchaseReceipt(BuyingController):
 	def validate(self):
 		check_future_date(self.posting_date)
 		check_future_date(self.actual_receipt_date)
+		self.validate_branch_perm()
 		super(PurchaseReceipt, self).validate()
 		self.set_status()
 		self.po_required()
@@ -209,6 +210,7 @@ class PurchaseReceipt(BuyingController):
 	# Update asset entries if asset
 	##
 	def update_asset(self):
+		a_list = []
 		for a in self.items:
 			item_group = frappe.db.get_value("Item", a.item_code, "item_group")
 			if item_group and item_group == "Fixed Asset":
@@ -217,11 +219,19 @@ class PurchaseReceipt(BuyingController):
 				ae.item_code = a.item_code
 				ae.item_name = a.item_name
 				ae.qty = a.qty
+				ae.cost_center = a.cost_center
+				ae.warehouse = a.warehouse
 				ae.received_date = self.posting_date
 				ae.ref_doc = self.name
 				ae.branch = frappe.db.get_value("Cost Center", a.cost_center, "branch")
 				ae.submit()
-
+				a_list.append(a.item_name)
+		if a_list:
+			subject = "Asset Procurement Notice"
+			message = " Dear Sir, Assets '{0}' are/is received. Kindly proceed further actions"
+			email = 'tsheringyangzom@ggyalsunginfra.bt'
+			frappe.sendmail(recipients=email, sender=None, subject=subject, message=message)
+		
 	##
 	#  Delete asset entries
 	##
@@ -424,6 +434,22 @@ class PurchaseReceipt(BuyingController):
 			pr_doc.update_billing_percentage(update_modified=update_modified)
 
 		self.load_from_db()
+
+	def validate_branch_perm(self):
+		user = frappe.session.user
+		user_roles = frappe.get_roles(user)
+		if user == "Administrator" or "System Manager" in user_roles or "Purchase Master" in user_roles: 
+			return
+	
+		branch_assign = frappe.db.sql("""select bi.branch from `tabAssign Branch` ab, `tabBranch Item` bi
+						where ab.user = '{user}'
+						and bi.parent = ab.name""".format(user=user), as_dict=1)
+		branch_list = [d.branch for d in branch_assign]
+		# frappe.throw(str(branch_list))
+		if self.branch not in branch_list:
+			frappe.throw("You do not have Branch access for {}, through Assign Branch".format(str(self.branch)))
+		if not self.is_new() and frappe.db.get_value(self.doctype, self.name, "branch") not in branch_list:
+			frappe.throw("You do not have Branch access for {} to update to new branch {}, through Assign Branch".format(frappe.db.get_value("Purchase Receipt", self.name, "branch"), self.branch))
 
 def update_billed_amount_based_on_po(po_detail, update_modified=True):
 	# Billed against Sales Order directly

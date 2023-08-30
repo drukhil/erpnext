@@ -1,0 +1,27 @@
+{
+ "content": null, 
+ "creation": "2023-05-23 14:53:32.556535", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2023-05-23 14:53:32.556535", 
+ "modified_by": "Administrator", 
+ "module": "Management Dashboard", 
+ "name": "tareythang-dashboard", 
+ "owner": "Administrator", 
+ "page_name": "tareythang-dashboard", 
+ "roles": [
+  {
+   "role": "Administrator"
+  }, 
+  {
+   "role": "Employee"
+  }, 
+  {
+   "role": "Projects Readonly"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null
+}

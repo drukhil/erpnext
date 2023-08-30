@@ -102,8 +102,6 @@ class JournalEntry(AccountsController):
 		self.set_account_and_party_balance()
 		if not self.title:
 			self.title = self.get_title()
-
-		#Custom Footprint Function
 		set_user(self)
 
 	def set_status(self):

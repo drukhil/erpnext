@@ -7,6 +7,7 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
 from erpnext.custom_utils import prepare_gl, check_future_date
+from erpnext.custom_workflow import set_user
 
 class HSDPayment(Document):
 	def validate(self):
@@ -14,6 +15,8 @@ class HSDPayment(Document):
 		self.set_status()
 		self.validate_allocated_amount()
 		self.clearance_date = None
+		set_user(self)
+
 
 	def set_status(self):
                 self.status = {

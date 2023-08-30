@@ -14,7 +14,7 @@ from frappe.model.naming import make_autoname
 
 from frappe.utils import add_days, getdate, nowdate, formatdate, today, get_first_day, date_diff, add_years, flt
 from erpnext.accounts.utils import get_fiscal_year
-
+from erpnext.accounts.report.financial_statements_gyalsung  import (get_period_list, get_columns, get_data)
 
 
 class Project(Document):
@@ -22,6 +22,7 @@ class Project(Document):
                	self.name = self.project_name
 
 	def validate(self):
+		self.update_expense()
 		self.flags.dont_sync_tasks = True
 		self.name = self.project_name
 		self.check_required_data()
@@ -41,12 +42,14 @@ class Project(Document):
 		self.physical_progress_weightage = round(flt(self.mandays)/flt(self.overall_mandays) * 100, 3)
 		#self.calculations()
 		#self.update_parent()
-		self.get_budget()
+		#self.get_budget()
 		self.update_expense()
 		if self.get("activity_tasks"):
 			self.make_target_entries()
 			self.make_group()
-			self.make_tsk_group()
+			#self.make_tsk_group()
+		if not self.is_group:
+			self.update_total_expense()
 
 	def on_submit(self):
 		self.flags.dont_sync_tasks = True
@@ -131,8 +134,8 @@ class Project(Document):
 	#def after_insert
 	def on_update_after_submit(self):
 		self.flags.dont_sync_tasks = True
-		if not self.completion_date:
-			frappe.throw("Date of Update is Required", title="Missing Input")
+		# if not self.completion_date:
+		# 	frappe.throw("Date of Update is Required", title="Missing Input")
 		#if self.pe_id != frappe.session.user:
 		#	frappe.throw(" Only {0} Can update this project".format(pe_name))
 
@@ -140,19 +143,28 @@ class Project(Document):
 			frappe.throw(_("Cannot Update For Future Dates"))
 
 		self.physical_progress = round(flt(self.physical_progress), 7)
-		self.update_progress()
+		if not self.is_group:
+			self.update_progress(update=True)
+			# self.update_parent()
 		if self.percent_completed == 100:
 			self.db_set("status", "Completed")
 		if self.percent_completed < 100:
 			self.db_set("status", "Ongoing")
 		self.total_task_duration()
-		if not self.is_group:
-			self.update_parent()
 		self.post_achievement_entries()
 		self.make_target_entries()
 		self.update_expense()	
+		if not self.is_group:
+			self.update_total_expense()
+		# self.validate_weightage()
+
+	def validate_weightage(self):
+                old_value = frappe.db.sql(""" select physical_progress_weightage from `tabProject` where name = "{0}" """.format(self.name))
+                if old_value != self.physical_progress_weightage:
+                        if frappe.session.user not in ('yeshinedup@gyalsunginfra.bt', 'Administrator'):
+                                frappe.throw("You are not authorized to change project weightage, kindly contact Project CTM")
 	
-	def update_progress(self):
+	def update_progress(self, update=False):
                 total_achievement = 0.0
                 for a in self.get("activity_tasks"):
 			if a.task_completion_percent > 100:
@@ -166,10 +178,17 @@ class Project(Document):
                         	total_achievement += flt(a.task_achievement_percent)
                 #self.physical_progress = round(total_achievement, 3)
 		#self.physical_progress = round(flt(total_achievement)/100 * flt(self.physical_progress_weightage), 3)
-		self.percent_completed = round(total_achievement, 4)	
+		if not update:
+			self.percent_completed = round(total_achievement, 4)	
+			self.physical_progress = round(flt(self.percent_completed)/100 * flt(self.physical_progress_weightage), 3)	
+		else:
+			self.db_set("percent_completed", round(total_achievement, 4))
+			self.db_set("physical_progress", round(round(total_achievement, 4)/100 * flt(self.physical_progress_weightage), 3))
+			self.reload()
 		#self.percent_completed = round(flt(self.physical_progress)/flt(self.physical_progress_weightage)*100, 3)
-		self.physical_progress = round(flt(self.percent_completed)/100 * flt(self.physical_progress_weightage), 3)	
 		self.update_parent()
+
+
 
 	def update_parent(self):
 		progress = frappe.db.sql(""" select sum(ifnull(physical_progress, 0)) as val from `tabProject` where parent_project = "{0}" 
@@ -182,20 +201,33 @@ class Project(Document):
 		#completed = round(flt(doc.physical_progress)/flt(doc.physical_progress_weightage), 4)
 		#frappe.db.sql(""" update `tabProject` set physical_progress = {0}, percent_completed = {1} where name = '{2}' and is_group = 1 and docstatus <= 1""".format(progress, completed, self.parent_project))
 
+
 	def get_budget(self):
                 self.reference_budget = None
                 self.estimated_budget = 0.0
-		budget = frappe.db.sql(""" select name, actual_total from `tabBudget` where cost_center = "%s" and docstatus = 1""" %self.project_name, as_dict =1)
-		if budget:
-			self.reference_budget = budget[0].name
-			self.estimated_budget = budget[0].actual_total
-			doc = frappe.db.sql(""" select sum(estimated_budget) as budget from `tabProject` 
-			where parent_project = '{0}' group by parent_project""".format(self.parent_project), as_dict = 1)
-			
-			if doc:
-				frappe.db.sql(""" update `tabProject` set estimated_budget = {0} where name = '{1}'
-				""".format(doc[0].budget, self.parent_project))
-	
+                from erpnext.accounts.accounts_custom_functions import get_child_cost_centers
+                parent_cc = frappe.get_doc("Cost Center", self.name).parent_cost_center
+                cost_centers = get_child_cost_centers(parent_cc)
+                budget = frappe.db.sql(""" select sum(actual_total) as actual_total from `tabBudget` 
+                where cost_center IN %(cost_center)s  and docstatus = 1""", {"cost_center": cost_centers}, as_dict =1)
+                if self.is_group:
+                        if budget:
+                                self.reference_budget = None
+                                self.estimated_budget = budget[0].actual_total
+                                frappe.db.sql(""" update `tabProject` set estimated_budget = {0} where name = '{1}'
+                                """.format(budget[0].actual_total, self.name))
+
+                else:
+                        budget1 = frappe.db.sql(""" select name, actual_total from `tabBudget` where cost_center = "%s" and 
+                                        docstatus = 1""" %self.project_name, as_dict =1)
+                        if budget1:
+                                self.reference_budget = budget1[0].name
+                                self.estimated_budget = budget1[0].actual_total
+                                frappe.db.sql(""" update `tabProject` set estimated_budget = {0} where name = '{1}'
+                                """.format(budget1[0].actual_total, self.name))
+
+                                frappe.db.sql(""" update `tabProject` set estimated_budget = {0} where name = '{1}'
+                                """.format(budget[0].actual_total, self.parent_project))	
 	def on_update(self):
 		self.flags.dont_sync_tasks = True
 		self.make_group()
@@ -245,7 +277,7 @@ class Project(Document):
 			if weightage:
 				wt = weightage[0].tweightage
 				frappe.db.sql(""" update `tabActivity Tasks` set task_weightage = {0} where  name = '{1}'
-				""".format(wt, a.name), debug = 1)'''
+				""".format(wt, a.name))'''
 
 
 	def make_tsk_group(self):
@@ -278,7 +310,7 @@ class Project(Document):
                 frappe.db.sql(""" update `tabActivity Tasks` set task_group = '' where parent = '{0}'""".format(self.name))
                 for a in group_list:
                         nn = a.name
-                        frappe.db.sql(""" update `tabActivity Tasks` set task_group = '{0}' where  idx between {1} and {2} and parent = '{3}' and name != '{4}'""".format(a.name, a.idx, a.max_idx, self.name, a.name), debug = 1)	
+                        frappe.db.sql(""" update `tabActivity Tasks` set task_group = '{0}' where  idx between {1} and {2} and parent = '{3}' and name != '{4}'""".format(a.name, a.idx, a.max_idx, self.name, a.nam))	
 	def make_target_entries(self):
 		frappe.db.sql(""" delete from `tabTarget Entry Sheet` where project = "{0}" """.format(self.name))
 		target_tot = 0.0
@@ -416,6 +448,20 @@ class Project(Document):
 		if exp:
 			self.db_set('expense', flt(exp[0].expense))
 
+
+	def update_total_expense(self):
+                from erpnext.accounts.accounts_custom_functions import get_child_cost_centers
+                parent_cc = frappe.get_doc("Cost Center", self.parent_project).parent_cost_center
+                cost_centers = get_child_cost_centers(parent_cc)
+
+                exp = frappe.db.sql(""" select sum(debit) - sum(credit) as expense 
+                      from `tabGL Entry` where cost_center IN %(cost_center)s  and account in (select name from `tabAccount` 
+                        where root_type = 'Expense') and docstatus = 1""", {"cost_center": cost_centers}, as_dict = 1)
+
+                if exp:
+                        doc = frappe.get_doc("Project", self.parent_project)
+                        doc.db_set('expense', flt(exp[0].expense))
+
 	def notify_on_change(self):
 		pass
 
@@ -427,7 +473,7 @@ def get_period(posting_date, prange):
         elif prange == 'Monthly':
                 period = str(months[posting_date.month - 1]) + " " + str(posting_date.year)
         elif prange == 'Quarterly':
-                period = "Quarter " + str(((posting_date.month-1)//3)+1) +" " + str(posting_date.year)
+                period = "Quarter " + str(((posting_date.month-1)/3)+1) +" " + str(posting_date.year)
         else:
                 year = get_fiscal_year(posting_date, company=filters.company)
                 period = str(year[2])

@@ -52,21 +52,21 @@ class AssignBranch(Document):
 				for a in names:
 					pass
 					#frappe.permissions.remove_user_permission(doc, a, self.user)
-			
+
 		#Add the branch permissions back as per assigned branches
-		if self.action == 'Remove':
+                if self.action == 'Remove':
                         frappe.permissions.remove_user_permission("Branch", self.current_branch, self.user)
                         for a in self.items:
                                 frappe.permissions.remove_user_permission('Branch', a.branch, self.user)
-                        
+
                         frappe.msgprint("Branch Removed")
 
                 if self.action == 'Add':
-			frappe.permissions.add_user_permission("Branch", self.current_branch, self.user)
-			for a in self.items:
-				frappe.permissions.add_user_permission('Branch', a.branch, self.user)
+                        frappe.permissions.add_user_permission("Branch", self.current_branch, self.user)
+                        for a in self.items:
+                                frappe.permissions.add_user_permission('Branch', a.branch, self.user)
 
-                	frappe.msgprint("Branch Assigned")
+                        frappe.msgprint("Branch Assigned")
 
 	#Populate branches with active branches 
 	def get_all_branches(self):

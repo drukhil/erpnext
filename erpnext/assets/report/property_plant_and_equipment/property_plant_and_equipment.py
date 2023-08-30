@@ -83,21 +83,21 @@ def get_accounts(filters):
 	return data
 
 def get_values(account, to_date, from_date, cost_center=None, opening=False, cwip=False, adjustment=False):
-#	query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account = \'" + str(account) + "\' and docstatus = 1"
+	query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account = \'" + str(account) + "\' and docstatus = 1"
 	if cwip:
 		query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account in " + str(account) + " and docstatus = 1 "
 	elif adjustment:
 		query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account = \'" + str(account) + "\' and docstatus = 1 and is_depreciation_adjustment = 'Yes'"
 	else:
 		query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account = \'" + str(account) + "\' and docstatus = 1"
-	if not opening:
-		query += " and posting_date between \'" + str(from_date) + "\' and \'" + str(to_date) + "\'"
-	else:
-		query += " and posting_date < \'" + str(from_date) + "\'"
+	# if not opening:
+	# 	query += " and posting_date between \'" + str(from_date) + "\' and \'" + str(to_date) + "\'"
+	# else:
+	# 	query += " and posting_date < \'" + str(from_date) + "\'"
 	if cost_center:
 		query += " and cost_center = \'" + str(cost_center) + "\'"
 
-	query += " and voucher_type not in ('Period Closing Voucher', 'Asset Movement', 'Bulk Asset Transfer')"
+	# query += " and voucher_type not in ('Period Closing Voucher', 'Asset Movement', 'Bulk Asset Transfer')"
 	#query += " and voucher_type not in ('Period Closing Voucher')"
 	value = frappe.db.sql(query, as_dict=True)
 

@@ -25,8 +25,10 @@ from erpnext.manufacturing.doctype.production_order.production_order import get_
 from frappe.model.naming import make_autoname
 from erpnext.custom_autoname import get_auto_name
 from erpnext.custom_utils import check_future_date
-
 from erpnext.custom_workflow import verify_mr_workflow
+
+
+
 # form_grid_templates = {
 # 	"items": "templates/form_grid/material_request_grid.html"
 # }
@@ -78,6 +80,10 @@ class MaterialRequest(BuyingController):
 	def validate(self):
 		check_future_date(self.transaction_date)
 		super(MaterialRequest, self).validate()
+		self.validate_branch_perm()
+		cc  = frappe.db.sql(""" select name from `tabCost Center` where branch = "{0}" """.format(self.branch), as_dict = 1)
+                if cc:
+                        self.cost_center = cc[0].name
 
 		self.validate_schedule_date()
 		self.validate_uom_is_integer("uom", "qty")
@@ -116,21 +122,20 @@ class MaterialRequest(BuyingController):
 				frappe.throw("Setup MR Approver for <b>" + str(self.temp_cc) + "</b> in Document Approver")
 			else:
 				self.approver = app
+
+		if self.title1 == 'Stock Request':
+                        if 'MR Manager' not in frappe.get_roles(frappe.session.user):
+                                frappe.throw("""<b> You Cannot Apply Material Request of Type Stock Request,
+                                Contact Admin/Store Manager </b> """)
 		'''
+                verify_mr_workflow(self)
+
+		requested_by = frappe.get_doc("Employee", {"user_id": self.owner})
+                requested_by = "{}({})".format(requested_by.employee_name, requested_by.designation)
+                self.requested_by = requested_by
 		# self.validate_qty_against_so()
 		# NOTE: Since Item BOM and FG quantities are combined, using current data, it cannot be validated
 		# Though the creation of Material Request from a Production Plan can be rethought to fix this
-		if self.title1 == 'Stock Request':
-			if 'MR Manager' not in frappe.get_roles(frappe.session.user):
-				frappe.throw("""<b> You Cannot Apply Material Request of Type Stock Request,
-				Contact Admin/Store Manager </b> """)
-
-		requested_by = frappe.get_doc("Employee", {"user_id": frappe.session.user})
-		requested_by = "{}/ + {}".format(requested_by.employee_name, requested_by.designation)
-		self.requested_by = requested_by
-		verify_mr_workflow(self)
-		if self.title1 == 'Stock Request':
-                        self.title2 ="<div style='color: red'> {0} </div>".format(self.title1)   
 
 	def set_title(self):
 	#	'''Set title as comma separated list of items'''
@@ -238,6 +243,22 @@ class MaterialRequest(BuyingController):
 				"indented_qty": get_indented_qty(item_code, warehouse)
 			})
 
+	def validate_branch_perm(self):
+		user = frappe.session.user
+		user_roles = frappe.get_roles(user)
+		if user == "Administrator" or "System Manager" in user_roles or "Purchase Master" in user_roles: 
+			return
+	
+		branch_assign = frappe.db.sql("""select bi.branch from `tabAssign Branch` ab, `tabBranch Item` bi
+						where ab.user = '{user}'
+						and bi.parent = ab.name""".format(user=user), as_dict=1)
+		branch_list = [d.branch for d in branch_assign]
+		# frappe.throw(str(branch_list))
+		if self.branch not in branch_list:
+			frappe.throw("You do not have Branch access for {}, through Assign Branch".format(str(self.branch)))
+		if not self.is_new() and frappe.db.get_value(self.doctype, self.name, "branch") not in branch_list:
+			frappe.throw("You do not have Branch access for {} to update to new branch {}, through Assign Branch".format(frappe.db.get_value("Material Request", self.name, "branch"), self.branch))
+			
 def update_completed_and_requested_qty(stock_entry, method):
 	if stock_entry.doctype == "Stock Entry":
 		material_request_map = {}

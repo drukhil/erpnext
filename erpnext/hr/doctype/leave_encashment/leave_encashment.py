@@ -40,8 +40,11 @@ class LeaveEncashment(Document):
                 
         def on_submit(self):
 		self.adjust_leave()
-		self.post_accounts_entry()
+		if self.employment_type != 'Deputation':
+			self.post_accounts_entry()
 
+		if self.employment_type == 'Deputation':
+			frappe.msgprint("Your Leave Encashment Will Be Processed from Parent Organization, Kindly Contact HR Manager for more info")
 	def before_cancel(self):
 		self.check_gl_entry()
 

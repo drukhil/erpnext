@@ -96,8 +96,8 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2020-07-27 10:31:09.720749", 
- "modified_by": "sonam.zangmo@bt.bt", 
+ "modified": "2020-12-18 21:31:31.832527", 
+ "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Division", 
  "name_case": "", 
@@ -204,12 +204,12 @@
    "write": 0
   }
  ], 
- "quick_entry": 1, 
+ "quick_entry": 0, 
  "read_only": 0, 
  "read_only_onload": 0, 
  "sort_field": "modified", 
  "sort_order": "DESC", 
  "title_field": "d_name", 
- "track_changes": 0, 
- "track_seen": 0
+ "track_changes": 1, 
+ "track_seen": 1
 }

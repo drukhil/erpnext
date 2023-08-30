@@ -24,7 +24,9 @@ from erpnext.hr.doctype.employee_leave_approver.employee_leave_approver import g
 # Ver 1.0 Ends
 from erpnext.custom_utils import get_year_start_date, get_year_end_date
 from datetime import timedelta, date
-from erpnext.custom_workflow import verify_workflow, approver_list 
+
+from erpnext.custom_workflow import verify_workflow, approver_list
+
 class LeaveDayBlockedError(frappe.ValidationError): pass
 class OverlapError(frappe.ValidationError): pass
 class InvalidLeaveApproverError(frappe.ValidationError): pass
@@ -42,12 +44,14 @@ class LeaveApplication(Document):
 			else:
 				self.workflow_state = "Waiting Approval"
 		elif self.workflow_state == "Cancelled":
-                        '''if frappe.session.user not in (self.leave_approver,"Administrator"):
-                                frappe.throw(_("Only leave approver <b>{0}</b> ( {1} ) can cancel this document.").format(self.leave_approver_name, self.leave_approver), title="Operation not permitted")
-                        '''
+			hr_approver = frappe.db.get_value("Employee", frappe.db.get_single_value("HR Settings", "hr_approver"), "user_id")
+			if not hr_approver:
+				frappe.throw(_("Missing HR Approver user set from HR Setting."))
+			if frappe.session.user not in (self.leave_approver,"Administrator", hr_approver):
+				frappe.throw(_("Only leave approver <b>{0}</b> ( {1} ) can cancel this document.").format(self.leave_approver_name, self.leave_approver), title="Operation not permitted")
 			self.status = "Cancelled"
-                else:
-                        pass
+		else:
+			pass
 
 	"""def get_feed(self):
 		return _("{0}: From {0} of type {1}").format(self.status, self.employee_name, self.leave_type)
@@ -57,7 +61,6 @@ class LeaveApplication(Document):
 		self.branch = frappe.db.get_value("Employee", self.employee, "branch")
 		self.cost_center = frappe.db.get_value("Employee", self.employee, "cost_center")
 		self.validate_dates_ta()
-		approver_list(self, self.employee, action = 'Draft')
 		self.validate_fiscal_year()
 		if not getattr(self, "__islocal", None) and frappe.db.exists(self.doctype, self.name):
 			self.previous_doc = frappe.db.get_value(self.doctype, self.name, "*", as_dict=True)
@@ -76,8 +79,7 @@ class LeaveApplication(Document):
 		self.validate_salary_processed_days()
 		#self.validate_leave_approver()
 		self.validate_backdated_applications()
-               	verify_workflow(self)
- 
+		verify_workflow(self)                
 	def on_update(self):
 		self.validate_fiscal_year()
 		if (not self.previous_doc and self.leave_approver) or (self.previous_doc and \
@@ -148,7 +150,10 @@ class LeaveApplication(Document):
 		d = getdate(self.from_date)
 		e = getdate(self.to_date)
 		days = date_diff(e, d) + 1
+<<<<<<< HEAD
 
+=======
+>>>>>>> 481acce0b0473e02e508b18258351a662b38a341
 		for a in (d + timedelta(n) for n in range(days)):
 			if getdate(a).weekday() != 6:
 				#create attendance
@@ -404,7 +409,6 @@ class LeaveApplication(Document):
                         if str(self.from_date)[0:4] != str(self.to_date)[0:4]:
                                 frappe.throw("Leave Application cannot overlap fiscal years")
 
-
 def daterange(start_date, end_date):
     for n in range(int ((date(end_date) - date(start_date)).days)):
 	yield date(start_date) + timedelta(n)
@@ -458,15 +462,19 @@ def get_number_of_leave_days(employee, leave_type, from_date, to_date, half_day=
 	number_of_days = date_diff(to_date, from_date) + 1
 
 	if not frappe.db.get_value("Leave Type", leave_type, "include_holiday"):
-		number_of_days = flt(number_of_days) - flt(get_holidays(employee, from_date, to_date))
+		number_of_days = flt(number_of_days) - flt(get_holidays(employee, from_date, to_date, leave_type))
 	else:
 		return number_of_days
 
 	d = from_date
-	half = frappe.db.get_value("Holiday List", get_holiday_list_for_employee(employee), "saturday_half")
+	hol_li = get_holiday_list_for_employee(employee)
+	if leave_type == "Bereavement Leave":
+		hol_li = "Thimphu Holiday"
+		
+	half = frappe.db.get_value("Holiday List", hol_li, "saturday_half")
 	while(getdate(d) <= getdate(to_date)):
 		#For Saturday half day work time
-		if getdate(d).weekday() == 5 and flt(get_holidays(employee, d, d)) == 0 and half:
+		if getdate(d).weekday() == 5 and flt(get_holidays(employee, d, d, leave_type)) == 0 and half:
 			number_of_days-=0.5
 		d = frappe.utils.data.add_days(d, 1)
 	
@@ -477,7 +485,6 @@ def get_leave_balance_on(employee, leave_type, ason_date, allocation_records=Non
 		consider_all_leaves_in_the_allocation_period=False):
         ##
         #  Ver 2.0 Begins, Following code replaced by subsequent, by SHIV on 2018/02/09
-        ##
         allocation   = get_leave_allocation_records(ason_date, employee).get(employee, frappe._dict()).get(leave_type, frappe._dict())
         balance      = 0
 
@@ -496,8 +503,10 @@ def get_leave_balance_on(employee, leave_type, ason_date, allocation_records=Non
                 balance = 0
 
         return flt(balance)
-	##
-        #  Ver 2.0 Ends
+
+
+
+	#  Ver 2.0 Ends
         ##
 
 # Ver 1.0 Begins added by SSK on 20/08/2016, following function is added
@@ -675,9 +684,11 @@ def get_leave_allocation_records(ason_date, employee=None):
 	return allocated_leaves
 
 
-def get_holidays(employee, from_date, to_date):
+def get_holidays(employee, from_date, to_date, leave_type):
 	'''get holidays between two dates for the given employee'''
 	holiday_list = get_holiday_list_for_employee(employee)
+	if leave_type == "Bereavement Leave":
+		holiday_list = "Thimphu Holiday"
 
 	holidays = frappe.db.sql("""select count(distinct holiday_date) from `tabHoliday` h1, `tabHoliday List` h2
 		where h1.parent = h2.name and h1.holiday_date between %s and %s

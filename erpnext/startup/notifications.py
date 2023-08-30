@@ -13,7 +13,7 @@ def get_notification_config():
                                 "status": "Ongoing"
                         },
 			#"Item": {"total_projected_qty": ("<", 0)},
-			"Lead": {"status": "Open"},
+			
 			"Contact": {"status": "Open"},
 			"Opportunity": {"status": "Open"},
 			"Quotation": {"docstatus": 0},
@@ -22,6 +22,7 @@ def get_notification_config():
 				"docstatus": ("<", 2)
 			},
 			"Journal Entry": {"docstatus": 0},
+			"Cost Appropriation": {"docstatus": 0},
 			"Sales Invoice": { "outstanding_amount": (">", 0), "docstatus": ("<", 2) },
 			"Purchase Invoice": {"docstatus": 0},
 			"Leave Application": {"status": "Open"},
@@ -84,13 +85,17 @@ def get_notification_config():
 			"SWS Application" : {"docstatus": 0},
 			"HSD Payment" : {"docstatus": 0},
 			"Equipment POL Transfer" : {"docstatus": 0},
-                        "Equipment Request" : {"percent_completed": ("<", "100"), "docstatus": 1},
-                        "Revenue Target Adjustment": {"docstatus": 0},
+            "Equipment Request" : {"percent_completed": ("<", "100"), "docstatus": 1},
+            "Revenue Target Adjustment": {"docstatus": 0},
 			"Employee Benefits" : {"docstatus": 0},
 			"Asset Modifier": {"docstatus": 0},
 			"Asset Movement": {"docstatus": 0},
 			"Bulk Asset Transfer": {"docstatus": 0},
 			"Supplementary Budget": {"docstatus": 0},
 			"Budget Reappropiation": {"docstatus": 0},
+			"TDS Remittance" : {"docstatus" : 0},
+			"Asset Issue Details" : {"docstatus" : 0},
+			"Vehicle Requisition" : {"docstatus" : 0},
+			"Process Overtime Payment" : {"docstatus" : 0},
 		}
 	}

@@ -138,7 +138,7 @@ class SalaryIncrement(Document):
                                 start, end = frappe.db.get_value("Fiscal Year",  str(fy) , ["year_start_date", "year_end_date"])
                                 days_in_year = date_diff(end, start)
                                 date_of_joining = frappe.get_doc("Employee", self.employee).date_of_joining
-                                no_of_days = 0.0
+				no_of_days = 0.0
 				if getdate(date_of_joining) <= getdate(str(fy) + "-10-01"):
                                         if getdate(date_of_joining) < getdate(start):
                                                 date_of_joining = getdate(start)

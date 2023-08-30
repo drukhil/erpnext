@@ -22,13 +22,5 @@ frappe.query_reports["Overtime Register For Normal Employees"] = {
 			"options":"Branch",
 			
 		}
-		//  {
-        //                 "fieldname":"employee",
-        //                 "label":__("Employee"),
-        //                 "fieldtype":"Link",
-        //                 "options":"Employee",
-
-        //         }
-		
 	]
-	}
+}

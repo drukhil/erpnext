@@ -13,6 +13,11 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "DFG",
+					"description": _("DFG records."),
+				},
+				{
+					"type": "doctype",
 					"name": "Attendance",
 					"description": _("Attendance record."),
 				},                                
@@ -34,41 +39,54 @@ def get_data():
 					"name": "Training And Development",
 					"label": _("Training & Development Records"),
 					"description": _("Traning & Development Master."),
-				}
-				#{
-                                #        "type": "doctype",
-                                #       "name": "GEP Employee",
-                                #        "label": _("GEP Employee"),
-                                #        "description": _("GEP Management"),
-                                #},
-				#{
-                                #        "type": "doctype",
-                                #        "name": "Process GEP Payment",
-                                #       "label": _("Process GEP Payment"),
-                                #        "description": _("Process GEP Payment"),
-                                #}
-			]
-		},
-		{
-			"label": _("Muster Roll Employee/Operator/Open Air Prisoner"),
-			"icon": "icon-facetime-video",
-			"items": [
+				}, 
 				{
 					"type": "doctype",
-					"name": "Muster Roll Employee",
-					"description": _("Muster Roll Employee Data"),
+					"name": "Meeting",
+					"label": _("Meeting Management"),
+					"description": _("Meeting Management."),
+				},   
+				{
+					"type": "doctype",
+					"name": "Requisition Form",
+					"label": _("Employee Requisition Form"),
+					"description": _("Employee Requisition Form."),
 				},
 				{
+					"type": "doctype",
+					"name": "Unfreeze OAP",
+					"label": _("Unfreeze OAP"),
+					"description": _("Unfreeze OAP."),
+				},                
+			]
+		},
+				
+		{
+                        "label": _("Muster Roll Employee/Operator/Open Air Prisoner/DFG"),
+                        "icon": "icon-facetime-video",
+                        "items": [
+                                {
+                                        "type": "doctype",
+                                        "name": "Muster Roll Employee",
+                                        "description": _("Muster Roll Employee Data"),
+                                },
+                                {
                                         "type": "doctype",
                                         "name": "Operator",
-					"label": "Operator List",
+                                        "label": "Operator List",
                                         "description": _("Master Data of Operators"),
                                 },
-				{
+                                {
                                         "type": "doctype",
                                         "name": "Open Air Prisoner",
-					"label": "OAP List",
+                                        "label": "OAP List",
                                         "description": _("Open Air Prisoner"),
+                                },
+											{
+                                        "type": "doctype",
+                                        "name": "Foreign Labourer",
+                                        "label": "Foreign Labourer",
+                                        "description": _("Foreign Labourer"),
                                 },
 
 				{
@@ -80,26 +98,26 @@ def get_data():
 					"type": "doctype",
 					"name": "Attendance Tool Others",
 					"label": "Attendance Tool",
-					"description": _("Attendance Tool"),
+					"description": _("Attendance Tool for Others"),
 				},
-				#{
-				#	"type": "doctype",
-				#	"name": "Upload Attendance Others",
-				#	"label": "Upload Bulk Attendance",
-				#	"description": _("Upload Bulk Attendance"),
-				#},
+				{
+					"type": "doctype",
+					"name": "Upload Attendance Others",
+					"label": "Upload Bulk Attendance for Muster Roll",
+					"description": _("Attendance Tool for Others"),
+				},
 				{
 					"type": "doctype",
 					"name": "Project Overtime Tool",
 					"label": "Overtime Tool",
 					"description": _("Overtime Tool"),
 				},
-				#{
-				#	"type": "doctype",
-				#	"name": "Upload Overtime Entries",
-				#	"label": "Upload Bulk Overtime",
-				#	"description": _("Overtime Tool for Others"),
-				#},
+				{
+					"type": "doctype",
+					"name": "Upload Overtime Entries",
+					"label": "Upload Overtime Entry for Muster Roll",
+					"description": _("Overtime Tool for Others"),
+				},
 				{
 					"type": "doctype",
 					"name": "Process MR Payment",
@@ -126,7 +144,7 @@ def get_data():
                                         "type": "doctype",
                                         "name": "Project Muster Roll Tool",
                                         "label": "Project Muster Roll Tool",
-                                        "description": _("Tool used to transfer Muster Roll from one project to another project"),
+                                        "description": _("MR Transfer tool"),
                                 },
 			]
 		},
@@ -241,6 +259,11 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Vehicle Requisition",
+					"description": _("Vehicle Requisition"),
+				},
+				{
+					"type": "doctype",
 					"name": "Leave Encashment",
 					"description": _("Leave Encashment"),
 				},
@@ -250,18 +273,18 @@ def get_data():
                                         "label": _("Process LTC"),
 					"description": _("LTC process"),
 				},
-				{
-					"type": "doctype",
-					"name": "PBVA",
-                                        "label": _("Process PBVA"),
-					"description": _("PBVA process"),
-				},
-				{
-					"type": "doctype",
-					"name": "Bonus",
-                                        "label": _("Process Bonus"),
-					"description": _("Bonus Process"),
-				},
+				#{
+				#	"type": "doctype",
+				#	"name": "PBVA",
+                                #       "label": _("Process PBVA"),
+				#	"description": _("PBVA process"),
+				#},
+				#{
+				#	"type": "doctype",
+				#	"name": "Bonus",
+                                #       "label": _("Process Bonus"),
+				#	"description": _("Bonus Process"),
+				#},
 				{
 					"type": "doctype",
 					"name": "Overtime Application",
@@ -294,12 +317,12 @@ def get_data():
 				#	"name": "Leave Encashment Settings",
 				#	"description": _("Leave Encashment Settings"),
 				#},                                
-				{
-					"type": "doctype",
-					"name": "Department Director",
-					"label": "Department\'s Director",
-					"description": _("Assign Directors to Departments")
-				},
+				#{
+				#	"type": "doctype",
+				#	"name": "Department Director",
+				#	"label": "Department\'s Director",
+				#	"description": _("Assign Directors to Departments")
+				#},
 				{
 					"type": "doctype",
 					"name": "Assign Branch",
@@ -441,8 +464,8 @@ def get_data():
 				 {
                                         "type" : "report",
                                         "is_query_report": True,
-                                        "name": "MR Payment Report",
-                                        "label": _("MR Payment Report"),
+                                        "name": "Payment Report",
+                                        "label": _("Muster Roll Employee/Operator/Open Air Prisoner Payment Report"),
                                         "doctype": "Process MR Payment"
                                 }
 

@@ -397,7 +397,9 @@ cur_frm.cscript.item_group = function(doc) {
              item_group: doc.item_group
         },
         callback: function(r) {
-             cur_frm.set_value("item_code", r.message.toString());
+         //    cur_frm.set_value("item_code", r.message.toString());
+	cur_frm.set_value("item_code", r.message);
+		console.log(r);
         }
    });
    /*if (doc.item_group != 'All Item Groups') {

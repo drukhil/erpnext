@@ -7,8 +7,8 @@
  "doctype": "Report", 
  "idx": 0, 
  "is_standard": "Yes", 
- "modified": "2020-01-30 12:15:17.370759", 
- "modified_by": "kinzang.namgyal@cdcl.bt", 
+ "modified": "2020-10-22 12:16:16.380105", 
+ "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Stock Issue Report", 
  "owner": "Administrator", 
@@ -39,6 +39,9 @@
   }, 
   {
    "role": "Auditor"
+  }, 
+  {
+   "role": "MR User"
   }
  ]
 }

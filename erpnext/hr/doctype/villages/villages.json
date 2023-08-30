@@ -1,7 +1,7 @@
 {
  "allow_copy": 0, 
  "allow_import": 1, 
- "allow_rename": 0, 
+ "allow_rename": 1, 
  "autoname": "field:village", 
  "beta": 0, 
  "creation": "2016-05-05 11:16:30.315424", 
@@ -125,7 +125,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2017-11-17 20:02:27.315351", 
+ "modified": "2021-11-25 11:31:02.491963", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Villages", 
@@ -198,6 +198,6 @@
  "read_only_onload": 0, 
  "sort_field": "modified", 
  "sort_order": "DESC", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }

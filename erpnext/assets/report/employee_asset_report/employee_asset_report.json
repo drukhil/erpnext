@@ -7,8 +7,8 @@
  "doctype": "Report", 
  "idx": 0, 
  "is_standard": "Yes", 
- "modified": "2018-12-21 12:28:24.870199", 
- "modified_by": "kinzang.namgyal@cdcl.bt", 
+ "modified": "2020-12-18 09:50:09.676107", 
+ "modified_by": "Administrator", 
  "module": "Assets", 
  "name": "Employee Asset Report", 
  "owner": "Administrator", 
@@ -31,6 +31,9 @@
   }, 
   {
    "role": "Auditor"
+  }, 
+  {
+   "role": "Management"
   }
  ]
 }

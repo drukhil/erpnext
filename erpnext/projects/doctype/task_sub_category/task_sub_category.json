@@ -1,6 +1,6 @@
 {
  "allow_copy": 0, 
- "allow_import": 1, 
+ "allow_import": 0, 
  "allow_rename": 0, 
  "autoname": "field:sub_category_name", 
  "beta": 0, 
@@ -98,7 +98,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2021-03-16 09:53:56.385753", 
+ "modified": "2020-11-23 14:28:00.393505", 
  "modified_by": "Administrator", 
  "module": "Projects", 
  "name": "Task Sub Category", 

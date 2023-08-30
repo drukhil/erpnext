@@ -1,0 +1,44 @@
+{
+ "add_total_row": 0, 
+ "apply_user_permissions": 1, 
+ "creation": "2022-07-08 15:20:45.914278", 
+ "disabled": 0, 
+ "docstatus": 0, 
+ "doctype": "Report", 
+ "idx": 0, 
+ "is_standard": "Yes", 
+ "modified": "2022-07-11 11:11:21.020949", 
+ "modified_by": "Administrator", 
+ "module": "Buying", 
+ "name": "Supplier Monitoring Report", 
+ "owner": "Administrator", 
+ "ref_doctype": "Supplier Monitoring", 
+ "report_name": "Supper Monitoring Report", 
+ "report_type": "Script Report", 
+ "roles": [
+  {
+   "role": "Administrator"
+  }, 
+  {
+   "role": "Auditor"
+  }, 
+  {
+   "role": "Purchase ReadOnly"
+  }, 
+  {
+   "role": "Purchase Manager HQ"
+  }, 
+  {
+   "role": "Purchase Manager"
+  }, 
+  {
+   "role": "Purchase User"
+  }, 
+  {
+   "role": "Stock Manager"
+  }, 
+  {
+   "role": "Stock User"
+  }
+ ]
+}

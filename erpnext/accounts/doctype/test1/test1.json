@@ -47,7 +47,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2017-10-10 11:12:13.409095", 
+ "modified": "2021-01-12 12:46:50.774610", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "test1", 
@@ -68,7 +68,7 @@
    "print": 1, 
    "read": 1, 
    "report": 1, 
-   "role": "All", 
+   "role": "Administrator", 
    "set_user_permissions": 0, 
    "share": 1, 
    "submit": 0, 
@@ -80,5 +80,6 @@
  "read_only_onload": 0, 
  "sort_field": "modified", 
  "sort_order": "DESC", 
+ "track_changes": 1, 
  "track_seen": 0
 }

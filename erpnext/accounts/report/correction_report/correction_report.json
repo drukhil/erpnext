@@ -1,0 +1,33 @@
+{
+ "add_total_row": 0, 
+ "apply_user_permissions": 1, 
+ "creation": "2022-04-01 14:29:33.593067", 
+ "disabled": 0, 
+ "docstatus": 0, 
+ "doctype": "Report", 
+ "idx": 0, 
+ "is_standard": "Yes", 
+ "modified": "2022-04-04 09:43:35.094113", 
+ "modified_by": "Administrator", 
+ "module": "Accounts", 
+ "name": "Correction report", 
+ "owner": "Administrator", 
+ "query": "select TRIM(' - GYALSUNG' from name) as cost_center, branch from `tabCost Center` where TRIM(' - GYALSUNG' from name) != branch;", 
+ "ref_doctype": "Cost Center", 
+ "report_name": "Branch Name", 
+ "report_type": "Query Report", 
+ "roles": [
+  {
+   "role": "Employee"
+  }, 
+  {
+   "role": "Accounts Manager"
+  }, 
+  {
+   "role": "Project Manager"
+  }, 
+  {
+   "role": "Administrator"
+  }
+ ]
+}

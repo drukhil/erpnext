@@ -4,6 +4,8 @@
 cur_frm.add_fetch("employee", "employee_name", "employee_name")
 cur_frm.add_fetch("employee", "branch", "branch")
 cur_frm.add_fetch("employee", "cost_center", "cost_center")
+
+
 frappe.ui.form.on('Overtime Application', {
 	onload: function(frm) {
 		if(!frm.doc.posting_date) {

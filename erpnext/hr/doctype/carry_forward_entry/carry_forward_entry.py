@@ -36,6 +36,8 @@ class CarryForwardEntry(Document):
                         query += " and branch = '{0}'".format(self.branch)
 		if self.employment_type:
 			query += " and employment_type = '{0}'".format(self.employment_type)
+		if self.employee:
+			query += " and employee = '{0}'".format(self.employee)
 
                 doc = frappe.db.sql(query)
 
@@ -43,7 +45,6 @@ class CarryForwardEntry(Document):
                 '''
                 if doc:
                         frappe.throw("Can not create multiple Entries for the same year")
-
 
 	def get_data(self):
                 fy_start_end_date = frappe.db.get_value("Fiscal Year", self.fiscal_year, ["year_start_date", "year_end_date"])
@@ -59,8 +60,11 @@ class CarryForwardEntry(Document):
                         filters_dict['branch'] = self.branch
 
 
-                if self.employment_type:
-                        filters_dict['employment_type'] = self.employment_type
+		if self.employment_type:
+			filters_dict['employment_type'] = self.employment_type
+
+		if self.employee:
+			filters_dict['name'] = self.employee
 
                 active_employees = frappe.get_all("Employee",
                         filters = filters_dict,
@@ -75,12 +79,10 @@ class CarryForwardEntry(Document):
                         if allocation:
                                 leaves_allocated = allocation['total_leaves_allocated']
 
-			# leaves taken
+                        # leaves taken
                         leaves_taken = get_approved_leaves_for_period(employee.name, self.leave_type, from_date, to_date)
-
-                        # closing balance
-                        '''leave_balance = get_leave_balance_on(employee.name, self.leave_type, to_date,
-                                allocation_records_based_on_to_date.get(employee.name, frappe._dict()))'''
+			
+			# closing balance
                         employee_id = employee.name
                         employee_name = employee.employee_name
                         leave_balance = flt(leaves_allocated) - flt(leaves_taken)
@@ -90,7 +92,8 @@ class CarryForwardEntry(Document):
                                 'leaves_allocated': leaves_allocated, 'leaves_taken': leaves_taken, 'leave_balance': leave_balance}
                         row.update(d)
 
-	def on_submit(self):
+
+        def on_submit(self):
                 for em in self.get('items'):
                         frappe.db.sql("""
                                 update `tabLeave Allocation` set cl_balance = {0} , cf_reference = '{1}',
@@ -99,7 +102,7 @@ class CarryForwardEntry(Document):
                                 order by to_date desc limit 1""".format(em.leave_balance, em.parent, em.employee))
                 frappe.msgprint(" Updated Leave Allocation Record ")
 
-        def on_cancel(self):
+	def on_cancel(self):
                 for em in self.get('items'):
                         frappe.db.sql("""
                                 update `tabLeave Allocation` set cl_balance = 0, cf_reference = '',
@@ -120,7 +123,7 @@ class CarryForwardEntry(Document):
                 if leave_allocation:
                         doc = frappe.get_doc("Leave Allocation", leave_allocation[0].name)
 
-	def update_allocation(self, cancel = None):
+        def update_allocation(self, cancel = None):
                 for em in self.get('items'):
                         balance = em.leave_balance
                         cf_reference = em.parent

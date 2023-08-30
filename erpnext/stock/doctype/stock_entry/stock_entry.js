@@ -122,7 +122,7 @@ erpnext.stock.StockEntry = erpnext.stock.StockController.extend({
 			this.item_selector = new erpnext.ItemSelector({frm: this.frm});
 		}
 	},
-
+	
 	refresh: function() {
 		var me = this;
 		erpnext.toggle_naming_series();
@@ -624,7 +624,7 @@ frappe.ui.form.on("Stock Entry", "refresh", function(frm) {
 frappe.ui.form.on("Stock Entry", "items_on_form_rendered", function(frm, grid_row, cdt, cdn) {
                 var row = cur_frm.open_grid_row();
                 if(!row.grid_form.fields_dict.cost_center.value) {
-                        //row.grid_form.fields_dict.cost_center.set_value(frm.doc.user_cost_center)
+                        row.grid_form.fields_dict.cost_center.set_value(frm.doc.user_cost_center)
                         row.grid_form.fields_dict.cost_center.refresh()
                 }
         })

@@ -9,13 +9,16 @@ def get_data():
 				{
 					"type": "doctype",
 					"name": "Asset",
+					"label": "Own Assets",
 				},
                                 {
 					"type": "doctype",
 					"name": "Asset Category",
 				},
-				{	"type": "doctype",
-					"name": "Asset Others"
+				{
+					"type": "doctype",
+					"name": "Asset Others",
+					"label": "Assets From Other Org.",
 				}
 			]
 		},
@@ -84,11 +87,12 @@ def get_data():
 					"doctype": "Asset",
 					"is_query_report": True,
 				},
-				{	
+				{
 					"type": "report",
 					"name": "Others' Asset Report",
 					"doctype": "Asset Others",
-					"is_query_report": True
+					"is_query_report": True,
+					"label": "Assets' From Other Org.",
 				},
 				{
                     "type": "report",

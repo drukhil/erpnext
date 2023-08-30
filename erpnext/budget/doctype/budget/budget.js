@@ -105,7 +105,6 @@ frappe.ui.form.on("Budget Account", "supplementary_budget", function(frm, cdt, c
 
     frappe.model.set_value(cdt, cdn, "budget_amount", calculate_budget_amount(child));
     calculate_value(frm, cdt, cdn);
-
 });
 
 //Calculate when re-appropiation budget received budget changes

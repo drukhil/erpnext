@@ -1,0 +1,27 @@
+{
+ "content": null, 
+ "creation": "2021-08-05 14:25:58.674065", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2021-09-27 12:45:37.456263", 
+ "modified_by": "Administrator", 
+ "module": "Management Dashboard", 
+ "name": "mechanical-services", 
+ "owner": "Administrator", 
+ "page_name": "Mechanical Services", 
+ "roles": [
+  {
+   "role": "Administrator"
+  }, 
+  {
+   "role": "Management"
+  }, 
+  {
+   "role": "Fleet Manager"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null
+}
