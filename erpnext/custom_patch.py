@@ -372,9 +372,10 @@ def submit_se():
 	print doc.name
 
 def submit_ca():
-	doc = frappe.get_doc("Cost Appropriation", "CA2023000048")
+	doc = frappe.get_doc("Cost Appropriation", "CA2023000053")
 	doc.submit()
-	print doc.name
+	frappe.db.commit()
+	print (doc.name)
 
 def cancel_se():
 	doc = frappe.get_doc("Stock Entry", "SEMI23075690")
@@ -383,9 +384,10 @@ def cancel_se():
 	print (doc.name)
 
 def submit_je():
-	doc = frappe.get_doc("Journal Entry", "JEJV230701995")
+	doc = frappe.get_doc("Journal Entry", "JEJV230800417")
 	doc.submit()
-	print doc.name
+	frappe.db.commit()
+	print (doc.name)
 
 def cancel_je():
 	doc = frappe.get_doc("Journal Entry", "JEBP230700130")

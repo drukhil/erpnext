@@ -143,14 +143,14 @@ class Project(Document):
 			frappe.throw(_("Cannot Update For Future Dates"))
 
 		self.physical_progress = round(flt(self.physical_progress), 7)
-		self.update_progress(update=True)
+		if not self.is_group:
+			self.update_progress(update=True)
+			# self.update_parent()
 		if self.percent_completed == 100:
 			self.db_set("status", "Completed")
 		if self.percent_completed < 100:
 			self.db_set("status", "Ongoing")
 		self.total_task_duration()
-		if not self.is_group:
-			self.update_parent()
 		self.post_achievement_entries()
 		self.make_target_entries()
 		self.update_expense()	
