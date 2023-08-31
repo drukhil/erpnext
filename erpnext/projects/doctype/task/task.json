@@ -41,10 +41,6 @@
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
-<<<<<<< HEAD
-   "default": "High", 
-=======
->>>>>>> 481acce0b0473e02e508b18258351a662b38a341
    "fieldname": "priority", 
    "fieldtype": "Select", 
    "hidden": 0, 
@@ -72,10 +68,6 @@
    "allow_on_submit": 0, 
    "bold": 1, 
    "collapsible": 0, 
-<<<<<<< HEAD
-   "default": "Open", 
-=======
->>>>>>> 481acce0b0473e02e508b18258351a662b38a341
    "fieldname": "status", 
    "fieldtype": "Select", 
    "hidden": 0, 
