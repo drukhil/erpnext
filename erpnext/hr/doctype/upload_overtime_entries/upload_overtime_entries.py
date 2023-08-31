@@ -33,6 +33,7 @@ def get_template():
 def add_header(w, args):
 	w.writerow(["Notes:"])
 	w.writerow(["Please do not change the template headings"])
+#	w.writerow(["Hours should be in 'R' column if its from time: 5:00 PM To 10:00 PM, AND For 'S' column, from 10:01 PM To Next Morning 8:00 AM, Sunday and Government Holiday"])
 	w.writerow(["Number of hours should be Integers"])
 	hd = ["Branch", "Cost Center", "Employee Type", "Employee ID", "Employee Name", "Year", "Month"]
 
