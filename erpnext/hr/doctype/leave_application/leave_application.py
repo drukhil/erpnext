@@ -150,10 +150,6 @@ class LeaveApplication(Document):
 		d = getdate(self.from_date)
 		e = getdate(self.to_date)
 		days = date_diff(e, d) + 1
-<<<<<<< HEAD
-
-=======
->>>>>>> 481acce0b0473e02e508b18258351a662b38a341
 		for a in (d + timedelta(n) for n in range(days)):
 			if getdate(a).weekday() != 6:
 				#create attendance
