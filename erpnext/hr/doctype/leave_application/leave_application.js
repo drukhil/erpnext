@@ -3,10 +3,6 @@
 
 cur_frm.add_fetch('employee','employee_name','employee_name');
 cur_frm.add_fetch('employee','company','company');
-<<<<<<< HEAD
-cur_frm.add_fetch('verifier', 'employee_name', 'verifier_name');
-=======
->>>>>>> 481acce0b0473e02e508b18258351a662b38a341
 
 frappe.ui.form.on("Leave Application", {
 	onload: function(frm) {
@@ -22,12 +18,6 @@ frappe.ui.form.on("Leave Application", {
 				}
 			};
 		});
-<<<<<<< HEAD
-	
-		
-=======
-
->>>>>>> 481acce0b0473e02e508b18258351a662b38a341
 		frm.set_query("employee", erpnext.queries.employee);
 
 		if(frm.doc.__islocal) {
@@ -61,29 +51,8 @@ frappe.ui.form.on("Leave Application", {
 	},
 
 	employee: function(frm) {
-<<<<<<< HEAD
-		/*frappe.call({
-                        'method': 'erpnext.custom_workflow.approver_list',
-                        'args': {'employee': frm.doc.employee },
-                       callback: function(r){
-                           if (r.message) {
-                                //cur_frm.set_value("leave_approver", r.message.verifier);    
-                                //cur_frm.set_value("approver", r.message.approver);    
-				//cur_frm.set_df_property("next_depreciation_date", "hidden", true);
-                                 }
-                        }
-                })
-	
-		frappe.call({
-			method: "erpnext.custom_workflow.validate_workflow_states",
-			doc: frm.doc
-		})
-		frm.trigger("get_employee_branch_costcenter")
-		frm.trigger("get_leave_balance");*/
-=======
 		frm.trigger("get_employee_branch_costcenter")
 		frm.trigger("get_leave_balance");
->>>>>>> 481acce0b0473e02e508b18258351a662b38a341
 	},
 
 	leave_type: function(frm) {
