@@ -122,7 +122,7 @@ class ProcessMRPayment(Document):
                                 and i.parent != '{4}'
 				and i.parent = m.name
 				and m.cost_center = '{5}'
-                        """.format(employee, employee_type, self.fiscal_year, self.month, self.name, self.cost_center), as_dict=1)
+                        """.format(employee, employee_type, self.fiscal_year, self.month, self.name, frappe.db.escape(self.cost_center)), as_dict=1)
 
                 for l in pl:
                         msg = 'Payment already processed for `{2}({3})`<br>RowId#{1}: Reference# <a href="#Form/Process MR Payment/{0}">{0}</a>'.format(l.parent, idx, l.person_name, l.employee)
