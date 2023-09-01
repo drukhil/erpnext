@@ -72,7 +72,7 @@ def get_conditions(filters):
 
 	filters["total_days_in_month"] = monthrange(cint(filters.year), filters.month)[1]
 
-	conditions = " and month(date) = %(month)s and year(date) = %(year)s and cost_center = \'" + str(filters.cost_center) + "\' "
+	conditions = " and month(date) = %(month)s and year(date) = %(year)s and cost_center = \'" + str(frappe.db.escape(filters.cost_center)) + "\' "
 
 	return conditions, filters
 
