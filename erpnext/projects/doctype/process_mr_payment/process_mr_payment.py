@@ -405,7 +405,7 @@ def get_records(employee_type, fiscal_year, fiscal_month, from_date, to_date, co
         		fiscal_year=fiscal_year,
         		fiscal_month=fiscal_month,
         		dn=dn,
-        		cost_center=cost_center,
+        		cost_center=frappe.db.escape(cost_center),
 			from_date = from_date,
 			to_date = to_date
         ),as_dict=True)
@@ -503,7 +503,7 @@ def get_records(employee_type, fiscal_year, fiscal_month, from_date, to_date, co
                                         and docstatus = 1
                                 ) as abc
                                 group by employee
-        """.format(employee_type, from_date, to_date, cost_center, total_days), as_dict=True)
+        """.format(employee_type, from_date, to_date, frappe.db.escape(cost_center), total_days), as_dict=True)
 
 
         for r in rest_list:
