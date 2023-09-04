@@ -22,7 +22,7 @@ class ProcessMRPayment(Document):
 			total_ot = total_wages = total_health = salary = 0.0
 			
 			for a in self.items:
-				if not self.workflow_state != "Rejected":
+				if self.workflow_state != "Rejected":
 					self.duplicate_entry_check(a.employee, a.employee_type, a.idx)
 				a.fiscal_year   = self.fiscal_year
 				a.month         = self.month
