@@ -42,7 +42,7 @@ def get_data(filters):
                           `tabProcess MR Payment` as p where i.parent = p.name and p.docstatus = 1 """
 
 	if filters.get("branch"):
-		query += " and p.branch = \'" + str(filters.branch) + "\'"
+		query += " and p.branch = \'" + str(frappe.db.escape(filters.branch)) + "\'"
 	if filters.get("year"):
 		query += " and i.fiscal_year = \'" + str(filters.year) + "\'"
 	if filters.get("month"):
