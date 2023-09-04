@@ -170,7 +170,7 @@ def cancel_draft_doc(doctype, docname):
 		doc.db_set("workflow_state", wfs[0].state if len(wfs) == 1 else "Cancelled")
 
 	if doctype in ["Process MR Payment","Leave Application","Material Request","Purchase invoice", "Sales Invoice", "Journal Entry", "Direct Payment", "Payment Entry", "HSD Payment", "Mechanical Payment"]:
-			doc.db_set("status", "Cancelled")
+		doc.db_set("status", "Cancelled")
 	elif doctype == "Travel Claim":
 		if doc.ta:
 			ta = frappe.get_doc("Travel Authorization", doc.ta)
