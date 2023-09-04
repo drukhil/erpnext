@@ -9,7 +9,7 @@ frappe.query_reports["TDS Challen"] = {
 			"fieldtype": "Link",
 			"width": "80",
 			"options": "Branch",
-			"reqd": 1
+			"reqd": 0
 		},
 		{
 			"fieldname": "fiscal_year",
