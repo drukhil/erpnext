@@ -110,7 +110,7 @@ class TDSRemittance(AccountsController):
 
         def post_gl_entry(self):
 		#cost_center = frappe.db.get_value("Branch", self.branch, "cost_center")
-		cost_center  = frappe.db.get_value("Cost Center", {'branch': self.branch}, "name")
+		cost_center  = frappe.db.get_value("Cost Center", {'branch': self.branch, 'is_group': 0}, "name")
                 gl_entries   = []
                	if self.total_tds > 0:
 			gl_entries.append(

@@ -23,8 +23,8 @@ frappe.ui.form.on('Asset Issue Details', {
 				args: {
 					doctype: 'Cost Center',
 					filters: {
-						'branch': frm.doc.branch
-						
+						'branch': frm.doc.branch,
+						'is_group': 0
 					},
 					fieldname: ['name']
 				},
