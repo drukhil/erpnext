@@ -107,7 +107,7 @@ frappe.ui.form.on("Project", {
                 var added_min = false;
 
        
-                var title = __('<b style="color: green; font-size: 110%;">  {0} Percent Completed </b>', [parseFloat(frm.doc.percent_completed, 2)]);
+                var title = __('{0} Percent Completed ', [parseFloat(frm.doc.percent_completed, 2)]);
                 bars.push({
                         'title': title,
                         'width': parseFloat(frm.doc.percent_completed) + '%',
@@ -117,7 +117,7 @@ frappe.ui.form.on("Project", {
                         bars[0].width = '0.5%';
                         added_min = 0.5;
                 }
-                message = title;
+                message = __('<b style="color: green; font-size: 110%;">  {0} Percent Completed </b>', [parseFloat(frm.doc.percent_completed, 2)]);
                 if(frm.doc.percent_completed !== 100){
                         var pending_complete = 100 - frm.doc.percent_completed;
                         if(pending_complete) {
@@ -128,7 +128,7 @@ frappe.ui.form.on("Project", {
                                         'width': (width > 100 ? "99.5" : width)  + '%',
                                         'progress_class': 'progress-bar-warning'
                                 })
-                                message = message + '. ' + title;
+                                message = message + ', ' + __('<b style="color: orange; font-size: 110%;"> {0} Remaining to Complete the Activity </b>', [pending_complete]);
                         }
                 }
                 frm.dashboard.add_progress(__('Status'), bars, message);
