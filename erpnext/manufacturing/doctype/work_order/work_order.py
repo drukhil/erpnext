@@ -563,6 +563,7 @@ def get_item_details(item, branch = None, project = None):
 	res = res[0]
 
 	filters = {"item": item, "is_default": 1}
+	frappe.throw(str(project))
 
 	if project:
 		filters = {"item": item, "project": project}

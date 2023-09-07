@@ -39,6 +39,7 @@ def allocate_overtime(employee_list, cost_center, branch, date, number_of_hours,
 	employee_list = json.loads(employee_list)
 	for employee in employee_list:
 		attendance = frappe.new_doc("Overtime Entry")
+        attendance.ignore_permissions=True
 		attendance.date = date
 		attendance.purpose = purpose
 		attendance.cost_center = cost_center

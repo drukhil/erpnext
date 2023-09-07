@@ -146,7 +146,6 @@ class ProjectAdvance(Document):
                                 frappe.throw(_("Expense GL is not defined for this Branch '{0}'.").format(self.branch), title="Data Missing")
                         exp_gl_det = frappe.db.get_value(doctype="Account", filters=exp_gl, fieldname=["account_type","is_an_advance_account"], as_dict=True)                                
 
-
                 # Posting Journal Entry
                 accounts = []
                 accounts.append({"account": adv_gl,

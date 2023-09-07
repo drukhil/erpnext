@@ -8,24 +8,24 @@ cur_frm.add_fetch("boq", "boq_type", "boq_type");
 frappe.ui.form.on('BOQ Substitution', {
 	setup: function(frm){
 		frm.get_field('boq_item').grid.editable_fields = [
-                        { fieldname: 'boq_code', columns: 2 },
-                        { fieldname: 'item', columns: 3 },
+            { fieldname: 'boq_code', columns: 2 },
+            { fieldname: 'item', columns: 3 },
 			{ fieldname: 'is_group', columns: 1 },
 			{ fieldname: 'substitute', columns: 1},
-                        { fieldname: 'uom', columns: 1 }, 
-                        { fieldname: 'quantity', columns: 1 },
-                        { fieldname: 'rate', columns: 1 },
-                        { fieldname: 'amount', columns: 2 }
-                ];
+            { fieldname: 'uom', columns: 1 }, 
+            { fieldname: 'quantity', columns: 1 },
+            { fieldname: 'rate', columns: 1 },
+            { fieldname: 'amount', columns: 2 }
+            ];
 		frm.get_field('initial_boq_item').grid.editable_fields = [
-                        { fieldname: 'boq_code', columns: 2 },
-                        { fieldname: 'item', columns: 3 },
-                        { fieldname: 'is_group', columns: 1 },
-                        { fieldname: 'uom', columns: 1 }, 
-                        { fieldname: 'quantity', columns: 1 },
-                        { fieldname: 'rate', columns: 1 },
-                        { fieldname: 'amount', columns: 2 }
-                ];
+            { fieldname: 'boq_code', columns: 2 },
+            { fieldname: 'item', columns: 3 },
+            { fieldname: 'is_group', columns: 1 },
+            { fieldname: 'uom', columns: 1 }, 
+            { fieldname: 'quantity', columns: 1 },
+            { fieldname: 'rate', columns: 1 },
+            { fieldname: 'amount', columns: 2 }
+        ];
 	},
 	
 	onload: function(frm){
@@ -67,74 +67,74 @@ frappe.ui.form.on('BOQ Substitution', {
 
 frappe.ui.form.on("BOQ Substitution Item",{	
 	quantity: function (frm, cdt, cdn) {
-                calculate_amount(frm, cdt, cdn);
+        calculate_amount(frm, cdt, cdn);
         },
-        rate: function (frm, cdt, cdn) {
-                calculate_amount(frm, cdt, cdn);
-        },
+    rate: function (frm, cdt, cdn) {
+        calculate_amount(frm, cdt, cdn);
+    },
 
 	substitute: function (frm, cdt, cdn) {
 		calculate_amount(frm, cdt, cdn);
 	},
 
-        amount: function (frm) {
-                calculate_total_amount(frm);
-        },
-        no: function (frm, cdt, cdn) {
-                child = locals[cdt][cdn];
-                var quant = child.no * child.coefficient * child.height * child.length * child.breath
-                frappe.model.set_value(cdt, cdn, 'quantity', parseFloat(quant));
-        },
-        breath: function (frm, cdt, cdn) {
-                child = locals[cdt][cdn];
-                var quant = child.no * child.coefficient * child.height * child.length * child.breath
-                frappe.model.set_value(cdt, cdn, 'quantity', parseFloat(quant));
-        },
-        height: function (frm, cdt, cdn) {
-                child = locals[cdt][cdn];
-                var quant = child.no * child.coefficient * child.height * child.length * child.breath
-                frappe.model.set_value(cdt, cdn, 'quantity', parseFloat(quant));
-        },
+    amount: function (frm) {
+        calculate_total_amount(frm);
+    },
+    no: function (frm, cdt, cdn) {
+        child = locals[cdt][cdn];
+        var quant = child.no * child.coefficient * child.height * child.length * child.breath
+        frappe.model.set_value(cdt, cdn, 'quantity', parseFloat(quant));
+    },
+    breath: function (frm, cdt, cdn) {
+        child = locals[cdt][cdn];
+        var quant = child.no * child.coefficient * child.height * child.length * child.breath
+        frappe.model.set_value(cdt, cdn, 'quantity', parseFloat(quant));
+    },
+    height: function (frm, cdt, cdn) {
+        child = locals[cdt][cdn];
+        var quant = child.no * child.coefficient * child.height * child.length * child.breath
+        frappe.model.set_value(cdt, cdn, 'quantity', parseFloat(quant));
+    },
 	length: function (frm, cdt, cdn) {
-                child = locals[cdt][cdn];
-                var quant = child.no * child.coefficient * child.height * child.length * child.breath
-                frappe.model.set_value(cdt, cdn, 'quantity', parseFloat(quant));
-        },
-        coefficient: function (frm, cdt, cdn) {
-                child = locals[cdt][cdn];
-                var quant = child.no * child.coefficient * child.height * child.length * child.breath
-                frappe.model.set_value(cdt, cdn, 'quantity', parseFloat(quant));
-        }
+        child = locals[cdt][cdn];
+        var quant = child.no * child.coefficient * child.height * child.length * child.breath
+        frappe.model.set_value(cdt, cdn, 'quantity', parseFloat(quant));
+    },
+    coefficient: function (frm, cdt, cdn) {
+        child = locals[cdt][cdn];
+        var quant = child.no * child.coefficient * child.height * child.length * child.breath
+        frappe.model.set_value(cdt, cdn, 'quantity', parseFloat(quant));
+    }
 });
 
 var get_boq_list = function (frm) {
         if (frm.doc.boq) {
                 frappe.call({
-                        method: "erpnext.projects.doctype.boq_substitution.boq_substitution.get_boq_list",
-                        args: {
-                                "boq": frm.doc.boq
-                        },
-                        callback: function (r) {
-                                if (r.message) {
-                                        cur_frm.clear_table("boq_item");
-                                        r.message.forEach(function (boq) {
-                                                var row = frappe.model.add_child(frm.doc, "BOQ Substitution Item", "boq_item");
-                                                row.boq_item_name = boq['name'];
-						row.boq_code = boq['boq_code'];
-                                                row.item = boq['item'];
-                                                row.uom = boq['uom'];
-						row.is_group = boq['is_group'];
-						row.balance_quantity = boq['balance_quantity'];
-						row.balance_rate = boq['balance_rate'];
-						row.balance_amount = boq['balance_amount'];
-						row.initial_amount = boq['amount'];
-                                        });
-                                        cur_frm.refresh();
-                                }
-                                else {
-                                        cur_frm.clear_table("boq_item");
-                                }
+                    method: "erpnext.projects.doctype.boq_substitution.boq_substitution.get_boq_list",
+                    args: {
+                            "boq": frm.doc.boq
+                    },
+                    callback: function (r) {
+                        if (r.message) {
+                            cur_frm.clear_table("boq_item");
+                            r.message.forEach(function (boq) {
+                                    var row = frappe.model.add_child(frm.doc, "BOQ Substitution Item", "boq_item");
+                                    row.boq_item_name = boq['name'];
+                                    row.boq_code = boq['boq_code'];
+                                    row.item = boq['item'];
+                                    row.uom = boq['uom'];
+                                    row.is_group = boq['is_group'];
+                                    row.balance_quantity = boq['balance_quantity'];
+                                    row.balance_rate = boq['balance_rate'];
+                                    row.balance_amount = boq['balance_amount'];
+                                    row.initial_amount = boq['amount'];
+                            });
+                            cur_frm.refresh();
                         }
+                        else {
+                            cur_frm.clear_table("boq_item");
+                        }
+                    }
                 });
         } else {
                 cur_frm.clear_table("boq_item");
@@ -174,7 +174,7 @@ var calculate_total_amount = function (frm) {
 			implication_amount += parseFloat(bi[i].implication_amount);
                 }
         }
-        frm.set_value("total_amount", total_amount);
+    frm.set_value("total_amount", total_amount);
 	frm.set_value("initial_amount", initial_amount);
 	frm.set_value("implication_amount", implication_amount);
 }

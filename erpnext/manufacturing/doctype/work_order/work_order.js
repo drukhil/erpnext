@@ -348,22 +348,6 @@ frappe.ui.form.on('Work Order', {
 					}
 				}
 			});
-			/*frappe.call({
-                        method: "erpnext.manufacturing.doctype.work_order.work_order.get_job_spec",
-                        args: {
-                                item: frm.doc.production_item
-                        },
-                        freeze: true,
-                        callback: function(r) {
-                                if(r.message) {
-                                        frm.set_value("job_specification", r.message);
-                                        }
-				else {
-					frm.set_value("job_specification", "");
-					
-				}
-                                }
-                        })*/
 
 		}
 	},

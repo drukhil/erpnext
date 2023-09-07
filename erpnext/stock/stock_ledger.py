@@ -112,7 +112,6 @@ class update_entries_after(object):
 
 		for sle in entries_to_fix:
 			self.process_sle(sle)
-
 		if self.exceptions:
 			self.raise_exceptions()
 
@@ -134,7 +133,6 @@ class update_entries_after(object):
 			bin_doc.insert(ignore_permissions=True)
 		else:
 			bin_doc = frappe.get_doc("Bin", bin_name)
-
 		bin_doc.update({
 			"valuation_rate": self.valuation_rate,
 			"actual_qty": self.qty_after_transaction,
@@ -155,7 +153,7 @@ class update_entries_after(object):
 		if sle.serial_no:
 			self.get_serialized_values(sle)
 			self.qty_after_transaction += flt(sle.actual_qty)
-			self.stock_value = flt(self.qty_after_transaction) * flt(self.valuation_rate)
+			self.stock_value = flt(flt(self.qty_after_transaction,2) * flt(self.valuation_rate,2),2)
 		else:
 			if sle.voucher_type=="Stock Reconciliation":
 				# assert
@@ -167,7 +165,7 @@ class update_entries_after(object):
 				if self.valuation_method == "Moving Average":
 					self.get_moving_average_values(sle)
 					self.qty_after_transaction += flt(sle.actual_qty)
-					self.stock_value = flt(self.qty_after_transaction) * flt(self.valuation_rate)
+					self.stock_value = flt(flt(self.qty_after_transaction) * flt(self.valuation_rate),2)
 				else:
 					self.get_fifo_values(sle)
 					self.qty_after_transaction += flt(sle.actual_qty)
@@ -187,6 +185,7 @@ class update_entries_after(object):
 		sle.stock_value_difference = stock_value_difference
 		sle.doctype="Stock Ledger Entry"
 		frappe.get_doc(sle).db_update()
+		# frappe.msgprint(str(sle))
 
 	def validate_negative_stock(self, sle):
 		"""

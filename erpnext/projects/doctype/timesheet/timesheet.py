@@ -549,7 +549,7 @@ def get_activity_cost(employee=None, activity_type=None):
 		
 @frappe.whitelist()
 def get_events(start, end, filters=None):
-        frappe.msgprint("get_events")
+	# frappe.msgprint("get_events")
 	"""Returns events for Gantt / Calendar view rendering.
 	:param start: Start date-time.
 	:param end: End date-time.
@@ -571,7 +571,7 @@ def get_events(start, end, filters=None):
         '''
 
 	result = frappe.db.sql("""select `tabTimesheet Detail`.name as name, `tabTimesheet Detail`.parent as parent,
-		`tabTimesheet Detail`.from_date, `tabTimesheet Detail`.days, activity_type, `tabTimesheet Detail`.project,
+		`tabTimesheet Detail`.from_date, `tabTimesheet Detail`.days, `tabTimesheet Detail`.description, activity_type, `tabTimesheet Detail`.project,
 		`tabTimesheet Detail`.to_date from `tabTimesheet Detail`, 
 		`tabTimesheet` where `tabTimesheet Detail`.parent = `tabTimesheet`.name and 
 		(from_date between %(start)s and %(end)s) {conditions}""".format(conditions=conditions),
@@ -579,7 +579,7 @@ def get_events(start, end, filters=None):
 			"start": start,
 			"end": end
 		}, as_dict=True, update={"allDay": 0})
-	frappe.msgprint(_("{0}").format(result))
+	# frappe.msgprint(_("{0}").format(result))
 	return result
 
 def get_conditions(filters):

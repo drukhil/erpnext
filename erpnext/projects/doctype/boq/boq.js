@@ -68,18 +68,18 @@ frappe.ui.form.on('BOQ', {
 				}, __("View"), true);
 			}
 			if (frappe.model.can_read("BOQ Substitution")) {
-                                frm.add_custom_button(__("Substitutions"), function () {
-                                        frappe.route_options = { "boq": frm.doc.name }
-                                        frappe.set_route("List", "BOQ Substitution");
-                                }, __("View"), true);
-                        }
+				frm.add_custom_button(__("Substitutions"), function () {
+						frappe.route_options = { "boq": frm.doc.name }
+						frappe.set_route("List", "BOQ Substitution");
+				}, __("View"), true);
+            }
 
 			if (frappe.model.can_read("BOQ Addition")) {
-                                frm.add_custom_button(__("Additions"), function () {
-                                        frappe.route_options = { "boq": frm.doc.name }
-                                        frappe.set_route("List", "BOQ Addition");
-                                }, __("View"), true);
-                        }
+				frm.add_custom_button(__("Additions"), function () {
+						frappe.route_options = { "boq": frm.doc.name }
+						frappe.set_route("List", "BOQ Addition");
+				}, __("View"), true);
+            }
 
 			/*
 			if(frappe.model.can_read("Project")) {
@@ -103,7 +103,6 @@ frappe.ui.form.on('BOQ', {
 					frappe.set_route("List", "Project Invoice");
 				}, __("View"), true);
 			}
-
 		}
 
 		frm.trigger("get_defaults");
@@ -116,13 +115,12 @@ frappe.ui.form.on('BOQ', {
 			//Logic for Substition and Extra Items Begins ---TASHI DORJI----
 			
 			frm.add_custom_button(__("BOQ Substitution"), function () { frm.trigger("make_boq_substitution") },
-                                __("Make"), "icon-file-alt"
-                        );
+                __("Make"), "icon-file-alt"
+            );
 			frm.add_custom_button(__("BOQ Addition"), function () { frm.trigger("make_additional_boq") },
-                                __("Make"), "icon-file-alt"
-                        );
+                __("Make"), "icon-file-alt"
+            );
 			//end the logic
-
 
 			if (frm.doc.party_type !== "Supplier") {
 				frm.add_custom_button(__("Subcontract"), function () { frm.trigger("make_boq_subcontract") }, __("Make"), "icon-file-alt");

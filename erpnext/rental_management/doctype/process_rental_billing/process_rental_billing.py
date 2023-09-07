@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 import frappe
+from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint, flt, nowdate, money_in_words, getdate
 from erpnext.accounts.doctype.business_activity.business_activity import get_default_ba
@@ -76,7 +77,7 @@ class ProcessRentalBilling(AccountsController):
 		return tenant_list	
 
 	def check_mandatory(self):
-		for f in ['month', 'fiscal_year']:
+		for f in ['month', 'fiscal_year', 'dzongkhag']:
 			if not self.get(f):
 				frappe.throw(_("Please set {0}").format(f))
 

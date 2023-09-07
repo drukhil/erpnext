@@ -369,7 +369,7 @@ class SalesOrder(SellingController):
 						rate = frappe.db.sql(""" select selling_price as rate from `tabSelling Price Rate` where parent = '{0}' and particular = '{1}' and timber_type = '{2}' and item_sub_group='{3}'""".format(item.price_template, timber_class, timber_type,item_sub_group), as_dict =1)
 
 			rate = rate and rate[0].rate or 0.0
-			if item.rate != rate:
+			if rate and item.rate != rate:
 				frappe.throw("Selling Rate had changed since you last pulled. Please pull again")
 			if item.rate <= 0.0 or item.amount <= 0.0:
 				frappe.throw("Rate and Amount must be greater than 0")

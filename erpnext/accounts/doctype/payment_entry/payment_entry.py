@@ -81,6 +81,7 @@ class PaymentEntry(AccountsController):
 			frappe.throw(_("Difference Amount must be zero"))
 		self.make_gl_entries()
 		self.update_advance_paid()
+		frappe.throw("STOP")
 		
 	def on_cancel(self):
 		if self.clearance_date:
@@ -452,7 +453,7 @@ class PaymentEntry(AccountsController):
 				"business_activity": self.business_activity,
 				"account_currency": self.party_account_currency
 			})
-			
+			frappe.msgprint(str(self.pl_cost_center))
 			dr_or_cr = "credit" if self.party_type == "Customer" else "debit"
 			
 			for d in self.get("references"):
@@ -474,6 +475,7 @@ class PaymentEntry(AccountsController):
 					"business_activity": self.business_activity,
 					"cost_center": cc
 				})
+				frappe.msgprint("cc:"+str(cc))
 				
 				allocated_amount_in_company_currency = flt(flt(d.allocated_amount) * flt(d.exchange_rate), 
 					self.precision("paid_amount"))	
