@@ -54,7 +54,7 @@ def from_gl_applicable_for_doc(coa,filters):
 		query = """
 				SELECT  
 						SUM(ifnull(debit,0)) AS debit,
-						SUM(ifnull(credit)) AS credit
+						SUM(ifnull(credit,0)) AS credit
 				FROM `tabGL Entry` where account = "{2}"
 				AND (credit IS NOT NULL OR debit IS NOT NULL)
 				AND posting_date BETWEEN '{0}' AND '{1}'
