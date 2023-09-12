@@ -348,6 +348,21 @@ def validate_workflow_states(doc):
             vars(doc)[document_approver[0]] = employee[0]
 
         elif workflow_state == "Waiting Supervisor Approval".lower():
+            if doc.travel_type == "Training":
+                officiating = get_officiating_employee(hr_approver[3])
+                if officiating:
+                    officiating = frappe.db.get_value("Employee", officiating[0].officiate, ["user_id","employee_name","designation","name"])
+                vars(doc)[document_approver[0]] = officiating[0] if officiating else hr_approver[0]
+            else:
+                officiating = get_officiating_employee(reports_to[3])
+                if officiating:
+                    officiating = frappe.db.get_value("Employee", officiating[0].officiate, ["user_id","employee_name","designation","name"])
+                    if officiating[0] == employee[0]:
+                        supervisor = frappe.db.get_value("Employee", {"user_id":employee[0]}, "reports_to")
+                        vars(doc)[document_approver[0]] = frappe.db.get_value("Employee", frappe.db.get_value("Employee",supervisor, ["reports_to"]), "user_id")
+                    else:
+                        vars(doc)[document_approver[0]] = officiating[0] if officiating else reports_to[0]                            
+            '''
             if doc.place_type == "In-Country" and doc.travel_type != "Training":
                 if not doc.tour_report:
                     frappe.throw("Please Attach the relevant documents to support your Travel Claim")
@@ -361,6 +376,7 @@ def validate_workflow_states(doc):
                 if officiating:
                     officiating = frappe.db.get_value("Employee", officiating[0].officiate, ["user_id","employee_name","designation","name"])
                 vars(doc)[document_approver[0]] = officiating[0] if officiating else hr_approver[0]
+            '''
                 
         elif workflow_state == "Claimed".lower():
             if doc.supervisor != frappe.session.user:
