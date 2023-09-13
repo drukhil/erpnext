@@ -60,7 +60,7 @@ def get_expense(filters, cost_center):
         return exp[0].expense
 
 def construct_query(filters):
-	cond = " and is_group = 1"
+	cond = " and is_group = 1 and branch != 'GA-Tareythang' "
 	fields = " ifnull(parent_project, 'GYALSUNG INFRA') as  parent, ifnull(physical_progress_weightage,0) as physical_progress_weightage, case physical_progress when 'NaN' then 0.0 else physical_progress end as physical_progress"
 	if filters.get("project"):
 		if filters.get("show_all"):
