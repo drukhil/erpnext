@@ -38,10 +38,10 @@ class SupplierMonitoring(Document):
 			# if getdate(a.received_date):
 			# 	a.days_delayed = date_diff(a.received_date, a.schedule_date)
 			a.balance_quantity =flt(a.qty) - flt(a.received_quantity)
-			a.received_amount = flt(a.rate) * a.received_quantity
-			a.undelivered_amount =flt(a.rate) * a.balance_quantity
+			a.received_amount = flt(a.rate) * flt(a.received_quantity)
+			a.undelivered_amount =flt(a.rate) * flt(a.balance_quantity)
 			if a.liquidated_damage > 0:
-				a.liquidated_damage = flt(a.received_amount) * a.days_delayed * .001
+				a.liquidated_damage = flt(a.received_amount) * flt(a.days_delayed) * .001
 			else:
 				a.liquidated_damage == 0
 			
