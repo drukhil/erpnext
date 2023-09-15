@@ -49,7 +49,7 @@ class BFSSecure:
 
 		co = frappe.get_doc("Customer Order", customer_order)
 		if co.product_category=="Timber" and co.product_group=="Timber Prime Products" and co.total_payable_amount==co.total_balance_amount:
-				self.amount = flt(co.total_balance_amount * 0.2, 2) # Advance of 20% Payment for Timber Prime Product
+			self.amount = flt(co.total_balance_amount * 0.2, 2) # Advance of 20% Payment for Timber Prime Product
 		else:
 			self.amount = flt(co.total_balance_amount)
 		co.save(ignore_permissions=True)
