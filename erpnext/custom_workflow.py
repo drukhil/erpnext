@@ -345,7 +345,7 @@ def validate_workflow_states(doc):
         hr_user = frappe.db.get_single_value("HR Settings", "hr_approver")
         hr_approver = frappe.db.get_value("Employee", hr_user, ["user_id","employee_name","designation","name"])
         if workflow_state == "Draft".lower():
-            vars(doc)[document_approver[0]] = employee[0]
+            vars(doc)[document_approver[0]] = reports_to[0]
 
         elif workflow_state == "Waiting Supervisor Approval".lower():
             if doc.travel_type == "Training":
