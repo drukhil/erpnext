@@ -15,6 +15,7 @@ class QuantityExtension(Document):
 		self.validate_mandatory()
 		self.validate_items()
 		self.update_user_details()
+		self.validate_duplciate_request()
 
 	def on_submit(self):
 		self.update_site()
@@ -22,6 +23,10 @@ class QuantityExtension(Document):
 
 	def on_cancel(self):
 		self.update_site()
+	
+	def validate_duplciate_request(self):
+		if frappe.db.exists("Quantity Extension",{"user":self.user,"approval_status":"Pending", "site":self.site}):
+			frappe.throw("Quantity Extension already requested and still Pending")
 
 	def sendsms(self,msg=None):
 		if self.docstatus == 1:
