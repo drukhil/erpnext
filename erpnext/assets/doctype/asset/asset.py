@@ -359,7 +359,7 @@ def make_sales_invoice(asset, item_code, company, branch):
 	si = frappe.new_doc("Sales Invoice")
 	si.company = company
 	si.currency = frappe.db.get_value("Company", company, "default_currency")
-	disposal_account, depreciation_cost_center = get_disposal_account_and_cost_center(company)
+	disposal_account, asset_loss_account, depreciation_cost_center = get_disposal_account_and_cost_center(company)
 	si.branch = branch
 	si.title = "Sale of Asset " + str(asset)
 	si.naming_series = 'Fixed Asset'

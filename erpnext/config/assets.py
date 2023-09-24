@@ -46,6 +46,11 @@ def get_data():
 					"name": "Insurance and Registration",
 					"description": _("Insurance and Registration details for equipments")
 				},
+				{
+					"type": "doctype",
+					"name": "Bulk Asset Disposal",
+					"description": _("Bulk Asset Disposal")
+				},
 			]
 		},
                 {

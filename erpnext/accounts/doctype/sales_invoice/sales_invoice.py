@@ -135,6 +135,10 @@ class SalesInvoice(SellingController):
 			self.update_against_document_in_jv()
 
 		self.update_time_sheet(self.name)
+		
+		if self.bulk_asset_disposal:
+			bulk_asset_disposal_doc = frappe.get_doc("Bulk Asset Disposal", self.bulk_asset_disposal)
+			bulk_asset_disposal_doc.db_set("sales_invoice", self.name)
 
 	def before_cancel(self):
 		self.update_time_sheet(None)
@@ -487,7 +491,7 @@ class SalesInvoice(SellingController):
 		for d in self.get("items"):
 			if d.is_fixed_asset:
 				if not disposal_account:
-					disposal_account, depreciation_cost_center = get_disposal_account_and_cost_center(self.company)
+					disposal_account, loss_disposal_account, depreciation_cost_center = get_disposal_account_and_cost_center(self.company)
 
 				d.income_account = disposal_account
 				if not d.cost_center:

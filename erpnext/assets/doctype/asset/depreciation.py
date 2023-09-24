@@ -172,7 +172,7 @@ def restore_asset(asset_name):
 @frappe.whitelist()
 def get_gl_entries_on_asset_disposal(asset, selling_amount=0):
 	fixed_asset_account, accumulated_depr_account, depr_expense_account = get_depreciation_accounts(asset)
-	disposal_account, depreciation_cost_center = get_disposal_account_and_cost_center(asset.company)
+	asset_gain_account, asset_loss_account, depreciation_cost_center = get_disposal_account_and_cost_center(asset.company)
 	accumulated_depr_amount = flt(asset.gross_purchase_amount) - flt(asset.value_after_depreciation)
 
         # Ver 1.0 Begins by SSK, cost_center is added in the following block 
@@ -193,6 +193,7 @@ def get_gl_entries_on_asset_disposal(asset, selling_amount=0):
         # Ver 1.0 Ends
 
 	profit_amount = flt(selling_amount) - flt(asset.value_after_depreciation)
+	disposal_account = asset_loss_account if profit_amount < 0 else asset_gain_account
 	if flt(asset.value_after_depreciation) and profit_amount:
 		debit_or_credit = "debit" if profit_amount < 0 else "credit"
 		gl_entries.append({
@@ -206,12 +207,14 @@ def get_gl_entries_on_asset_disposal(asset, selling_amount=0):
 
 @frappe.whitelist()
 def get_disposal_account_and_cost_center(company):
-	disposal_account, depreciation_cost_center = frappe.db.get_value("Company", company,
-		["disposal_account", "depreciation_cost_center"])
+	disposal_account, loss_disposal_account, depreciation_cost_center = frappe.db.get_value("Company", company,
+		["disposal_account", "loss_disposal_account", "depreciation_cost_center"])
 
 	if not disposal_account:
-		frappe.throw(_("Please set 'Gain/Loss Account on Asset Disposal' in Company {0}").format(company))
+		frappe.throw(_("Please set 'Gain Account on Asset Disposal' in Company {0}").format(company))
+	if not loss_disposal_account:
+		frappe.throw(_("Please set 'Loss Account on Asset Disposal' in Company {0}").format(company))
 	if not depreciation_cost_center:
 		frappe.throw(_("Please set 'Asset Depreciation Cost Center' in Company {0}").format(company))
 
-	return disposal_account, depreciation_cost_center
+	return disposal_account, loss_disposal_account, depreciation_cost_center
