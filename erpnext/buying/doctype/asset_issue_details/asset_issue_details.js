@@ -3,6 +3,8 @@
 
 frappe.ui.form.on('Asset Issue Details', {
         item_code: function(frm) {
+			cur_frm.set_value("purchase_receipt", "");
+			cur_frm.set_value("asset_rate", "");
 		frm.set_query("purchase_receipt",function(doc) {
 			return {
 				query: "erpnext.buying.doctype.asset_issue_details.asset_issue_details.check_item_code",
