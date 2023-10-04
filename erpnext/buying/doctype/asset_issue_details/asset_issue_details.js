@@ -55,15 +55,15 @@ frappe.ui.form.on('Asset Issue Details', {
 			args: {
 				parent: "Purchase Receipt",
 				doctype: "Purchase Receipt Item",
-				fieldname: "rate",
+				fieldname: "net_rate",
 				filters: {
 					"parent": frm.doc.purchase_receipt,
 					"item_code": frm.doc.item_code
 				}
 			},
 			callback: function(r){
-				if(r.message.rate){
-					cur_frm.set_value("asset_rate", r.message.rate)
+				if(r.message.net_rate){
+					cur_frm.set_value("asset_rate", r.message.net_rate)
 				}
 				else{
 					frappe.throw("Not working")
