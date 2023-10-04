@@ -12,6 +12,7 @@ from erpnext.custom_utils import check_budget_available, get_branch_cc
 
 class ProcessMRPayment(Document):
 	def validate(self):
+		self.validate_duplicate_entry()
                 # Setting `monthyear`
 		month = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].index(self.month) + 1
 		month = str(month) if cint(month) > 9 else str("0" + str(month))
@@ -159,7 +160,13 @@ class ProcessMRPayment(Document):
 			row = self.append('items', {})
 			row.update(d)
 
-	
+	def validate_duplicate_entry(self):
+		data = []
+		for a in self.items:
+			if a.employee not in data:
+				data.append(a.employee)
+			else:
+				frappe.throw("Duplicate Employee entry {} at #Row. {}".format(a.employee, a.idx))
 
 	def post_journal_entry(self):
 		expense_bank_account, ot_account, wage_account, gratuity_account = self.prepare_gls()
