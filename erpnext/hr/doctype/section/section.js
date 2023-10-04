@@ -3,27 +3,15 @@
 
 frappe.ui.form.on('Section', {
 	refresh: function(frm) {
-
+		cur_frm.set_query("d_name", function() {
+			return {
+				"filters": {
+					"dpt_name": frm.doc.dpt_name,
+				}
+			}
+		});
+	},
+	dpt_name: function(frm) {
+		frm.set_value("d_name","");
 	}
 });
-
-cur_frm.fields_dict['d_name'].get_query = function(doc, dt, dn) {
-       return {
-               filters:{"dpt_name": doc.dpt_name}
-       }
-}
-
-cur_frm.fields_dict['s_name'].get_query = function(doc, dt, dn) {
-       return {
-               filters:{"d_name": doc.d_name}
-       }
-}
-
-cur_frm.fields_dict.cost_center.get_query = function(doc) {
-	return{
-		filters:{
-			'is_group': 0,
-			'is_disabled': 0,
-		}
-	}
-}
