@@ -72,7 +72,7 @@ class AssignBranch(Document):
 	def get_all_branches(self):
 		query = """ select b.name as branch from tabBranch b, `tabCost Center` c where b.name = c.branch and b.is_disabled != 1"""
 		if self.parent_cc:
-			query += " and c.parent = '{0}'".format(self.parent_cc)
+			query += " and c.parent_cost_center = '{0}'".format(self.parent_cc)
 
 		entries = frappe.db.sql(query, as_dict=True)
 		self.set('items', [])
