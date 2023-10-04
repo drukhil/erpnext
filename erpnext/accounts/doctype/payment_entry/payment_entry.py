@@ -225,6 +225,9 @@ class PaymentEntry(AccountsController):
 					if ref_doc.docstatus != 1:
 						frappe.throw(_("{0} {1} must be submitted")
 							.format(d.reference_doctype, d.reference_name))
+						
+					if ref_doc.doctype == "Purchase Invoice":
+						self.vendor_invoice_no = ref_doc.bill_no
 							
 	def validate_journal_entry(self):
 		for d in self.get("references"):
