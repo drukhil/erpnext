@@ -76,6 +76,7 @@ class PaymentEntry(AccountsController):
 		self.set_remarks()
 		self.loss_and_gain = sum([flt(d.amount) for d in self.get("deductions")])
 		set_user(self)
+		self.set_vendor_invoice()
 	
 	def set_status(self):
                 self.status = {
@@ -226,9 +227,13 @@ class PaymentEntry(AccountsController):
 						frappe.throw(_("{0} {1} must be submitted")
 							.format(d.reference_doctype, d.reference_name))
 						
-					if ref_doc.doctype == "Purchase Invoice":
-						self.vendor_invoice_no = ref_doc.bill_no
-							
+	""" Jai, vendor inv for RTGS purpose """
+	def set_vendor_invoice(self):
+		for d in self.get("references"):
+			ref_doc = frappe.get_doc(d.reference_doctype, d.reference_name)
+			if ref_doc.doctype == "Purchase Invoice":
+				self.vendor_invoice_no = ref_doc.bill_no
+
 	def validate_journal_entry(self):
 		for d in self.get("references"):
 			if d.allocated_amount and d.reference_doctype == "Journal Entry":				
