@@ -503,7 +503,7 @@ def get_future_stock_vouchers(posting_date, posting_time, for_warehouses=None, f
 	future_stock_vouchers = []
 
 	values = []
-	condition = ""
+	condition = " and voucher_type not in ('Imprest Recoup')"
 	if for_items:
 		condition += " and item_code in ({})".format(", ".join(["%s"] * len(for_items)))
 		values += for_items
