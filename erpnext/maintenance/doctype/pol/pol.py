@@ -32,6 +32,7 @@ class POL(StockController):
 		self.validate_item()
 #
 	def on_submit(self):
+		self.validate_amount_limit()
 		self.validate_dc()
 		self.validate_data()
 		self.check_on_dry_hire()
@@ -66,6 +67,13 @@ class POL(StockController):
 
 		self.cancel_budget_entry()
 		self.delete_pol_entry()
+
+	def validate_amount_limit(self):
+		security_deposit = frappe.db.get_value("Fuelbook", self.fuelbook, "security_deposit")
+		query = "select sum(ifnull(outstanding_amount, 0)) as os_amount from tabPOL where docstatus = 1 and outstanding_amount > 0 and fuelbook = %s "
+		total_os_amount = frappe.db.sql(query, self.fuelbook, as_dict=True)[0]["os_amount"]
+		if flt(total_os_amount + self.outstanding_amount) > flt(security_deposit):
+			frappe.throw("Total amount Nu. {}/-.POL exceeds credit limit of Nu. {}/- by Nu. {}/- Kindly recoup the older POL and try again.".format(flt(total_os_amount + self.outstanding_amount), flt(security_deposit), flt(total_os_amount + self.outstanding_amount) - flt(security_deposit)))
 
 	def validate_dc(self):
 		is_container, no_own_tank = frappe.db.get_value("Equipment Type", frappe.db.get_value("Equipment", self.equipment, "equipment_type") , ["is_container", "no_own_tank"])
