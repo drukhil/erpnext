@@ -84,7 +84,7 @@ class AssetIssueDetails(Document):
 def check_item_code(doctype=None, txt=None, searchfield=None, start=None, page_len=None, filters=None):
 	cond = ""
 	if filters.get('item_code'):
-		cond += " item_code = '{}'".format(filters.get('item_code'))
+		cond += " item_code = '{}' and reference_doctype = '{}' ".format(filters.get('item_code'), filters.get('ref_type'))
 	query = "select ref_doc from `tabAsset Received Entries` where {cond}".format(cond=cond)
  
 	return frappe.db.sql(query)

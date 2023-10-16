@@ -222,6 +222,7 @@ class PurchaseReceipt(BuyingController):
 				ae.cost_center = a.cost_center
 				ae.warehouse = a.warehouse
 				ae.received_date = self.posting_date
+				ae.reference_doctype = self.doctype
 				ae.ref_doc = self.name
 				ae.branch = frappe.db.get_value("Cost Center", a.cost_center, "branch")
 				ae.submit()

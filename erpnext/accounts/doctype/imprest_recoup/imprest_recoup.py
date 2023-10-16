@@ -305,6 +305,7 @@ class ImprestRecoup(StockController):
 					ae.qty = a.quantity
 					ae.received_date = self.posting_date
 					ae.ref_doc = self.name
+					ae.reference_doctype = self.doctype
 					ae.branch = self.branch
 					ae.submit()
 
