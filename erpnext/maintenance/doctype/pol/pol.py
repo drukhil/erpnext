@@ -70,8 +70,8 @@ class POL(StockController):
 
 	def validate_amount_limit(self):
 		security_deposit = frappe.db.get_value("Fuelbook", self.fuelbook, "security_deposit")
-		query = "select sum(ifnull(outstanding_amount, 0)) as os_amount from tabPOL where docstatus = 1 and outstanding_amount > 0 and fuelbook = %s "
-		total_os_amount = frappe.db.sql(query, self.fuelbook, as_dict=True)[0]["os_amount"]
+		query = "select sum(ifnull(outstanding_amount, 0)) as os_amount from tabPOL where docstatus = 1 and outstanding_amount > 0 and fuelbook = %s and name!=%s"
+		total_os_amount = frappe.db.sql(query, (self.fuelbook, self.name), as_dict=True)[0]["os_amount"]
 		if flt(total_os_amount + self.outstanding_amount) > flt(security_deposit):
 			frappe.throw("Total amount Nu. {}/-.POL exceeds credit limit of Nu. {}/- by Nu. {}/- Kindly recoup the older POL and try again.".format(flt(total_os_amount + self.outstanding_amount), flt(security_deposit), flt(total_os_amount + self.outstanding_amount) - flt(security_deposit)))
 
