@@ -43,7 +43,8 @@ class CustomerOrder(Document):
 						and so.status = "To Deliver and Bill"
 						and so.docstatus=1
 						and co.product_category="Sand"
-						""".format(self.customer), as_dict=True):
+						and co.site="{}"
+						""".format(self.customer, self.site), as_dict=True):
 			if a.name:
 				frappe.throw("Making order not allowed for {} as the previous order {} is still not delivered".format(self.product_category, a.name))
 
