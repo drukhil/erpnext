@@ -13,17 +13,25 @@ class HSDPayment(Document):
 	def validate(self):
 		check_future_date(self.posting_date)
 		self.set_status()
+		self.validate_amount()
 		self.validate_allocated_amount()
 		self.clearance_date = None
 		set_user(self)
 
 
 	def set_status(self):
-                self.status = {
-                        "0": "Draft",
-                        "1": "Submitted",
-                        "2": "Cancelled"
-                }[str(self.docstatus or 0)]
+		self.status = {
+				"0": "Draft",
+				"1": "Submitted",
+				"2": "Cancelled"
+		}[str(self.docstatus or 0)]
+
+	def validate_amount(self):
+		total = 0
+		for d in self.items:
+			total += flt(d.allocated_amount)
+		self.amount = total
+		self.actual_amount = total
 
 	def validate_allocated_amount(self):
 		if not self.amount > 0:
