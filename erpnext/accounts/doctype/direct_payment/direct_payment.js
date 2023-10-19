@@ -119,7 +119,7 @@ function roundOff(num) {
 }
 
 function calculate_tds(frm) {
-	var tds = roundOff(parseFloat(frm.doc.tds_percent) * parseFloat(frm.doc.taxable_amount) / 100 );
+	var tds = Math.round(parseFloat(frm.doc.tds_percent) * parseFloat(frm.doc.taxable_amount) / 100 );
 	frm.set_value("tds_amount", tds);
 	if(tds > 0){
 		if(frm.doc.deduction_amount)
