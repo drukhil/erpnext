@@ -433,7 +433,7 @@ cur_frm.cscript.type = function(doc) {
 
     if(!doc.tds_amount) {
         //Set the initial value for tds amount
-        cur_frm.set_value("tds_amount", Math.round((doc.tds_rate/100 ) * doc.tds_taxable_amount));
+        cur_frm.set_value("tds_amount", (doc.tds_rate/100 ) * doc.tds_taxable_amount);
     }
     doUpdates(doc);
 
@@ -458,7 +458,7 @@ cur_frm.cscript.tds_taxable_amount = function(doc) {
 //Do necessary updates
 function doUpdates(doc) {
     //Set the value for tds amount
-    cur_frm.set_value("tds_amount", Math.round((doc.tds_rate/100 ) * doc.tds_taxable_amount));
+    cur_frm.set_value("tds_amount", (doc.tds_rate/100 ) * doc.tds_taxable_amount);
     if(doc.party_account_currency != cur_frm.doc.currency) {
          cur_frm.set_value("base_tds_amount", (doc.tds_rate/100 ) * doc.tds_taxable_amount * doc.conversion_rate);
     }
