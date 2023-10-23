@@ -40,7 +40,7 @@ class ProcessMRPayment(Document):
 						a.total_wage = flt(salary)
 					if flt(total_days) == round(flt(a.number_of_days),2):
 						a.total_wage = flt(salary)
-					if round(flt(a.number_of_days),2) >= 21:
+					if round(flt(a.number_of_days),2) >= 28:
 						a.total_wage = flt(salary)
 
 				if a.employee_type == 'Open Air Prisoner':
