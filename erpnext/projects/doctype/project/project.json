@@ -1129,7 +1129,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "expense", 
@@ -2056,7 +2056,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 4, 
- "modified": "2023-07-18 15:29:53.030711", 
+ "modified": "2023-10-30 18:52:56.629227", 
  "modified_by": "Administrator", 
  "module": "Projects", 
  "name": "Project", 
