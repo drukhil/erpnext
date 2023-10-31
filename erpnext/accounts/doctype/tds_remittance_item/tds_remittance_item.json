@@ -81,7 +81,7 @@
    "read_only": 0, 
    "report_hide": 0, 
    "reqd": 0, 
-   "search_index": 0, 
+   "search_index": 1, 
    "set_only_once": 0, 
    "unique": 0
   }, 
@@ -146,7 +146,7 @@
  "issingle": 0, 
  "istable": 1, 
  "max_attachments": 0, 
- "modified": "2019-08-13 16:54:13.113033", 
+ "modified": "2023-10-31 17:10:36.810487", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "TDS Remittance Item", 
@@ -158,6 +158,6 @@
  "read_only_onload": 0, 
  "sort_field": "modified", 
  "sort_order": "DESC", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }
