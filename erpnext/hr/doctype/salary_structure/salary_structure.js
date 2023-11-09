@@ -266,6 +266,51 @@ frappe.ui.form.on('Salary Structure', {
 	royal_audit_allowance: function(frm){
                 calculate_others(frm.doc);
         },
+	eligible_for_leave_encashment_allowance: function(frm){
+                calculate_others(frm.doc);
+        },
+	leave_encashment_method: function(frm){
+                calculate_others(frm.doc);
+        },
+	leave_encashment: function(frm){
+                calculate_others(frm.doc);
+        },
+	eligible_for_leave_travel_concession_allowance: function(frm){
+                calculate_others(frm.doc);
+        },
+	leave_travel_concession_method: function(frm){
+                calculate_others(frm.doc);
+        },
+	leave_travel_concession: function(frm){
+                calculate_others(frm.doc);
+        },
+	eligible_for_lump_sum_pay_revision: function(frm){
+                calculate_others(frm.doc);
+        },
+	lump_sum_pay_revision_method: function(frm){
+                calculate_others(frm.doc);
+        },
+	lump_sum_pay_revision: function(frm){
+                calculate_others(frm.doc);
+        },
+	eligible_for_one_off_5_percent_indexation: function(frm){
+                calculate_others(frm.doc);
+        },
+	one_off_5_percent_indexation_method: function(frm){
+                calculate_others(frm.doc);
+        },
+	one_off_5_percent_indexation: function(frm){
+                calculate_others(frm.doc);
+        },
+	eligible_for_one_off_fixed_payment: function(frm){
+                calculate_others(frm.doc);
+        },
+	one_off_fixed_payment_method: function(frm){
+                calculate_others(frm.doc);
+        },
+	one_off_fixed_payment: function(frm){
+                calculate_others(frm.doc);
+        },
 
 
 })
