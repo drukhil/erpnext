@@ -285,10 +285,11 @@ def make_travel_claim(source_name, target_doc=None):
 		target.currency = source_parent.currency if source_parent.currency else target.currency
 		target.dsa = source_parent.dsa_per_day
 		if target.currency == "BTN":
-                        target.exchange_rate = 1
-                else:
-                        target.exchange_rate = get_exchange_rate(target.currency, "BTN")
+			target.exchange_rate = 1
+		else:
+			target.exchange_rate = get_exchange_rate(target.currency, "BTN")
 		target.amount = target.dsa
+		target.advance_amount = source_parent.advance_amount if target.currency == "BTN" else source_parent.advance_amount_nu
 		if target.halt:
 			target.amount = flt(target.dsa) * flt(target.no_days)
 		target.actual_amount = target.amount * target.exchange_rate
@@ -307,7 +308,7 @@ def make_travel_claim(source_name, target_doc=None):
 				"field_map": {
 					"name": "ta",
 					"posting_date": "ta_date",
-					"advance_amount_nu": "advance_amount"
+					# "advance_amount_nu": "advance_amount"
 				},
 				"postprocess": update_date,
 				"validation": {"docstatus": ["=", 1]}
