@@ -88,10 +88,9 @@ class SalaryArrearPayment(Document):
 			row = self.append('items', {})
 			d.contract_allowance = d.corporate_allowance = d.officiating_allowance = d.project_allowance = d.pda = d.shift = d.underground = 0
 			
-			if emp_doc.employment_type in ("Contract", "Chief Executive Officer"):
-				basic_pay_increment = 0.05 if emp_doc.employee_subgroup in ("S1", "S2", "S3", "O1", "O2", "O3", "O4", "O5", "O6", "O7", "GSC I", "GS II", "ESP") else 0.02
-			else:
-				basic_pay_increment = 0.02 if emp_doc.employee_subgroup in ("M4", "M3", "M2", "M1", "E2", "E1") else 0.05
+			# if emp_doc.employment_type in ("Contract", "Chief Executive Officer"):
+			basic_pay_increment = 0.05 if emp_doc.employee_subgroup in ("S1", "S2", "S3", "O1", "O2", "O3", "O4", "O5", "O6", "O7", "GSC I", "GS II", "ESP") else 0.02
+			# basic_pay_increment = 0.02 if emp_doc.employee_subgroup in ("M4", "M3", "M2", "M1", "E2", "E1") else 0.05
 			
 			d.basic_pay = flt(d.prev_basic_pay + d.prev_basic_pay * basic_pay_increment)
 			d.basic_pay = math.ceil(d.basic_pay)
@@ -102,12 +101,12 @@ class SalaryArrearPayment(Document):
 			elif 5 < last_digit <= 9:
 				d.basic_pay += 10 - last_digit
 			
-			if emp_doc.employment_type in ("Contract", "Chief Executive Officer"):
+			if d.prev_contract > 0:
 				if sal_struct.contract_allowance_method == "Percent":
 					d.contract_allowance = flt(d.basic_pay * (sal_struct.contract_allowance * 0.01), 0)
 				elif sal_struct.contract_allowance_method == "Lumpsum":
 					d.contract_allowance = flt(sal_struct.contract_allowance)
-			else:
+			if d.prev_corporate > 0:
 				if sal_struct.ca_method == "Percent":
 					d.corporate_allowance = flt(d.basic_pay * (sal_struct.ca * 0.01), 0)
 				elif sal_struct.ca_method == "Lumpsum":
