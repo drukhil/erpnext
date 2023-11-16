@@ -200,14 +200,14 @@ var create_custom_buttons = function(frm){
 }
 
 var enable_disable = function(frm){
-	var permitted_doctypes = ['Bonus', 'Employee Loan Payment', 'LTC', 'PBVA', 'Salary'];
+	var permitted_doctypes = ['Bonus', 'Employee Loan Payment', 'LTC', 'PBVA', 'Salary', 'Salary Arrear'];
 	frm.toggle_display(['fiscal_year', 'region', 'employee', 'department', 'division'], permitted_doctypes.includes(frm.doc.transaction_type));
-	frm.toggle_display(['month'], ['Employee Loan Payment', 'Salary'].includes(frm.doc.transaction_type));
+	frm.toggle_display(['month'], ['Employee Loan Payment', 'Salary', 'Salary Arrear'].includes(frm.doc.transaction_type));
 	frm.toggle_display(['transaction_no', 'from_date', 'to_date'], !permitted_doctypes.includes(frm.doc.transaction_type) && frm.doc.transaction_type);
 	frm.toggle_display(['from_date', 'to_date'], !permitted_doctypes.includes(frm.doc.transaction_type) && frm.doc.transaction_type && !frm.doc.transaction_no);
 
 	frm.toggle_reqd(['fiscal_year'], permitted_doctypes.includes(frm.doc.transaction_type));
-	frm.toggle_reqd(['month'], ['Employee Loan Payment', 'Salary'].includes(frm.doc.transaction_type));
+	frm.toggle_reqd(['month'], ['Employee Loan Payment', 'Salary', 'Salary Arrear'].includes(frm.doc.transaction_type));
 	frm.toggle_reqd(['from_date', 'to_date'], !permitted_doctypes.includes(frm.doc.transaction_type) && frm.doc.transaction_type && !frm.doc.transaction_no);
 }
 

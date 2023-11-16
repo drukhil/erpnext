@@ -324,6 +324,8 @@ class BankPayment(Document):
 			data = self.get_mechanical_payments()
 		elif self.transaction_type == "Salary":
 			data = self.get_salary()
+		elif self.transaction_type == "Salary Arrear":
+			data = self.get_salary_arrear()
 		elif self.transaction_type in ("PBVA"):
 			data = self.get_pbva()
 		elif self.transaction_type == "LTC":
@@ -341,6 +343,50 @@ class BankPayment(Document):
 		elif self.transaction_type == "Employee Loan Payment":
 			data = self.get_loan_detail()
 		return data
+	
+	def get_salary_arrear(self):
+		cond = ""
+		if not self.fiscal_year:
+			frappe.throw(_("Please select Fiscal Year"))
+		elif not self.month:
+			frappe.throw(_("Please select Month"))
+
+		cond = self.get_conditions()
+		return frappe.db.sql("""SELECT "Salary Arrear Payment" transaction_type, t1.name transaction_id, 
+						t1.name transaction_reference, t1.modified transaction_date,
+						t2.employee, t2.employee_name beneficiary_name, 
+						IFNULL(t2.bank_name, e.bank_name) bank_name, 
+						e.bank_branch bank_branch, fib.financial_system_code,
+						e.bank_account_type,
+						IFNULL(t2.bank_ac_no, e.bank_ac_no) bank_account_no, 
+						round(t2.net_payable_arrear,2) amount,
+						'Salary Arrear for {month}-{salary_year}' remarks, "Draft" status						
+					FROM `tabSalary Arrear Payment` t1 JOIN `tabSalary Arrear Payment Item` t2
+						ON t1.name = t2.parent
+						JOIN `tabEmployee` e ON t2.employee = e.name
+						LEFT JOIN `tabFinancial Institution Branch` fib ON fib.name = e.bank_branch
+					WHERE t1.fiscal_year = '{salary_year}'
+					AND t1.from_month = '{salary_month}'
+					AND t1.docstatus = 1
+					AND e.salary_mode = 'Bank'
+					{cond}
+					AND IFNULL(t2.net_payable_arrear,0) > 0
+					AND NOT EXISTS(select 1
+						FROM `tabBank Payment Item` bpi, `tabBank Payment` bp
+						WHERE bpi.transaction_type = 'Salary Slip'
+						AND bp.name=bpi.parent
+						AND bp.transaction_type not in ('Employee Loan Payment')
+						AND bpi.transaction_id = t1.name
+						AND bpi.parent != '{bank_payment}'
+						AND bpi.docstatus != 2
+						AND bpi.status NOT IN ('Cancelled', 'Failed')
+					)
+		""".format(salary_year=self.fiscal_year, 
+			salary_month=self.get_month_abbr(self.month),
+			month=self.month,
+			bank_payment = self.name,
+			cond = cond), as_dict=True)
+	
 	def get_pbva(self):
 		cond = ""
 		if not self.fiscal_year:
@@ -809,6 +855,10 @@ class BankPayment(Document):
 	def get_month_id(self, month_abbr):
 		return {"January": "01", "February": "02", "March": "03", "April": "04", "May": "05", "June": "06",
 			"July": "07", "August": "08", "September": "09", "October": "10", "November": "11", "December": "12"}[month_abbr]
+	
+	def get_month_abbr(self, month_abbr):
+		return {"January": "Jan", "February": "Feb", "March": "Mar", "April": "Apr", "May": "May", "June": "Jun",
+			"July": "Jul", "August": "Aug", "September": "Sep", "October": "Oct", "November": "Nov", "December": "Dec"}[month_abbr]
 
 	def get_conditions(self):
 		cond = []

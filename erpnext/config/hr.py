@@ -191,6 +191,12 @@ def get_data():
 					"description": _("Earnings, Deductions and other Salary components")
 				},
 				{
+					"type": "doctype",
+					"name": "Salary Arrear Payment",
+					"label": _("Salary Arrear Payment"),
+					"description": _("Arrear Payment for Salary Increment")
+				},
+				{
 					"type": "report",
 					"name": "Employee TDS Certificate",
 					"label": "Generate TDS Certificate",
