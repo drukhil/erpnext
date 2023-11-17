@@ -487,6 +487,12 @@ def get_data():
 				},
 				{
 					"type": "report",
+					"name": "Employee Benefits Report",
+					"is_query_report": True,
+					"doctype": "Employee Benefits"
+				},
+				{
+					"type": "report",
 					"name": "DES Employee Report",
 					"doctype": "DES Employee"
 				},
@@ -533,18 +539,25 @@ def get_data():
 					"doctype": "Overtime Application List"
 				},
 				{
-                                        "type": "report",
-                                        "is_query_report": True,
-                                        "name": "Salary Advance Report",
-                                        "doctype": "Salary Advance"
-                                },
-								{
+                    "type": "report",
+                    "is_query_report": True,
+                    "name": "Salary Advance Report",
+                    "doctype": "Salary Advance"
+                },
+				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "MR Payment",
 					"label": "MR Payment",
 					"doctype": "Process MR Payment"
 				},
+        
+				{
+					"type": "report",
+					"is_query_report": True,
+					"doctype": "Training Records",
+					"name": "Training and Development Report",
+				}
 			]
 		},
 	]
