@@ -123,18 +123,12 @@ class SalaryArrearPayment(Document):
 			d.arrear_project_allowance = d.project_allowance - d.previous_project_allowance
 			d.arrear_officiating_allowance = d.officiating_allowance - d.prev_officiating
 			d.salary_tax = get_salary_tax((d.basic_pay+d.corporate_allowance+d.contract_allowance+d.fixed_allowance + d.project_allowance-d.pf))
-			frappe.msgprint(str(d.employee))
-			frappe.msgprint(str(d.salary_tax))
 			d.health_contribution = flt((d.basic_pay+d.corporate_allowance+d.contract_allowance+d.fixed_allowance+ d.project_allowance) * (d.health_con_per * 0.01),0)
-			# frappe.msgprint(str(d.health_contribution))
 			d.arrear_pf = flt(d.pf-d.previous_pf)
-			frappe.msgprint(str(d.arrear_pf))
 			d.arrear_employer_pf = flt(d.employer_pf-d.previous_employer_pf) if d.employer_pf and d.previous_employer_pf else 0
-			# frappe.msgprint(str(d.arrear_employer_pf))
 			d.new_gross_pay = flt(d.arrear_basic_pay + d.arrear_corporate_allowance + d.arrear_contract_allowance + d.arrear_officiating_allowance + d.fixed_allowance + d.arrear_project_allowance)
 			d.arrear_salary_tax = get_salary_tax(d.new_gross_pay-d.arrear_pf)
 			d.arrear_hc = flt(d.new_gross_pay*(d.health_con_per*0.01),0)
-			# frappe.msgprint(str(d.arrear_hc))
 			d.total_deduction = flt(d.arrear_hc+d.arrear_pf+d.arrear_salary_tax)
 			d.net_payable_arrear = d.new_gross_pay - d.total_deduction
 
