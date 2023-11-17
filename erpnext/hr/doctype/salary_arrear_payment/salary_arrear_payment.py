@@ -13,8 +13,10 @@ import math
 class SalaryArrearPayment(Document):
 	def validate(self):
 		self.total_net_arrear_payable = 0
+		self.arrear_gross_amount = 0
 		for a in self.items:
 			self.total_net_arrear_payable += a.net_payable_arrear
+			self.arrear_gross_amount += a.new_gross_pay
 
 	# Populate Arrear details 
 	def get_arrear_employees(self):
@@ -161,8 +163,10 @@ class SalaryArrearPayment(Document):
 
 			row.update(d)
 		self.total_net_arrear_payable = 0
+		self.arrear_gross_amount = 0
 		for a in self.items:
 			self.total_net_arrear_payable += a.net_payable_arrear
+			self.arrear_gross_amount += a.new_gross_pay
 
 	def make_accounting_entry(self):
 		if frappe.db.exists("Journal Entry Account", {"reference_type": self.doctype, "reference_name": self.name}):
