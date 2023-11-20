@@ -122,8 +122,8 @@ class SalaryArrearPayment(Document):
 			d.arrear_contract_allowance = d.contract_allowance - d.prev_contract
 			d.arrear_project_allowance = d.project_allowance - d.previous_project_allowance
 			d.arrear_officiating_allowance = d.officiating_allowance - d.prev_officiating
-			d.salary_tax = get_salary_tax((d.basic_pay+d.corporate_allowance+d.contract_allowance+d.fixed_allowance + d.project_allowance-d.pf))
-			d.health_contribution = flt((d.basic_pay+d.corporate_allowance+d.contract_allowance+d.fixed_allowance+ d.project_allowance) * (d.health_con_per * 0.01),0)
+			d.salary_tax = get_salary_tax((d.basic_pay+d.corporate_allowance+d.contract_allowance+d.fixed_allowance + d.project_allowance + d.officiating_allowance-d.pf))
+			d.health_contribution = flt((d.basic_pay+d.corporate_allowance+d.contract_allowance+d.fixed_allowance+ d.project_allowance+d.officiating_allowance) * (d.health_con_per * 0.01),0)
 			d.arrear_pf = flt(d.pf-d.previous_pf)
 			d.arrear_employer_pf = flt(d.employer_pf-d.previous_employer_pf) if d.employer_pf and d.previous_employer_pf else 0
 			d.new_gross_pay = flt(d.arrear_basic_pay + d.arrear_corporate_allowance + d.arrear_contract_allowance + d.arrear_officiating_allowance + d.fixed_allowance + d.arrear_project_allowance)
@@ -167,7 +167,8 @@ class SalaryArrearPayment(Document):
 			employee_pf += det.arrear_pf
 			salary_tax += det.arrear_salary_tax
 			net_payable += det.net_payable_arrear
-			cost_center = frappe.db.get_value("Cost Center", {"branch": det.branch}, "name")
+			cost_center = frappe.db.get_value("Branch", {"name": det.branch}, "cost_center")
+			default_business_activity = frappe.db.get_value("Business Activity",{"is_default":1},"name")
 			if cost_center not in cc:
 				cc.update({
         			cost_center: {
@@ -206,6 +207,7 @@ class SalaryArrearPayment(Document):
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": rec,
+					"business_activity": default_business_activity,
 					"debit_in_account_currency": flt(cc[rec]['basic_pay'],2),
 					"debit": flt(cc[rec]['basic_pay'],2),
 				})
@@ -216,6 +218,7 @@ class SalaryArrearPayment(Document):
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": rec,
+					"business_activity": default_business_activity,
 					"debit_in_account_currency": flt(cc[rec]['corporate_allowance'],2),
 					"debit": flt(cc[rec]['corporate_allowance'],2),
 				})
@@ -225,6 +228,7 @@ class SalaryArrearPayment(Document):
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": rec,
+					"business_activity": default_business_activity,
 					"debit_in_account_currency": flt(cc[rec]['contract_allowance'],2),
 					"debit": flt(cc[rec]['contract_allowance'],2),
 				})
@@ -235,8 +239,20 @@ class SalaryArrearPayment(Document):
 						"reference_type": self.doctype,
 						"reference_name": self.name,
 						"cost_center": rec,
+						"business_activity": default_business_activity,
 						"debit_in_account_currency": flt(cc[rec]['project_allowance'],2),
 						"debit": flt(cc[rec]['project_allowance'],2),
+					})
+			#Officiating Allowance
+			if flt(cc[rec]['officiating_allowance'],2) > 0:
+				payables_je.append("accounts", {
+						"account": frappe.db.get_value("Salary Component", "Officiating Allowance", "gl_head"),
+						"reference_type": self.doctype,
+						"reference_name": self.name,
+						"cost_center": rec,
+						"business_activity": default_business_activity,
+						"debit_in_account_currency": flt(cc[rec]['officiating_allowance'],2),
+						"debit": flt(cc[rec]['officiating_allowance'],2),
 					})
 			#Fixed Allowance
 			payables_je.append("accounts", {
@@ -244,6 +260,7 @@ class SalaryArrearPayment(Document):
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": rec,
+					"business_activity": default_business_activity,
 					"debit_in_account_currency": flt(cc[rec]['fixed_allowance'],2),
 					"debit": flt(cc[rec]['fixed_allowance'],2),
 				})
@@ -255,6 +272,7 @@ class SalaryArrearPayment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
+				"business_activity": default_business_activity,
 				"credit_in_account_currency": flt(health_contribution,2),
 				"credit": flt(health_contribution,2),
 				"party_check": 0
@@ -265,6 +283,7 @@ class SalaryArrearPayment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
+				"business_activity": default_business_activity,
 				"credit_in_account_currency": flt(employee_pf,2),
 				"credit": flt(employee_pf,2),
 				"party_check": 0
@@ -276,6 +295,7 @@ class SalaryArrearPayment(Document):
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": company_cc,
+					"business_activity": default_business_activity,
 					"credit_in_account_currency": flt(salary_tax,2),
 					"party_check": 0,
 					"credit": flt(salary_tax,2),
@@ -286,6 +306,7 @@ class SalaryArrearPayment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
+				"business_activity": default_business_activity,
 				"credit_in_account_currency": flt(net_payable,2),
 				"credit": flt(net_payable,2),
 				"party_check": 0
@@ -311,6 +332,7 @@ class SalaryArrearPayment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
+				"business_activity": default_business_activity,
 				"debit_in_account_currency": flt(health_contribution,2),
 				"debit": flt(health_contribution,2),
 				"party_check": 0
@@ -322,6 +344,7 @@ class SalaryArrearPayment(Document):
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": company_cc,
+					"business_activity": default_business_activity,
 					"debit_in_account_currency": flt(salary_tax,2),
 					"debit": flt(salary_tax,2),
 					"party_check": 0
@@ -331,6 +354,7 @@ class SalaryArrearPayment(Document):
 				"account": default_bank_account,
 				"reference_type": self.doctype,
 				"reference_name": self.name,
+				"business_activity": default_business_activity,
 				"cost_center": company_cc,
 				"credit_in_account_currency": flt(salary_tax,2)+flt(health_contribution,2),
 				"credit": flt(salary_tax,2)+flt(health_contribution,2),
@@ -358,6 +382,7 @@ class SalaryArrearPayment(Document):
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": p,
+					"business_activity": default_business_activity,
 					"debit_in_account_currency": flt(cc[p]['employer_pf'],2),
 					"debit": flt(cc[p]['employer_pf'],2),
 				})
@@ -368,6 +393,7 @@ class SalaryArrearPayment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
+				"business_activity": default_business_activity,
 				"debit_in_account_currency": flt(employee_pf,2),
 				"debit": flt(employee_pf,2),
 				"party_check": 0
@@ -378,6 +404,7 @@ class SalaryArrearPayment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
+				"business_activity": default_business_activity,
 				"credit_in_account_currency": flt(employee_pf,2)+flt(total_employer_pf,2),
 				"credit": flt(employee_pf,2)+flt(total_employer_pf,2),
 			})
@@ -402,6 +429,7 @@ class SalaryArrearPayment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
+				"business_activity": default_business_activity,
 				"debit_in_account_currency": flt(net_payable,2),
 				"debit": flt(net_payable,2),
 				"party_check": 0
@@ -412,6 +440,7 @@ class SalaryArrearPayment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
+				"business_activity": default_business_activity,
 				"credit_in_account_currency": flt(net_payable,2),
 				"credit": flt(net_payable,2),
 			})
