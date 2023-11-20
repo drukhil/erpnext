@@ -27,17 +27,19 @@ form_grid_templates = {
 
 class StockEntry(StockController):
 	def autoname(self):
-                if self.purpose == 'Material Issue':
-                        series = 'SEMI'
-                elif self.purpose == 'Material Receipt':
-                        series = 'SEMR'
-                elif self.purpose == 'Material Transfer':
-                        series = 'SEMT'
-                else:
-                        series = 'SE'
+		if self.purpose == 'Material Issue':
+			series = 'SEMI'
+		elif self.purpose == 'Material Receipt':
+			series = 'SEMR'
+		elif self.purpose == 'Material Transfer':
+			series = 'SEMT'
+		elif self.purpose == 'Material Write Off':
+			series = 'SEMW'
+		else:
+			series = 'SE'
 
 		#self.name = make_autoname(get_auto_name(self, self.naming_series) + ".####")
-                self.name = make_autoname(str(series) + ".YY.MM.####")
+		self.name = make_autoname(str(series) + ".YY.MM.####")
 
 	def get_feed(self):
 		return _("From {0} to {1}").format(self.from_warehouse, self.to_warehouse)
@@ -145,7 +147,7 @@ class StockEntry(StockController):
 
 	def validate_purpose(self):
 		valid_purposes = ["Material Issue", "Material Receipt", "Material Transfer", "Material Transfer for Manufacture", "Material Consumption for Manufacture",
-			"Manufacture", "Repack", "Subcontract"]
+			"Manufacture", "Repack", "Subcontract", "Material Write Off"]
 		if self.purpose not in valid_purposes:
 			frappe.throw(_("Purpose must be one of {0}").format(comma_or(valid_purposes)))
 
@@ -173,11 +175,11 @@ class StockEntry(StockController):
 
 			item_details = self.get_item_details(frappe._dict({"item_code": item.item_code,
 				"company": self.company, "project": self.project, "uom": item.uom}), for_update=True)
-
+			
 			for f in ("uom", "stock_uom", "description", "item_name", "expense_account",
 				"cost_center", "conversion_factor"):
-					if f in ["stock_uom", "conversion_factor"] or not item.get(f):
-						item.set(f, item_details.get(f))
+				if f in ["stock_uom", "conversion_factor"] or not item.get(f):
+					item.set(f, item_details.get(f))
 
 			if self.difference_account and not item.expense_account:
 				item.expense_account = self.difference_account
@@ -194,7 +196,7 @@ class StockEntry(StockController):
 	def validate_warehouse(self):
 		"""perform various (sometimes conditional) validations on warehouse"""
 
-		source_mandatory = ["Material Issue", "Material Transfer", "Subcontract", "Material Transfer for Manufacture"]
+		source_mandatory = ["Material Issue", "Material Transfer", "Subcontract", "Material Transfer for Manufacture", "Material Write Off"]
 		target_mandatory = ["Material Receipt", "Material Transfer", "Subcontract", "Material Transfer for Manufacture"]
 
 		validate_for_manufacture_repack = any([d.bom_no for d in self.get("items")])
@@ -648,6 +650,8 @@ class StockEntry(StockController):
 		# update uom
 		if args.get("uom") and for_update:
 			ret.update(self.get_uom_details(args))
+		if self.purpose == 'Material Write Off':
+			ret["expense_account"] = frappe.db.get_value('Company', self.company, "write_off_account")
 
 		if not ret["expense_account"]:
 			ret["expense_account"] = frappe.db.get_value("Company", self.company, "stock_adjustment_account")
@@ -754,7 +758,7 @@ class StockEntry(StockController):
 
 		if self.bom_no:
 			if self.purpose in ["Material Issue", "Material Transfer", "Manufacture", "Repack",
-					"Subcontract", "Material Transfer for Manufacture"]:
+					"Subcontract", "Material Transfer for Manufacture", "Material Write Off"]:
 				if self.work_order and self.purpose == "Material Transfer for Manufacture":
 					item_dict = self.get_pending_raw_materials()
 					if self.to_warehouse and self.pro_doc:

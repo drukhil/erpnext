@@ -130,7 +130,7 @@
    "no_copy": 0, 
    "oldfieldname": "purpose", 
    "oldfieldtype": "Select", 
-   "options": "\nMaterial Issue\nMaterial Receipt\nMaterial Transfer\nMaterial Transfer for Manufacture\nMaterial Consumption for Manufacture\nManufacture", 
+   "options": "\nMaterial Issue\nMaterial Receipt\nMaterial Transfer\nMaterial Transfer for Manufacture\nMaterial Consumption for Manufacture\nManufacture\nMaterial Write Off", 
    "permlevel": 0, 
    "print_hide": 0, 
    "print_hide_if_no_value": 0, 
@@ -1692,7 +1692,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2021-08-30 08:36:24.876864", 
+ "modified": "2023-10-30 10:46:10.025161", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Stock Entry", 
@@ -1912,6 +1912,6 @@
  "sort_field": "modified", 
  "sort_order": "DESC", 
  "title_field": "title", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }
