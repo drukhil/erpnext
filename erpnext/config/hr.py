@@ -263,6 +263,12 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Salary Arrear Payment",
+                    "label": _("Salary Arrear Payment"),
+					"description": _("Salary Arrear Payment"),
+				},
+				{
+					"type": "doctype",
 					"name": "Overtime Application",
                                         "label": _("Overtime Application"),
 					"description": _("Overtime Application"),
