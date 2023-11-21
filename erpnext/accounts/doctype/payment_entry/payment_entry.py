@@ -481,7 +481,7 @@ class PaymentEntry(AccountsController):
                         if d.amount:
                                 total_deductions += flt(d.amount)
 
-		if self.payment_type in ("Pay", "Internal Transfer"):
+		if self.payment_type in ("Pay", "Internal Transfer") and round(self.paid_amount) + round(total_deductions) > 0:
 			if frappe.get_value("Account", self.paid_from, "report_type") == "Profit and Loss":	
 				if self.pl_cost_center:
 					gl_entries.append(
