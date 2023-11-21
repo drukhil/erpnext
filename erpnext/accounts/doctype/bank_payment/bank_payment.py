@@ -722,6 +722,10 @@ class BankPayment(Document):
 		return {"January": "01", "February": "02", "March": "03", "April": "04", "May": "05", "June": "06",
 			"July": "07", "August": "08", "September": "09", "October": "10", "November": "11", "December": "12"}[month_abbr]
 
+	def get_month_abbr(self, month_abbr):
+		return {"January": "Jan", "February": "Feb", "March": "Mar", "April": "Apr", "May": "May", "June": "Jun",
+			"July": "Jul", "August": "Aug", "September": "Sep", "October": "Oct", "November": "Nov", "December": "Dec"}[month_abbr]
+
 	def get_conditions(self):
 		cond = []
 		for field_name in ("employee", "department", "division"):
