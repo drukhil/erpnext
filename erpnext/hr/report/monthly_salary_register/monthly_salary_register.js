@@ -58,6 +58,13 @@ frappe.query_reports["Monthly Salary Register"] = {
 			"fieldtype": "Select",
 			"options": "All\nSubmitted\nUn-Submitted\nCancelled",
 			"default": "All"
-		}
+		},
+		{
+			"fieldname": "report_type",
+			"label": __("Report Type"),
+			"fieldtype": "Select",
+			"options": "Salary\nArrear",
+			"default": "Salary"
+		},
 	]
 }
