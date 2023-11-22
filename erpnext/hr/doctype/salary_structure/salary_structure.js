@@ -98,6 +98,9 @@ frappe.ui.form.on('Salary Structure', {
 	eligible_for_scarcity: function(frm){
 		calculate_others(frm.doc);
 	},
+	eligible_for_fixed_allowance: function(frm){
+		calculate_others(frm.doc);
+	},
 	eligible_for_cash_handling: function(frm){
 		calculate_others(frm.doc);
 	},
