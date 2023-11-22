@@ -10,6 +10,32 @@ from datetime import timedelta, date
 from erpnext.custom_utils import get_branch_cc, get_branch_warehouse
 import csv
 
+def update_salary_structure():
+	ss = frappe.db.sql("""
+		select ss.name, ss.employee_grade, ss.employment_type, ss.employee_group from `tabSalary Structure` ss,
+		`tabEmployee` e where e.name = ss.employee
+		and e.status = 'Active' and ss.is_active = 'Yes'
+    """,as_dict=1)
+	if ss:
+		for s in ss:
+			sal_struct = frappe.get_doc("Salary Structure", s.name)
+			if s.employee_group not in ("Temporary", "CPE"):
+				sal_struct.eligible_for_fixed_allowance = 1
+				for e in sal_struct.earnings:
+					if e.salary_component == "Basic Pay":
+						if s.employee_subgroup in ("M7", "M7 ( Contract )", "O7", "F7", "M6", "M6 (Contract)", "M5", "M4", "M4 Contract", "E3", "E4", "E3 ( Contract )", "E4 ( Contract )", "E2", "CEO"):
+							e.amount += e.amount * 0.02
+						else:
+							e.amount += e.amount * 0.05
+						e.amount = math.ceil(e.amount)
+						if flt(str(e.amount)[len(str(e.amount))-1]) > 0 and flt(str(e.amount)[len(str(e.amount))-1]) <= 5:
+							e.amount = flt(str(e.amount)[0:len(str(e.amount))-1]+"5")
+						elif flt(str(e.amount)[len(str(e.amount))-1]) > 5 and flt(str(e.amount)[len(str(e.amount))-1]) <= 9:
+							value_to_add = 10 - flt(str(e.amount)[len(str(e.amount))-1])
+							e.amount = e.amount + value_to_add
+				sal_struct.save(ignore_permissions=1)
+				print(sal_struct.employee)
+
 # 2022/07/22 BY SHIV
 # Someone's silly code deleted components from SST, hence this method is created to recreate those 
 #	missing components under SST based on the latest salary slip 2022-06
@@ -2702,3 +2728,18 @@ def submit_sws_app():
 	except Exception as e:
 		print(str(e))
 	frappe.db.commit()
+
+def correct_gl_for_item_in_si():
+	with open("/home/frappe/erp/apps/erpnext/erpnext/correct_gl.csv") as f:
+		reader = csv.reader(f)
+		mylist = list(reader)
+		c = 0
+		for i in mylist:
+			si_doc = frappe.db.sql("select si.name, si.customer, si.posting_date, sid.item_name, sid.income_account from `tabSales Invoice` si, `tabSales Invoice Item` sid where sid.parent=si.name and si.docstatus=1 and sid.item_code='{}' and si.posting_date > '2023-01-01'".format(i[0]), as_dict=1)
+			for d in si_doc:
+				gl_entries = frappe.db.sql("select name, voucher_no, account from `tabGL Entry` where voucher_no='{}' and account='{}'".format(d.name, d.income_account), as_dict=1)
+				for a in gl_entries:
+					frappe.db.sql("update `tabGL Entry` set account='{}' where name='{}' and account='{}'".format(i[2], a.name, a.account))
+					frappe.db.sql("update `tabSales Invoice Item` set income_account='{}' where parent='{}' and income_account='{}'".format(i[2], d.name, d.income_account))
+				c += 1
+		print(str(c))
