@@ -179,11 +179,13 @@ class MechanicalPayment(AccountsController):
 		for a in self.items:
 			#Get against voucher and type for correct Receivable report
 			against_voucher, against_voucher_type = None, None
+			doc = frappe.get_doc(a.reference_type, a.reference_name)
 			if a.reference_type == "Job Card":
-				doc = frappe.get_doc(a.reference_type, a.reference_name)
 				if doc.jv:
 					against_voucher_type = "Journal Entry"
 					against_voucher = doc.jv
+			if doc.customer != a.customer:
+				frappe.throw(" {} customer selected but the customer must be {} as per {} {}. ".format(a.customer, doc.customer, a.reference_type, a.reference_name))
 
 			gl_entries.append(
 				self.get_gl_dict({"account": receivable_account,
