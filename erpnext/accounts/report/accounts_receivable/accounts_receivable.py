@@ -105,6 +105,7 @@ class ReceivablePayableReport(object):
 			if self.is_receivable_or_payable(gle, dr_or_cr, future_vouchers):
 				outstanding_amount, credit_note_amount = self.get_outstanding_amount(gle,
 					self.filters.report_date, dr_or_cr, return_entries, currency_precision)
+				
 				if abs(outstanding_amount) > 0.1/10**currency_precision:
 					row = [gle.posting_date, gle.party, gle.account]
 
@@ -162,17 +163,22 @@ class ReceivablePayableReport(object):
 
 	def get_entries_till(self, report_date, party_type):
 		# returns a generator
-		return (e for e in self.get_gl_entries(party_type)
-			if getdate(e.posting_date) <= report_date)
+		# Modified by Thukten to filter based on Cost Center
+		if not self.filters.cost_center:
+			return (e for e in self.get_gl_entries(party_type)
+				if getdate(e.posting_date) <= report_date)
+		else:
+			return (e for e in self.get_gl_entries(party_type)
+				if getdate(e.posting_date) <= report_date and e.cost_center == self.filters.cost_center) 
 
 	def is_receivable_or_payable(self, gle, dr_or_cr, future_vouchers):
 		return (
 			# advance
 			(not gle.against_voucher) or
-
 			# against sales order/purchase order
-			(gle.against_voucher_type in ["Sales Order", "Purchase Order"]) or
-
+			(gle.against_voucher_type in ["Sales Order", "Purchase Order","Job Card","Hire Charge Invoice","Equipment Hiring Form", "Asset"] and dr_or_cr == "debit" and gle.get(dr_or_cr) > 0) or
+			#(gle.against_voucher_type in ["Sales Order", "Purchase Order",]) or
+			(gle.against_voucher_type in ["Sales Order", "Purchase Order", "Asset"] and dr_or_cr == "credit") or
 			# sales invoice/purchase invoice
 			(gle.against_voucher==gle.voucher_no and gle.get(dr_or_cr) > 0) or
 
@@ -254,11 +260,11 @@ class ReceivablePayableReport(object):
 				voucher_type, voucher_no, cost_center, against_voucher_type, against_voucher,
 				account_currency, remarks, {0}
 				from `tabGL Entry`
-				where docstatus < 2 and party_type=%s and (party is not null and party != '') {1}
-				group by voucher_type, voucher_no, against_voucher_type, against_voucher, party
+				where docstatus < 2 and party_type=%s and (party is not null and party != '') 
+				and party not in ("FRMD Lingmeythang","FRMD,Trashigang") {1}
+				group by voucher_type, voucher_no, against_voucher_type, against_voucher, party, cost_center
 				order by posting_date, party"""
 				.format(select_fields, conditions), values, as_dict=True)
-
 		return self.gl_entries
 
 	def prepare_conditions(self, party_type):
@@ -278,10 +284,6 @@ class ReceivablePayableReport(object):
 		if self.filters.account:
 			conditions.append("account=%s")
 			values.append(self.filters.account)
-		
-		if self.filters.cost_center:
-			conditions.append("cost_center=%s")
-			values.append(self.filters.cost_center)
 
 		if party_type_field=="customer":
 			if self.filters.get("customer_group"):
@@ -307,6 +309,8 @@ class ReceivablePayableReport(object):
 						.setdefault(gle.against_voucher_type, {})\
 						.setdefault(gle.against_voucher, [])\
 						.append(gle)
+
+
 
 		return self.gl_entries_map.get(party, {})\
 			.get(against_voucher_type, {})\

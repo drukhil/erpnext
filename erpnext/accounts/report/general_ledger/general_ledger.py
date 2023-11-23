@@ -298,7 +298,8 @@ def get_result_as_list(data, filters):
 			row += [d.get("debit_in_account_currency"), d.get("credit_in_account_currency")]
 
 		row += [d.get("voucher_type"), d.get("voucher_no"), d.get("against"),
-			d.get("party_type"), d.get("party"), d.get("cost_center"), d.get("remarks")
+			d.get("party_type"), d.get("party"),  d.get("against_voucher_type"), d.get("against_voucher"),
+			d.get("cost_center"), d.get("remarks")
 		]
 
 		result.append(row)

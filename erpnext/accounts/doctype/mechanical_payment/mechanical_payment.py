@@ -176,34 +176,46 @@ class MechanicalPayment(AccountsController):
 						})
 				)
 		
-		gl_entries.append(
-			self.get_gl_dict({"account": receivable_account,
-					 "credit": flt(self.receivable_amount),
-					 "credit_in_account_currency": flt(self.receivable_amount),
-					 "cost_center": self.cost_center,
-					 "party_check": 1,
-					 "party_type": "Customer",
-					 "party": self.customer,
-					 "reference_type": self.doctype,
-					 "reference_name": self.name,
-					 "remarks": self.remarks
-					})
-			)
+		for a in self.items:
+			#Get against voucher and type for correct Receivable report
+			against_voucher, against_voucher_type = None, None
+			if a.reference_type == "Job Card":
+				doc = frappe.get_doc(a.reference_type, a.reference_name)
+				if doc.jv:
+					against_voucher_type = "Journal Entry"
+					against_voucher = doc.jv
+
+			gl_entries.append(
+				self.get_gl_dict({"account": receivable_account,
+						"credit": flt(a.allocated_amount),
+						"credit_in_account_currency": flt(a.allocated_amount),
+						"cost_center": self.cost_center,
+						"party_check": 1,
+						"party_type": "Customer",
+						"party": a.customer if a.customer else self.customer,
+						"reference_type": self.doctype,
+						"reference_name": self.name,
+						"against_voucher_type":against_voucher_type if against_voucher_type else a.reference_type,
+						"against_voucher": against_voucher if against_voucher else a.reference_name,						
+						"remarks": self.remarks
+						})
+				)
+	
 		if self.deducts:
-                        for a in self.deducts:
-                                gl_entries.append(
-                                        self.get_gl_dict({"account": a.accounts,
-                                                        "debit": flt(a.amount),
-                                                        "debit_in_account_currency": flt(a.amount),
-                                                        "cost_center": self.cost_center,
-                                                        "party_check": 1,
-                                                        "party_type": a.party_type,
-                                                        "party": a.party,
-                                                        "reference_type": self.doctype,
-                                                        "reference_name": self.name,
-                                                        "remarks": self.remarks
-                                                 })
-                        )
+			for a in self.deducts:
+				gl_entries.append(
+					self.get_gl_dict({"account": a.accounts,
+									"debit": flt(a.amount),
+									"debit_in_account_currency": flt(a.amount),
+									"cost_center": self.cost_center,
+									"party_check": 1,
+									"party_type": a.party_type,
+									"party": a.party,
+									"reference_type": self.doctype,
+									"reference_name": self.name,
+									"remarks": self.remarks
+								})
+                )
 
 
 		make_gl_entries(gl_entries, cancel=(self.docstatus == 2),update_outstanding="No", merge_entries=False)
@@ -211,18 +223,16 @@ class MechanicalPayment(AccountsController):
 	def get_transactions(self):
 		if not self.branch or not self.customer or not self.payment_for:
 			frappe.throw("Branch, Customer and Payment For is Mandatory")
-		transactions = frappe.db.sql("select name, outstanding_amount from `tab{0}` where customer = '{1}' and branch = '{2}' and outstanding_amount > 0 and docstatus = 1 order by creation".format(self.payment_for, self.customer, self.branch), as_dict=1)
+		transactions = frappe.db.sql("select name, outstanding_amount, customer from `tab{0}` where customer = '{1}' and branch = '{2}' and outstanding_amount > 0 and docstatus = 1 order by creation".format(self.payment_for, self.customer, self.branch), as_dict=1)
 		self.set('items', [])
 
 		total = 0
-                for d in transactions:
-                        d.reference_type = self.payment_for
+		for d in transactions:
+			d.reference_type = self.payment_for
 			d.reference_name = d.name
 			d.allocated_amount = d.outstanding_amount
-                        row = self.append('items', {})
-                        row.update(d)
+			row = self.append('items', {})
+			row.update(d)
 			total += flt(d.outstanding_amount)
 		self.receivable_amount = total
 		self.actual_amount = total
-
-
