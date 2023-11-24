@@ -90,7 +90,7 @@ def get_columns(salary_slips, filters):
                     _("Branch") + ":Link/Branch:120", _("Department") + ":Link/Department:120", _("Division") + ":Link/Division:120",
                     _("Grade") + ":Link/Employee Grade:120", _("Designation") + ":Link/Designation:120",
             _("Year") + "::80", _("Month") + "::80", _("Leave Without Pay") + ":Float:130", 
-            _("Payment Days") + ":Float:120", _("Status") + "::100"
+         _("Status") + "::100"
         ]
     else:
         columns = [
