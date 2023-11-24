@@ -52,7 +52,7 @@ def execute(filters=None):
                 ss.employee,ss.employee_name, ss.employment_type, cid, joining_date,
                 ss.bank_name, ss.bank_ac_no, 
                 ss.cost_center, ss.branch, ss.department,
-                ss.division, ss.employee_grade, ss.designation, 
+                ss.division, ss.section, ss.employee_grade, ss.designation, 
                 ss.fiscal_year, ss.from_month, ss.payment_days,
                 status, ss.prev_basic_pay, ss.prev_corporate,
                 ss.prev_contract, ss.prev_officiating, ss.prev_hc,
