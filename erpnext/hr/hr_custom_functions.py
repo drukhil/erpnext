@@ -223,7 +223,7 @@ def get_salary_tax(gross_amt):
 
         if flt(flt(gross_amt) if flt(gross_amt) else 0.00) > flt(flt(max_limit[0][0]) if flt(max_limit[0][0]) else 0.00):
                # tax_amount = flt((((flt(gross_amt) if flt(gross_amt) else 0.00)-83333.00)*0.25)+11875.00)
-		tax_amount = flt((((flt(gross_amt) if flt(gross_amt) else 0.00)-125000.00)*0.30)+20208.00)
+            tax_amount = flt((((flt(gross_amt) if flt(gross_amt) else 0.00)-125000.00)*0.30)+20208.00)
         else:
                 result = frappe.db.sql("""select b.tax from
                         `tabSalary Tax` a, `tabSalary Tax Item` b

@@ -264,6 +264,8 @@ class SalaryStructure(Document):
                                         
                                 if ed == 'earnings':
                                         if self.get(m['field_name']):
+                                                if m["field_name"] == "eligible_for_fixed_allowance":
+                                                        calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "fixed_allowance")
                                                 calc_amt = round(flt(basic_pay)*flt(self.get(m['field_value']))*0.01 if self.get(m['field_method']) == 'Percent' else flt(self.get(m['field_value'])))
                                                 comm_allowance += round(flt(calc_amt) if m['name'] == 'Communication Allowance' else 0)
                                                 total_earning += calc_amt
