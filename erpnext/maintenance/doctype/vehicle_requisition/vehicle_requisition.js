@@ -15,6 +15,11 @@ frappe.ui.form.on('Vehicle Requisition', {
 		if (!frm.doc.posting_date) {
 			frm.set_value("posting_date", get_today());
 		}
+		if(cur_frm.doc.head > 4){
+			frm.set_df_property("additional_mto", "hidden", 0);
+		}else{
+			frm.set_df_property("additional_mto", "hidden", 1);
+		}
 	},
 	refresh: function(frm) {
 		cur_frm.set_query("travel_authorization", function() {
@@ -25,13 +30,15 @@ frappe.ui.form.on('Vehicle Requisition', {
 			};
 		});
 		if ((frm.doc.__islocal) || (frm.doc.workflow_state == 'Draft'))  {
-			frm.set_df_property("mto", "hidden", 1)
-			
+			frm.set_df_property("mto", "hidden", 1);
+			frm.set_df_property("additional_mto", "hidden", 1);
 			
         }
 				if(!frm.doc.__islocal && in_list(user_roles, "Fleet Manager")) {
 					frm.set_df_property("driver", "read_only", 0)
+					frm.set_df_property("second_driver", "read_only", 0)
 					frm.set_df_property("equipment", "read_only", 0)
+					frm.set_df_property("second_vehicle", "read_only", 0)
 					
 						}
 		cur_frm.set_query("equipment", function() {
@@ -41,7 +48,26 @@ frappe.ui.form.on('Vehicle Requisition', {
 				}
 			};
 		});
+		cur_frm.set_query("second_vehicle", function() {
+			return {
+				"filters": {
+			"branch": frm.doc.branch
+				}
+			};
+		});
 		cur_frm.set_query("driver", function() {
+			return {
+				
+					filters: [
+						['Employee', 'designation', 'in', ['Operator', 'Driver', 'GCE-NC2 (Driver)', "Admin. Assistant", 'GCE-NC2 (Light Driver)']],
+						['Employee', 'branch', '=', frm.doc.branch],
+						
+						['Employee', 'status', '=', 'Active']
+						]
+				
+			};
+		});
+		cur_frm.set_query("second_driver", function() {
 			return {
 				
 					filters: [
@@ -63,6 +89,15 @@ frappe.ui.form.on('Vehicle Requisition', {
 	//cur_frm.set_value('total_duration', frappe.datetime.get_day_diff(cur_frm.doc.expected_end_date, cur_frm.doc.expected_start_date) + 1)
 		}
 	},
+	head: function(frm){
+		console.log(cur_frm.doc.head);
+		if(cur_frm.doc.head > 4){
+			frm.set_df_property("additional_mto", "hidden", 0);
+		}else{
+			frm.set_df_property("additional_mto", "hidden", 1);
+		}
+		
+	}
 });
 
 frappe.ui.form.on("Vehicle Requisition", "after_save", function(frm, cdt, cdn){

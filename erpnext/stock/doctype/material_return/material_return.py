@@ -27,6 +27,7 @@ class MaterialReturn(StockController):
 			a.item_name = item_name
 			a.amount = flt(a.qty) * flt(a.basic_rate)
 			a.expense_account = expense_account
+			a.cost_center = self.cost_center
 
 	def on_submit(self):
 		self.make_sl_entry()

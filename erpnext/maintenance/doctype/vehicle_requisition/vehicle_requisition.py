@@ -10,34 +10,59 @@ from frappe.utils import add_days, getdate, date_diff
 class VehicleRequisition(Document):
 	def validate(self):
 		self.validate_dates()
+		self.validate_second_vehicle()
 
 	def on_submit(self):
 		self.notify_all()
 
 
 	def validate_dates(self):
-		if self.head > 4:
-			frappe.throw("Only one vehicle will be assigned for 4 passenger, For more than 4 passenger(No of Heads), kindly apply for another vehicle requisition. ")
+		# if self.head > 4:
+		# 	frappe.throw("Only one vehicle will be assigned for 4 passenger, For more than 4 passenger(No of Heads), kindly apply for another vehicle requisition. ")
 		if self.head > 1:
 			if not self.items:
 				frappe.throw("Kindly fill in your travel companions under the <b> Companion Officials </b> section.")
 		if getdate(self.travel_date) > getdate(self.return_date):
 			frappe.throw("Travel Start Date Cannot be after Travel Return Date. Kindly check the travel dates.")
 
+	def validate_second_vehicle(self):
+		if self.head < 5 and self.second_vehicle:
+			self.second_vehicle=''
+			self.second_equipment=''
+			self.second_equipment_type=''
+			self.second_driver=''
+			self.second_driver_name=''
+			self.second_driver_email=''
+			self.second_driver_phone=''
 
-	def notify_all(self):
-                subject = "Vehicle Requisition" + self.name
-                message = """ Dear '{0}' - Phone #({1}), <br> 
-				Your Vehicle Requisition '{2}' is approved. Mr '{3}' with vehicle '{4}' is assigned for this tour from '{5}' to '{6}'. His phone number is '{7}'. Have a nice trip.....""".format(self.employee_name, self.phone_number,  self.name, self.driver_name, self.equipment_number,self.travel_date, self.return_date, self.driver_phone)
+		if self.head > 4:
+			if self.equipment == self.second_vehicle:
+				frappe.throw("Same Vehicle is selected. Please Check!")
+			if self.driver == self.second_driver:
+				frappe.throw("Same Driver is selected twice. Please Check!")
 				
+	def notify_all(self):
+		subject = "Vehicle Requisition" + self.name
+		message = """ Dear {0} - Phone #({1}), <br><br> 
+		Your Vehicle Requisition {2} is approved.<br> """.format(self.employee_name, self.phone_number,  self.name)
+		
+		"""Mr '{3}' with vehicle '{4}' is assigned for this tour from '{5}' to '{6}'. His phone number is '{7}'. Have a nice trip.....""".format(self.employee_name, self.phone_number,  self.name, self.driver_name, self.equipment_number,self.travel_date, self.return_date, self.driver_phone)
+				
+		if self.second_driver and self.head > 4:
+			message += """Mr. {driver} - phone#{driver_phone} with vehicle {equipment} and <br> Mr. {sec_driver} - phone#{sec_phone} with vehicle {sec_vehicle} is assigned for this tour from {from_date} to {to_date}. Have a nice trip.""".format(driver=self.driver_name, equipment=self.equipment_number,from_date=self.travel_date, to_date=self.return_date, driver_phone=self.driver_phone, sec_driver=self.second_driver_name,sec_vehicle=self.second_equipment,sec_phone=self.second_driver_phone)
+		else:
+			message += """Mr. {driver} - phone#{driver_phone} with vehicle {equipment} is assigned for this tour from {from_date} to {to_date}. Have a nice trip.""".format(driver=self.driver_name, equipment=self.equipment_number,from_date=self.travel_date, to_date=self.return_date, driver_phone=self.driver_phone)
+		# frappe.throw(str(message))
 		user = []
 		users = ['dorjiphurba@gyalsunginfra.bt', 'gmpa@gyalsunginfra.bt','hr@gyalsunginfra.bt', self.email_id, self.driver_email ]
 		user.extend(users)
+		if self.second_driver and self.head > 4:
+			user.append(self.second_driver_email)
 		
-       		if user:
-            		for a in user:
-                		try:
-                    			frappe.sendmail(recipients=a, sender=self.owner, subject=subject, message=message, reference_doctype= self.doctype, reference_name= self.name)     
+		if user:
+			for a in user:
+				try:
+					frappe.sendmail(recipients=a, sender=self.owner, subject=subject, message=message, reference_doctype= self.doctype, reference_name= self.name)     
 				except:
 					pass
 
