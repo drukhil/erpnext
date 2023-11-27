@@ -383,7 +383,8 @@ def make_payment_entry(source_name, target_doc=None):
 			"reference_type": "Job Card",
 			"reference_name": obj.name,
 			"outstanding_amount": obj.outstanding_amount,
-			"allocated_amount": obj.outstanding_amount
+			"allocated_amount": obj.outstanding_amount,
+			"customer": obj.customer
 		})
 
 	doc = get_mapped_doc("Job Card", source_name, {

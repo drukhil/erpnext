@@ -233,6 +233,7 @@ class MechanicalPayment(AccountsController):
 			d.reference_type = self.payment_for
 			d.reference_name = d.name
 			d.allocated_amount = d.outstanding_amount
+			d.customer = d.customer
 			row = self.append('items', {})
 			row.update(d)
 			total += flt(d.outstanding_amount)

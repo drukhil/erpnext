@@ -413,7 +413,8 @@ def make_payment_entry(source_name, target_doc=None):
                         "reference_type": "Hire Charge Invoice",
                         "reference_name": obj.name,
                         "outstanding_amount": obj.outstanding_amount,
-                        "allocated_amount": obj.outstanding_amount
+                        "allocated_amount": obj.outstanding_amount,
+                        "customer": obj.customer
                 })
     
     doc = get_mapped_doc("Hire Charge Invoice", source_name, {
