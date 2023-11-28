@@ -20,8 +20,8 @@ frappe.ui.form.on('Cost Appropriation', {
                         frm.add_custom_button(__('Accounting Ledger'), function(){
                                 frappe.route_options = {
                                         voucher_no: frm.doc.name,
-                                        from_date: frm.doc.from_date,
-                                        to_date: frm.doc.to_date,
+                                        from_date: frm.doc.posting_date,
+                                        to_date: frm.doc.posting_date,
                                         company: frm.doc.company,
                                         group_by_voucher: false
                                 };
