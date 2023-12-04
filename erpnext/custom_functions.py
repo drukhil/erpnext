@@ -16,7 +16,7 @@ def check_pending_approvers():
 		send_email(a, sorted_list[a], "Material Request")
 
 	#Travel Authorization	
-	mrs = frappe.db.sql("select name, supervisor as approver, creation as date from `tabTravel Authorization` where docstatus = 0 and document_status != 'Rejected'", as_dict=True)
+	mrs = frappe.db.sql("select name, supervisor as approver, creation as date from `tabTravel Authorization` where docstatus = 0 and document_status != 'Rejected' and workflow_state != 'Draft'", as_dict=True)
 	sorted_list = segregrate(mrs)
 	for a in sorted_list:
 		send_email(a, sorted_list[a], "Travel Authorization")
