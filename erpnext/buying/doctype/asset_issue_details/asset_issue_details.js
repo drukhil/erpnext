@@ -2,6 +2,7 @@
 // For license information, please see license.txt
 cur_frm.add_fetch("item_code", "item_name", "item_name");
 cur_frm.add_fetch("issued_to", "employee_name", "employee_name");
+cur_frm.add_fetch("purchase_receipt", "posting_date", "purchase_date");
 frappe.ui.form.on('Asset Issue Details', {
         onload: function(frm){
 		frm.set_query('item_code', function(doc, cdt, cdn) {
@@ -31,7 +32,7 @@ frappe.ui.form.on('Asset Issue Details', {
 			} 
 		});
 	},
-	"purchase_receipt": function(frm){
+	"purchase_receipt": function(frm){ 
 		frappe.call({
 			method: "frappe.client.get_value",
 			args: {

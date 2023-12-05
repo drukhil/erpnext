@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 cur_frm.add_fetch("target_custodian", "user_id", "target_user_id")
 cur_frm.add_fetch("target_custodian", "cost_center", "target_custodian_cost_center")
-
+cur_frm.add_fetch("asset", "purchase_date", "purchase_receipt");
 frappe.ui.form.on('Asset Movement', {
 	refresh: function(frm) {
 		if(frm.doc.docstatus == 1) {

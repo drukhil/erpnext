@@ -126,7 +126,7 @@ class Asset(Document):
 				cint(self.number_of_depreciations_booked)
 			current_value = flt(self.gross_purchase_amount) - (flt(self.opening_accumulated_depreciation) + flt(self.expected_value_after_useful_life))
 			if number_of_pending_depreciations and current_value > 0:
-				for n in xrange(number_of_pending_depreciations):
+				for n in range(number_of_pending_depreciations):
 					#frappe.throw("THHH " + str(self.number_of_depreciations_booked))
 					schedule_date = get_last_day(add_months(self.next_depreciation_date,
 						n * cint(self.frequency_of_depreciation)))

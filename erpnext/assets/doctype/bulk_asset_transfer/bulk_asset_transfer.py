@@ -3,6 +3,7 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+import datetime
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -78,12 +79,17 @@ class BulkAssetTransfer(Document):
 			self.docstatus == 2
 
 	def get_assets(self):
+		
 		if not self.purpose:
 			frappe.throw("Select a Purpose first!")
 		if self.cost_center and self.purpose == "Cost Center":
-			entries = frappe.db.sql("select name as asset_code, asset_name, gross_purchase_amount as gross_amount, cost_center, issued_to as custodian from tabAsset where status not in ('Scrapped', 'Sold') and cost_center = %s and docstatus = 1", self.cost_center, as_dict=True)
+			entries = frappe.db.sql("select name as asset_code, asset_name,purchase_date, gross_purchase_amount as gross_amount, cost_center, issued_to as custodian from tabAsset where status not in ('Scrapped', 'Sold') and cost_center = %s and docstatus = 1", self.cost_center, as_dict=True)
+			
+			self.get_purchase_date(entries)
+			
 		elif self.current_custodian and self.purpose == "Custodian":
-			entries = frappe.db.sql("select name as asset_code, asset_name, gross_purchase_amount as gross_amount, cost_center, issued_to as custodian from tabAsset where status not in ('Scrapped', 'Sold') and issued_to = %s and docstatus = 1", self.current_custodian, as_dict=True)
+			entries = frappe.db.sql("select name as asset_code, asset_name, purchase_date,gross_purchase_amount as gross_amount, cost_center, issued_to as custodian from tabAsset where status not in ('Scrapped', 'Sold') and issued_to = %s and docstatus = 1", self.current_custodian, as_dict=True)
+			self.get_purchase_date(entries)
 		else:
 			frappe.throw("Either select Cost Center or Custodian")
 		self.set('items', [])
@@ -113,6 +119,13 @@ class BulkAssetTransfer(Document):
 					equip.branch = branch
 					equip.save()
 					#save_equipment(equipment, branch, self.posting_date, self.name, "Cancel")
+	def get_purchase_date(self,data):
+		for item in data:
+			if item.asset_code:
+				item.purchase_receipt = item.purchase_date
+				frappe.errprint(str(item.purchase_date))
+		
+        
 
 	def delete_gl_entries(self):
 		frappe.db.sql("delete from `tabGL Entry` where voucher_no = %s", self.name)
