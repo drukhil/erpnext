@@ -165,6 +165,38 @@ class BankPayment(Document):
 						frappe.get_desk_link(self.doctype, j.name)
 					), title="Transaction Details")
 
+	def append_bank_response_in_bpi(self):
+		if self.payment_type == 'Bulk Payment':
+			file_list = []
+			for d in self.get("uploads"):
+				file_name = d.file_name
+				if file_name.endswith('.csv'):
+					file_list.append(file_name.replace('.csv', '_VALSUC.csv'))
+					file_list.append(file_name.replace('.csv', '_VALERR.csv'))
+				elif file_name.endswith('.txt'):
+					file_list.append(file_name.replace('.txt', '_SUC.txt'))
+					file_list.append(file_name.replace('.txt', '_ERR.txt'))
+
+			filepath = get_site_path('private', 'files', 'epayment', 'processed').rstrip("/") + "/"
+
+			for file in file_list:
+				file_path_to_check = filepath + file
+				if os.path.exists(file_path_to_check):
+					with open(file_path_to_check, 'r') as file:
+						csv_reader = csv.reader(file)
+						rows = list(csv_reader)
+
+						for idx, row in enumerate(rows):
+							if file_path_to_check.endswith('_VALERR.csv'):
+								if idx == len(rows) - 1:
+									continue
+							bank_account_no_from_ack = row[1]
+							bank_response = row[8]
+
+							for rec in self.items:
+								if rec.bank_account_no == bank_account_no_from_ack:
+									rec.db_set('error_message', bank_response)
+	
 	def update_transaction_status(self, cancel=False):
 		''' update respective transactions status '''
 		for i in self.get("items"):		
@@ -511,7 +543,7 @@ class BankPayment(Document):
 								)
 								ORDER BY je.posting_date
 							""".format(bank_payment = self.name, 
-                    		cond = cond), as_dict=True):
+							cond = cond), as_dict=True):
 			if a.voucher_type == "Contra Entry":
 				debit_amt = credit_amt = 0.00
 				debit_bank_account = 0
@@ -544,11 +576,11 @@ class BankPayment(Document):
 				credit_amt = debit_amt = other_credit = 0.00
 				party_type = party = reference_type = reference_name = ""
 				party_count = frappe.db.sql("""select count(distinct party) as party_count 
-                                from `tabJournal Entry Account` 
-                                where parent = '{journal_entry}'
-                                AND party IS NOT NULL
-                                AND party != ""
-                                """.format(journal_entry = a.transaction_id))[0][0]
+								from `tabJournal Entry Account` 
+								where parent = '{journal_entry}'
+								AND party IS NOT NULL
+								AND party != ""
+								""".format(journal_entry = a.transaction_id))[0][0]
 				for b in frappe.db.sql("""SELECT ja.name transaction_reference, ja.reference_type, 
 											ja.reference_name, ja.party_type, ja.party, ja.account,
 										round(ja.debit_in_account_currency,2) as debit_amount, 
@@ -832,7 +864,7 @@ class BankPayment(Document):
 						 (case when ir.final_settlement=1 then (select bank_branch from `tabEmployee` where name=ir.party) else (select bank_branch from `tabEmployee` where name=ir.pay_to_recd_from) end) as bank_branch,
 						 (case when ir.final_settlement=1 then (select bank_account_type from `tabEmployee` where name=ir.party) else (select bank_account_type from `tabEmployee` where name=ir.pay_to_recd_from) end) as bank_account_type,
 						 (case when ir.final_settlement=1 then (select bank_ac_no from `tabEmployee` where name=ir.party) else (select bank_ac_no from `tabEmployee` where name=ir.pay_to_recd_from) end) as bank_account_no,
-                         ir.purchase_amount as amount
+						 ir.purchase_amount as amount
 					FROM `tabImprest Recoup` ir
 					WHERE ir.branch = '{branch}'
 					{cond}
@@ -1157,59 +1189,59 @@ def get_intra_bank_file(doc, filename, posting_date, account_type="01"):
 	return filepath, noof_transactions
 
 def get_inter_bank_file(doc, filename, posting_date, account_type="01"):
-    ''' generate file in inter bank format and return the filename '''
+	''' generate file in inter bank format and return the filename '''
 
-    rec  = []
-    total_amount= 0
+	rec  = []
+	total_amount= 0
 
-    filepath	= ''
-    slno	= 0
-    paying_customer = frappe.db.get_value("Bank Payment Settings", doc.bank_name, "paying_customer")  
+	filepath	= ''
+	slno	= 0
+	paying_customer = frappe.db.get_value("Bank Payment Settings", doc.bank_name, "paying_customer")  
 
-    # get credit records for transactions
-    for i in doc.get("items"):
-        narration = str(doc.name) + ' ' + str(doc.remarks if doc.remarks else i.remarks)
-        if str(doc.bank_name) not in (str(i.bank_name),'INR') and i.status in ('Pending', 'Failed'):
-            slno += 1
-            amount_str = format_amount(i.amount)
-            frappe.get_doc('Bank Payment Item', i.name).db_set('file_name', filename+'.csv')
-            rec.append([slno, doc.bank_account_no, paying_customer, i.financial_system_code, i.bank_account_type,
-                   i.bank_account_no, i.beneficiary_name[:50], remove_special_characters(narration[:100]), "BTN", amount_str,
-                   posting_date.strftime("%Y%m%d"), 0, 0, filename.split("_")[-1]])
+	# get credit records for transactions
+	for i in doc.get("items"):
+		narration = str(doc.name) + ' ' + str(doc.remarks if doc.remarks else i.remarks)
+		if str(doc.bank_name) not in (str(i.bank_name),'INR') and i.status in ('Pending', 'Failed'):
+			slno += 1
+			amount_str = format_amount(i.amount)
+			frappe.get_doc('Bank Payment Item', i.name).db_set('file_name', filename+'.csv')
+			rec.append([slno, doc.bank_account_no, paying_customer, i.financial_system_code, i.bank_account_type,
+				   i.bank_account_no, i.beneficiary_name[:50], remove_special_characters(narration[:100]), "BTN", amount_str,
+				   posting_date.strftime("%Y%m%d"), 0, 0, filename.split("_")[-1]])
    
-            total_amount += flt(i.amount,2)
+			total_amount += flt(i.amount,2)
 
-    if len(rec):
-        # header row
-        total_amount_str = format_amount(total_amount)
-        rec = [["03", "001", "01", "FT01", "001", "BHUB", "RMAB", "1", "1",  posting_date.strftime("%Y%m%d%H%M%S"),
-                    posting_date.strftime("%Y%m%d") , len(rec), total_amount_str, filename.split("_")[-1]]] + rec
+	if len(rec):
+		# header row
+		total_amount_str = format_amount(total_amount)
+		rec = [["03", "001", "01", "FT01", "001", "BHUB", "RMAB", "1", "1",  posting_date.strftime("%Y%m%d%H%M%S"),
+					posting_date.strftime("%Y%m%d") , len(rec), total_amount_str, filename.split("_")[-1]]] + rec
 
-    # generate file if both debit and credit records exist
-    if rec:
-        filepath = get_site_path('private','files','epayment','upload').rstrip("/")+"/"
-        if not os.path.exists(filepath):
-            os.makedirs(filepath)
+	# generate file if both debit and credit records exist
+	if rec:
+		filepath = get_site_path('private','files','epayment','upload').rstrip("/")+"/"
+		if not os.path.exists(filepath):
+			os.makedirs(filepath)
 
-        filepath = filepath+filename+'.csv'
-        with open(filepath, 'w') as file:
-            writer = csv.writer(file)
-            writer.writerows(rec)
+		filepath = filepath+filename+'.csv'
+		with open(filepath, 'w') as file:
+			writer = csv.writer(file)
+			writer.writerows(rec)
 
-    noof_transactions = slno
-    return filepath, noof_transactions
+	noof_transactions = slno
+	return filepath, noof_transactions
 
 def format_amount(amount):
-    amount_str = str(flt(amount,2))
-    amount_str_nu = amount_str.split(".")[0] 
-    amount_str_ch = amount_str.split(".")[1].ljust(2,"0")
-    amount_str =  str(amount_str_nu) + "." + str(amount_str_ch)
-    return amount_str
+	amount_str = str(flt(amount,2))
+	amount_str_nu = amount_str.split(".")[0] 
+	amount_str_ch = amount_str.split(".")[1].ljust(2,"0")
+	amount_str =  str(amount_str_nu) + "." + str(amount_str_ch)
+	return amount_str
 
 def remove_special_characters(narration):
-    import re
-    formatted_narration = re.sub('[^A-Za-z0-9]+', ' ', str(narration))
-    return formatted_narration
+	import re
+	formatted_narration = re.sub('[^A-Za-z0-9]+', ' ', str(narration))
+	return formatted_narration
 
 def get_inr_bank_file(doc, filename, posting_date):
 	posting_date = posting_date.strftime("%Y%m%d%H%M%S") 
