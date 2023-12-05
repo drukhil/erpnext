@@ -220,7 +220,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "project_category", 
@@ -347,7 +347,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "project_sub_category", 
@@ -2056,7 +2056,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 4, 
- "modified": "2023-10-30 18:52:56.629227", 
+ "modified": "2023-12-05 16:00:09.227480", 
  "modified_by": "Administrator", 
  "module": "Projects", 
  "name": "Project", 
