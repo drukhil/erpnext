@@ -56,7 +56,7 @@ class BMTProject(Document):
 		for d in entries:
 			row = self.append('items', {})
 			row.update(d)
-
+""" This function exec from hooks daily """
 def update_bmt():
 	pro = frappe.db.sql("""select name from `tabBMT Project`""",  as_dict=True)
 	for a in pro:

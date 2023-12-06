@@ -320,7 +320,14 @@ class ImprestRecoup(StockController):
 		expense_bank_account = frappe.get_doc("Branch", self.branch).expense_bank_account
 		if not expense_bank_account:
 			frappe.throw("Set Up Expense Bank Account in Branch")
+
                 if self.final_settlement and self.closing_balance:
+                        account_type = frappe.db.get_value("Account", self.settlement_account, "account_type")
+                        party_type = party = ""
+                        if account_type in ("Receivable", "Payable"):
+                                party_type = self.party_type
+                                party = self.party
+                        
                         je = frappe.new_doc("Journal Entry")
                         je.flags.ignore_permissions = 1
                         je.update({
@@ -338,7 +345,9 @@ class ImprestRecoup(StockController):
                                 "credit_in_account_currency": self.opening_balance,
                                 "reference_type": self.doctype,
                                 "reference_name": self.name,
-                                "cost_center": self.cost_center
+                                "cost_center": self.cost_center,
+                                "party_type": party_type,
+				"party": party,
                                 })
 
                         #debit account update
