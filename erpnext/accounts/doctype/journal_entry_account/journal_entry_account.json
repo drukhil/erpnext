@@ -544,7 +544,7 @@
    "label": "Reference Type", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "\nSales Invoice\nPurchase Invoice\nJournal Entry\nSales Order\nPurchase Order\nExpense Claim\nAsset", 
+   "options": "\nSales Invoice\nPurchase Invoice\nJournal Entry\nSales Order\nPurchase Order\nExpense Claim\nAsset\nImprest Recoup", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -695,8 +695,8 @@
  "issingle": 0, 
  "istable": 1, 
  "max_attachments": 0, 
- "modified": "2019-06-13 11:55:17.841732", 
- "modified_by": "dorji2392@bt.bt", 
+ "modified": "2023-12-06 17:52:00.096255", 
+ "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Journal Entry Account", 
  "owner": "Administrator", 
@@ -705,6 +705,6 @@
  "read_only": 0, 
  "read_only_onload": 0, 
  "sort_order": "DESC", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }
