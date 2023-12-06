@@ -317,7 +317,7 @@ class ImprestRecoup(StockController):
 
 
 	def make_adjustment_jv(self):
-		expense_bank_account = frappe.get_doc("Branch", self.bank).expense_bank_account
+		expense_bank_account = frappe.get_doc("Branch", self.branch).expense_bank_account
 		if not expense_bank_account:
 			frappe.throw("Set Up Expense Bank Account in Branch")
                 if self.final_settlement and self.closing_balance:
