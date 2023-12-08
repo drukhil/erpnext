@@ -8,14 +8,26 @@ frappe.query_reports["Asset Movement Register"] = {
                         "label": ("From Date"),
                         "fieldtype": "Date",
                         "width": "80",
-                        "reqd": 1
+                       // "reqd": 1
                 },
                 {
                         "fieldname":"to_date",
                         "label": ("To Date"),
                         "fieldtype": "Date",
                         "width": "80",
-                        "reqd": 1
+                        //"reqd": 1
+                },
+                {
+                        "fieldname":"type",
+                        "label": ("Type"),
+                        "fieldtype": "Select",
+                        "width": "80",
+                        options:[
+                               
+                                 'Asset Movement',
+                                "Bulk Asset Transfer"
+                        ]
+                        //"reqd": 1
                 },
 	]
 }
