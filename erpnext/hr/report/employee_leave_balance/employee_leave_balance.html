@@ -1,0 +1,46 @@
+{%
+	if (report.columns.length > 10) {
+		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
+	}
+%} 
+
+<h2 class="text-center">Gyalsung Infra - Employee Leave Balance</h2>
+
+<!--div style="float: right;">
+	<strong>Date: </strong>{%= dateutil.str_to_user(dateutil.get_datetime_as_string().split(' ')[0]) %}
+</div-->
+
+<table style="width: 100%;">
+	<tr>
+		<td width="250px">From Date:</td><td><strong>{%= dateutil.str_to_user(filters.from_date) %}</strong></td>
+		<td width="250px">To Date: </td><td><strong>{%= dateutil.str_to_user(filters.to_date) %}</strong></td>
+	</tr>
+</table>
+
+<hr>
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			{% for(var i=0, l=report.columns.length; i<l; i++) { %}
+				<th class="text-right">{%= report.columns[i].label %}</th>
+			{% } %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for(var j=0, k=data.length; j<k; j++) { %}
+			{%
+				var row = data[j]
+			%}
+			<tr>
+				{% for(var i=0, l=report.columns.length; i<l; i++) { %}
+					<td class="text-right">
+						{% var fieldname = report.columns[i].field; %}
+						{% if (!is_null(row[fieldname])) { %}
+							{%= row[fieldname] %}
+						{% } %}
+					</td>
+				{% } %}
+			</tr>
+		{% } %}
+	</tbody>
+</table>
