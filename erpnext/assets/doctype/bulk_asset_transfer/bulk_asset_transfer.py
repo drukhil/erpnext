@@ -41,6 +41,7 @@ class BulkAssetTransfer(Document):
 		for a in self.items:
 			doc = frappe.get_doc("Asset", a.asset_code)
 			doc.db_set("issued_to", self.custodian)
+			doc.db_set("employee_name", self.custodian_name)
 
 			if a.cost_center != self.custodian_cost_center:
 				doc.db_set("cost_center", self.custodian_cost_center)
@@ -77,7 +78,8 @@ class BulkAssetTransfer(Document):
 		for a in self.items:
 			check_valid_asset_transfer(a.asset_code, self.posting_date)
 			doc = frappe.get_doc("Asset", a.asset_code)
-			doc.db_set("issued_to", a.custodian)
+			doc.db_set("issued_to", self.current_custodian)
+			doc.db_set("employee_name", self.c_custodian_name)
 
 			if a.cost_center != self.custodian_cost_center:
 				branch = frappe.db.get_value("Cost Center", a.cost_center, "branch")
