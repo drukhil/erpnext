@@ -22,6 +22,9 @@ frappe.ui.form.on('Bulk Asset Transfer', {
 			}, __("View"));
 		}
 	},
+	setup: function(frm) {
+		frm.get_docfield("items").allow_bulk_edit = 1;
+	},
 	get_assets: function(frm) {
 		return frappe.call({
 			method: "get_assets",
