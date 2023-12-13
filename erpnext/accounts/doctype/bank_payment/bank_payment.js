@@ -8,6 +8,8 @@ cur_frm.add_fetch("paid_from", "bank_account_type", "bank_account_type");
 cur_frm.add_fetch("paid_from", "bank_account_no", "bank_account_no");	
 frappe.ui.form.on('Bank Payment', {
 	setup: function(frm){
+		frm.get_docfield("items").allow_bulk_edit = 1;
+
 		var status = {"Draft": "tomato",
                         "Pending": "orange",
                         "In progress": "blue",
