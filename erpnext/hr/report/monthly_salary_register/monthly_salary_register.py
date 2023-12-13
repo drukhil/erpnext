@@ -17,78 +17,134 @@ def execute(filters=None):
 	if not filters: filters = {}
 	
 	data    = []
-        columns = []
-        salary_slips = get_salary_slips(filters)
+	columns = []
+	if filters.get("report_type") == "Salary":
+		salary_slips = get_salary_slips(filters)
+	else:
+		salary_slips = get_salary_arrears(filters)
+
 	if not salary_slips:
-                return columns, data
-        
-	columns, earning_types, ded_types = get_columns(salary_slips)
+		return columns, data
+		
+	columns, earning_types, ded_types = get_columns(salary_slips, filters)
 	ss_earning_map = get_ss_earning_map(salary_slips)
 	ss_ded_map = get_ss_ded_map(salary_slips)
 	
 	for ss in salary_slips:
-                status = ""
-                if ss.docstatus == 1:
-                        status = "Submitted"
-                elif ss.docstatus == 0:
-                        status = "Un-Submitted"
-                elif ss.docstatus == 2:
-                        status = "Cancelled"
-                else:
-                        status = str(ss.docstatus)
-                        
-		row = [ss.employee, ss.employee_name,
-			ss.bank_name, ss.bank_account_no, 
-			ss.company, ss.branch, ss.department,
-                         ss.division, ss.section, ss.employee_grade, ss.designation, 
-ss.employment_type,		 ss.fiscal_year, ss.month, ss.leave_withut_pay, ss.payment_days,
-                         status]
+		status = ""
+		if ss.docstatus == 1:
+			status = "Submitted"
+		elif ss.docstatus == 0:
+			status = "Un-Submitted"
+		elif ss.docstatus == 2:
+			status = "Cancelled"
+		else:
+			status = str(ss.docstatus)
 			
-		for e in earning_types:
-			row.append(ss_earning_map.get(ss.name, {}).get(e))
+		cid, joining_date = frappe.db.get_value("Employee", ss.employee, ["passport_number","date_of_joining"])
+
+		if filters.get("report_type") == "Salary":			
+			row = [ss.employee, ss.employee_name,
+				ss.bank_name, ss.bank_account_no, 
+				ss.company, ss.branch, ss.department,
+				ss.division, ss.section, ss.employee_grade, ss.designation, 
+				ss.employment_type, ss.fiscal_year, ss.month, ss.leave_withut_pay, ss.payment_days,
+				status]
+		else:
+			row = [
+				ss.employee, ss.employee_name, ss.employment_type, cid, joining_date,
+				ss.bank_name, ss.bank_ac_no, 
+				ss.cost_center, ss.branch, ss.department,
+				ss.division, ss.section, ss.unit, ss.region, ss.employee_grade, ss.designation, 
+				ss.fiscal_year, ss.from_month,
+				status, ss.prev_basic_pay, ss.prev_corporate,
+				ss.prev_contract, ss.prev_officiating, ss.prev_pda, 
+				ss.prev_shift_allowance, ss.prev_underground_allowance,
+				ss.prev_hc, ss.previous_pf, ss.previous_employer_pf, ss.previous_salary_tax,
+				ss.basic_pay, ss.corporate_allowance,
+				ss.contract_allowance, ss.officiating_allowance, ss.fixed_allowance, 
+				ss.pda, ss.shift_allowance, ss.underground_allowance,
+				ss.health_contribution, ss.pf, ss.employer_pf, ss.salary_tax,
+				ss.arrear_basic_pay, ss.arrear_corporate_allowance,
+				ss.arrear_contract_allowance, ss.arrear_officiating_allowance, 
+				ss.arrear_pda, ss.arrear_shift_allowance, ss.arrear_underground_allowance,
+				ss.arrear_hc, ss.arrear_pf, ss.arrear_employer_pf, ss.arrear_salary_tax, ss.total_deduction,
+				ss.new_gross_pay, ss.net_payable_arrear
+				]
+		if filters.get("report_type") == "Salary":
+			for e in earning_types:
+				row.append(ss_earning_map.get(ss.name, {}).get(e))
+				
+			row += [ss.arrear_amount, ss.leave_encashment_amount, ss.gross_pay]
 			
-		row += [ss.arrear_amount, ss.leave_encashment_amount, ss.gross_pay]
-		
-		for d in ded_types:
-			row.append(ss_ded_map.get(ss.name, {}).get(d))
-		
-		row += [ss.total_deduction, ss.net_pay]
+			for d in ded_types:
+				row.append(ss_ded_map.get(ss.name, {}).get(d))
+			
+			row += [ss.total_deduction, ss.net_pay]
 		
 		data.append(row)
 	
 	return columns, data
 	
-def get_columns(salary_slips):
-	columns = [
-		_("Employee") + ":Link/Employee:80", _("Employee Name") + "::140",
-		_("Bank Name")+ "::80", _("Bank A/C#")+"::100", 
-		_("Company") + ":Link/Company:120",
-                _("Branch") + ":Link/Branch:120", _("Department") + ":Link/Department:120", _("Division") + ":Link/Division:120",
-                _("Section") + ":Link/Section:120",_("Grade") + "::80", _("Designation") + ":Link/Designation:120", _("Employment Type") + "::100",
-		_("Year") + "::80", _("Month") + "::80", _("Leave Without Pay") + ":Float:130", 
-		_("Payment Days") + ":Float:120", _("Status") + "::100"
-	]
+def get_columns(salary_slips, filters):
+	if filters.get("report_type") == "Salary":
+		columns = [
+			_("Employee") + ":Link/Employee:80", _("Employee Name") + "::140",
+			_("Bank Name")+ "::80", _("Bank A/C#")+"::100", 
+			_("Company") + ":Link/Company:120",
+			_("Branch") + ":Link/Branch:120", _("Department") + ":Link/Department:120", _("Division") + ":Link/Division:120",
+			_("Section") + ":Link/Section:120",_("Grade") + "::80", _("Designation") + ":Link/Designation:120", _("Employment Type") + "::100",
+			_("Year") + "::80", _("Month") + "::80", _("Leave Without Pay") + ":Float:130", 
+			_("Payment Days") + ":Float:120", _("Status") + "::100"
+		]
+	else:
+		columns = [
+			_("Employee") + ":Link/Employee:80", _("Employee Name") + "::140", _("Employment Type") + ":Link/Employment Type:120",
+			_("CID No") + "::120", _("Joining Date") + ":Date:100", _("Bank Name")+ "::80", _("Bank A/C#")+"::100", 
+			_("Company") + ":Link/Company:120",
+			_("Cost Center") + ":Link/Cost Center:120",
+			_("Branch") + ":Link/Branch:120", _("Department") + ":Link/Department:120", _("Division") + ":Link/Division:120",
+			_("Section") + ":Link/Section:120",  _("Unit") + ":Link/Unit:120",
+			_("Grade") + ":Link/Employee Grade:120", _("Designation") + ":Link/Designation:120",
+			_("Year") + "::80", _("Month") + "::80", 
+			_("Status") + "::100"
+		]
+
 	earning_types = []
 	ded_types     = []
 
-        earning_types = frappe.db.sql_list("""select salary_component from `tabSalary Detail`
-                        where amount != 0 and parent in (%s)
-                        and parentfield = 'earnings'
-                        group by salary_component
-                        order by count(*) desc""" % 
-                        (', '.join(['%s']*len(salary_slips))), tuple([d.name for d in salary_slips]))
+	earning_types = frappe.db.sql_list("""select salary_component from `tabSalary Detail`
+					where amount != 0 and parent in (%s)
+					and parentfield = 'earnings'
+					group by salary_component
+					order by count(*) desc""" % 
+					(', '.join(['%s']*len(salary_slips))), tuple([d.name for d in salary_slips]))
 		
-        ded_types = frappe.db.sql_list("""select salary_component from `tabSalary Detail`
-                        where amount != 0 and parent in (%s)
-                        and parentfield = 'deductions'
-                        group by salary_component
-                        order by count(*) desc""" % 
-                        (', '.join(['%s']*len(salary_slips))), tuple([d.name for d in salary_slips]))
-		
-        columns = columns + [(e + ":Currency:120") for e in earning_types] + \
-                        ["Arrear Amount:Currency:120", "Leave Encashment Amount:Currency:150", 
-                        "Gross Pay:Currency:120"] + [(d + ":Currency:120") for d in ded_types] + \
-                        ["Total Deduction:Currency:120", "Net Pay:Currency:120"]
+	ded_types = frappe.db.sql_list("""select salary_component from `tabSalary Detail`
+					where amount != 0 and parent in (%s)
+					and parentfield = 'deductions'
+					group by salary_component
+					order by count(*) desc""" % 
+					(', '.join(['%s']*len(salary_slips))), tuple([d.name for d in salary_slips]))
+	if filters.get("report_type") == "Salary":
+		columns = columns + [(e + ":Currency:120") for e in earning_types] + \
+						["Arrear Amount:Currency:120", "Leave Encashment Amount:Currency:150", 
+						"Gross Pay:Currency:120"] + [(d + ":Currency:120") for d in ded_types] + \
+						["Total Deduction:Currency:120", "Net Pay:Currency:120"]
+	else:
+		columns = columns + ["Previous Basic Pay:Currency:120", "Previous Corporate Allowance:Currency:150", 
+				"Previous Contract Allowance:Currency:120", "Previous Officiating Allowance:Currency:150", 
+				"Previous PDA:Currency:150", "Previous Shift Allowance:Currency:150", "Previous Underground Allowance:Currency:150",
+				"Previous Health Contribution:Currency:150", "Previous PF:Currency:150", "Previous Employer PF:Currency:150", "Previous Salary Tax:Currency:150",
+				"New Basic Pay:Currency:120", "New Corporate Allowance:Currency:150", 
+				"New Contract Allowance:Currency:120", "New Officiating Allowance:Currency:150", "Fixed Allowance:Currency:150",
+				"New PDA:Currency:150", "New Shift Allowance:Currency:150", "New Underground Allowance:Currency:150",
+				"New Health Contribution:Currency:150", "New PF:Currency:150", "New Employer PF:Currency:150", "New Salary Tax:Currency:150",
+				"Arrear Basic Pay:Currency:120", "Arrear Corporate Allowance:Currency:150", 
+				"Arrear Contract Allowance:Currency:120", "Arrear Officiating Allowance:Currency:150",
+				"Arrear PDA:Currency:150", "Arrear Shift Allowance:Currency:150", "Arrear Underground Allowance:Currency:150",
+				"Arrear Health Contribution:Currency:150","Arrear PF:Currency:150", "Arrear Employer PF:Currency:150", 
+				"Arrear Salary Tax:Currency:150", "Total Arerar Deduction:Currency:150", "Arrear Gross Pay:Currency:150", "Net Arrear Payable:Currency:150"]
 
 	return columns, earning_types, ded_types
 	
@@ -101,9 +157,35 @@ def get_salary_slips(filters):
 	if not salary_slips:
 		msgprint(_("No salary slip found for month: ") + cstr(filters.get("month")) + 
 			_(" and year: ") + cstr(filters.get("fiscal_year")), raise_exception=1)
-        '''
-	
+		'''
 	return salary_slips
+
+def get_salary_arrears(filters):
+	conditions, filters = get_arrear_conditions(filters)
+	salary_slips = frappe.db.sql("""select sapi.*, sap.*, e.employee_subgroup as employee_grade, e.designation, e.employment_type, e.cost_center, e.branch, e.department, e.division, e.section, e.unit from `tabSalary Arrear Payment` sap, `tabSalary Arrear Payment Item` sapi, `tabEmployee` e where e.name = sapi.employee and sapi.parent = sap.name {}
+		order by sap.from_month, sap.fiscal_year""".format(conditions), as_dict=1)
+
+	return salary_slips
+
+def get_arrear_conditions(filters):
+	conditions = ""
+	if filters.get("month"):
+		conditions += " and sap.from_month = '{}'".format(filters.get("month"))
+	
+	if filters.get("fiscal_year"): conditions += " and sap.fiscal_year = '{}'".format(filters.get("fiscal_year"))
+	if filters.get("company"): conditions += " and sap.company = '{}'".format(filters.get("company"))
+	if filters.get("employee"): conditions += " and sapi.employee = '{}'".format(filters.get("employee"))
+	
+	if filters.get("process_status") == "All":
+		conditions += " and sap.docstatus = sap.docstatus"
+	elif filters.get("process_status") == "Submitted":
+		conditions += " and sap.docstatus = 1"
+	elif filters.get("process_status") == "Un-Submitted":
+		conditions += " and sap.docstatus = 0"
+	elif filters.get("process_status") == "Cancelled":
+		conditions += " and sap.docstatus = 2"
+	
+	return conditions, filters
 	
 def get_conditions(filters):
 	conditions = ""
@@ -117,31 +199,30 @@ def get_conditions(filters):
 	if filters.get("company"): conditions += " and company = %(company)s"
 	if filters.get("employee"): conditions += " and employee = %(employee)s"
 	
-        if filters.get("process_status") == "All":
-                conditions += " and docstatus = docstatus"
-        elif filters.get("process_status") == "Submitted":
-                conditions += " and docstatus = 1"
-        elif filters.get("process_status") == "Un-Submitted":
-                conditions += " and docstatus = 0"
-        elif filters.get("process_status") == "Cancelled":
-                conditions += " and docstatus = 2"
-
+	if filters.get("process_status") == "All":
+		conditions += " and docstatus = docstatus"
+	elif filters.get("process_status") == "Submitted":
+		conditions += " and docstatus = 1"
+	elif filters.get("process_status") == "Un-Submitted":
+		conditions += " and docstatus = 0"
+	elif filters.get("process_status") == "Cancelled":
+		conditions += " and docstatus = 2"
 	
 	return conditions, filters
 	
 def get_ss_earning_map(salary_slips):
 	ss_earning_map = {}
 
-        ss_earnings = frappe.db.sql("""select parent, salary_component, sum(ifnull(amount,0)) as amount 
-                        from `tabSalary Detail` where parent in (%s)
-                        and parentfield = 'earnings'
-                        group by parent, salary_component
-                        """ %
-                        (', '.join(['%s']*len(salary_slips))), tuple([d.name for d in salary_slips]), as_dict=1)
-                
-        for d in ss_earnings:
-                ss_earning_map.setdefault(d.parent, frappe._dict()).setdefault(d.salary_component, [])
-                ss_earning_map[d.parent][d.salary_component] = flt(d.amount)
+	ss_earnings = frappe.db.sql("""select parent, salary_component, sum(ifnull(amount,0)) as amount 
+					from `tabSalary Detail` where parent in (%s)
+					and parentfield = 'earnings'
+					group by parent, salary_component
+					""" %
+					(', '.join(['%s']*len(salary_slips))), tuple([d.name for d in salary_slips]), as_dict=1)
+			
+	for d in ss_earnings:
+		ss_earning_map.setdefault(d.parent, frappe._dict()).setdefault(d.salary_component, [])
+		ss_earning_map[d.parent][d.salary_component] = flt(d.amount)
 	
 	return ss_earning_map
 
