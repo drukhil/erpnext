@@ -974,7 +974,7 @@
    "print_hide_if_no_value": 0, 
    "read_only": 0, 
    "report_hide": 0, 
-   "reqd": 1, 
+   "reqd": 0, 
    "search_index": 0, 
    "set_only_once": 0, 
    "unique": 0
@@ -1095,7 +1095,7 @@
    "print_hide_if_no_value": 0, 
    "read_only": 0, 
    "report_hide": 0, 
-   "reqd": 1, 
+   "reqd": 0, 
    "search_index": 0, 
    "set_only_once": 0, 
    "unique": 0
@@ -4294,7 +4294,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2023-12-14 08:38:10.664064", 
+ "modified": "2023-12-14 11:41:58.291677", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Sales Order", 
