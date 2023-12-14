@@ -25,7 +25,7 @@ class BudgetReappropiation(Document):
 			self.created_by = frappe.session.user
 			self.creator_name = frappe.db.get_value("Employee", {"user_id":self.created_by},"employee_name")
 		
-		if self.workflow_state=="Waiting Verifying" and not self.applied_by:
+		if self.workflow_state=="Waiting For Verification" and not self.applied_by:
 			self.applied_by = frappe.session.user 
 			self.applied_name = frappe.db.get_value("Employee", {"user_id":self.applied_by},"employee_name")
 		

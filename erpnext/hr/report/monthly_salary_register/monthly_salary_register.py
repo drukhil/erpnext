@@ -41,7 +41,7 @@ def execute(filters=None):
 		else:
 			status = str(ss.docstatus)
 			
-		cid, joining_date = frappe.db.get_value("Employee", ss.employee, ["passport_number","date_of_joining"])
+		cid, joining_date, tpn_number = frappe.db.get_value("Employee", ss.employee, ["passport_number","date_of_joining", "tpn_number"])
 
 		if filters.get("report_type") == "Salary":			
 			row = [ss.employee, ss.employee_name,
@@ -53,7 +53,7 @@ def execute(filters=None):
 		else:
 			row = [
 				ss.employee, ss.employee_name, ss.employment_type, cid, joining_date,
-				ss.bank_name, ss.bank_ac_no, 
+				ss.bank_name, ss.bank_ac_no, tpn_number,
 				ss.cost_center, ss.branch, ss.department,
 				ss.division, ss.section, ss.unit, ss.region, ss.employee_grade, ss.designation, 
 				ss.fiscal_year, ss.from_month,
@@ -100,7 +100,7 @@ def get_columns(salary_slips, filters):
 	else:
 		columns = [
 			_("Employee") + ":Link/Employee:80", _("Employee Name") + "::140", _("Employment Type") + ":Link/Employment Type:120",
-			_("CID No") + "::120", _("Joining Date") + ":Date:100", _("Bank Name")+ "::80", _("Bank A/C#")+"::100", 
+			_("CID No") + "::120", _("Joining Date") + ":Date:100", _("Bank Name")+ "::80", _("Bank A/C#")+"::100", _("TPN Number") + ":Data:100",
 			_("Company") + ":Link/Company:120",
 			_("Cost Center") + ":Link/Cost Center:120",
 			_("Branch") + ":Link/Branch:120", _("Department") + ":Link/Department:120", _("Division") + ":Link/Division:120",

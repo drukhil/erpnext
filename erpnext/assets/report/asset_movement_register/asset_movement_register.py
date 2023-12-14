@@ -28,14 +28,18 @@ def get_columns(filters):
                               {
                         "fieldname": "name",
                         "label": ("Transaction Id"),
-                        "fieldtype": "Data",
+			"fieldtype": "Link",
+			"options": "Asset Movement",
+                     #   "fieldtype": "Data",
                        
                         "width": 100
                 },
                 {
                         "fieldname": "asset",
                         "label": ("Asset Code"),
-                        "fieldtype": "Data",
+                        "fieldtype": "Link",
+                        "options": "Asset",
+                        #"fieldtype": "Data",
                         "width": 200
                 },
                 {
@@ -84,7 +88,9 @@ def get_columns(filters):
                               {
                         "fieldname": "bulk_id",
                         "label": ("Transaction Id"),
-                        "fieldtype": "Data",
+                        "fieldtype": "Link",
+                        "options": "Bulk Asset Transfer",
+                        #"fieldtype": "Data",
                        
                         "width": 100
                 },
@@ -92,7 +98,9 @@ def get_columns(filters):
                 {
                         "fieldname": "asset_code",
                         "label": ("Asset Code"),
-                        "fieldtype": "Data",
+                        "fieldtype": "Link",
+                        "options": "Asset",
+                        #"fieldtype": "Data",
                         "width": 200
                 },
                 {
