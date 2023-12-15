@@ -239,7 +239,7 @@ def inter_payment(Amt, PayeeAcctNum, BnfcryAcct, BnfcryName, BnfcryAcctTyp, Bnfc
                         <!--Optional:-->
                         <ban:BlinkJrnlNum></ban:BlinkJrnlNum>
                         <ban:UUIDSource></ban:UUIDSource>
-                        <ban:UUIDNUM></ban:UUIDNUM>
+                        <ban:UUIDNUM>{10}</ban:UUIDNUM>
                         <!--Optional:-->
                         <ban:UUIDSeqNo></ban:UUIDSeqNo>
                         </ban:RqHeader>
