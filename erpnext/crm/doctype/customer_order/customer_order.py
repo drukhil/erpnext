@@ -30,7 +30,7 @@ class CustomerOrder(Document):
 		self.update_user_details()
 		self.create_customer()
 		self.get_site_details()
-		self.disallow_making_order()
+		#self.disallow_making_order() commented by Thukten to allow other types of sand delivery
 
 	#Disallow making orders if previous order are not delivered
 	def disallow_making_order(self):
