@@ -8,19 +8,19 @@ from frappe.utils import flt, getdate, formatdate, cstr
 from operator import itemgetter
 
 def execute(filters=None):
-	validate_filters(filters);
-	columns = get_columns();
-	queries = construct_query(filters);
-	data = get_data(queries, filters);
+	validate_filters(filters)
+	columns = get_columns()
+	queries = construct_query(filters)
+	data = get_data(queries, filters)
 
 	return columns, data, filters
 
 def get_data(query, filters=None):
 	data = []
-	datas = frappe.db.sql(query, as_dict=True);
+	datas = frappe.db.sql(query, as_dict=True)
 	for d in datas:
 		row = [d.month, "Salary", d.basic_pay, round(flt(d.gross_pay) - flt(d.basic_pay) - (flt(d.comm_all) / 2), 2), round(flt(d.gross_pay)-(flt(d.comm_all) / 2),2), round(flt(d.gross_pay)-(flt(d.comm_all) / 2),2), d.nppf,d.gis, flt(d.gross_pay) - flt(d.nppf) - flt(d.gis) - (flt(d.comm_all) / 2), d.tds, d.health, d.receipt_number, d.receipt_date]
-		data.append(row);
+		data.append(row)
 
 	#Leave Encashment 
 	if filters.employee:
@@ -31,40 +31,71 @@ def get_data(query, filters=None):
 				data.append(row)
 	
 		#Bonus
-                bonus = frappe.db.sql("""
+		bonus = frappe.db.sql("""
                                         select distinct b.name, b.fiscal_year, b.posting_date, r.receipt_number, r.receipt_date 
                                         from tabBonus b, `tabRRCO Receipt Entries` r
                                         where b.fiscal_year = r.fiscal_year and b.docstatus = 1 and b.posting_date between %s and %s and r.purpose = 'Annual Bonus' 
                                       """, (str(filters.fiscal_year) + "-01-01", str(filters.fiscal_year) + "-12-31"), as_dict=1)
-                for b in bonus:
-                        amt = frappe.db.sql("""
+		for b in bonus:
+			
+			amt = frappe.db.sql("""
                                         select amount, tax_amount, balance_amount  
                                         from `tabBonus Details` 
                                         where parent = %s and employee = %s
                                       """, (b.name, filters.employee), as_dict=1)
-                        for a in amt:
-                                row = [str(b.posting_date)[5:7], "Bonus", a.amount, 0, a.amount, a.amount, 0, 0, a.amount, a.tax_amount, 0, b.receipt_number, b.receipt_date]
-                                data.append(row)
+			for a in amt:
+				
+				row = [str(b.posting_date)[5:7], "Bonus", a.amount, 0, a.amount, a.amount, 0, 0, a.amount, a.tax_amount, 0, b.receipt_number, b.receipt_date]
+				data.append(row)
 
 		#PVBA
-                pbva = frappe.db.sql("""
+		pbva = frappe.db.sql("""
                                         select distinct b.name, b.fiscal_year, b.posting_date, r.receipt_number, r.receipt_date 
                                         from tabPBVA b, `tabRRCO Receipt Entries` r
                                         where b.fiscal_year = r.fiscal_year and b.docstatus = 1 and b.posting_date between %s and %s and r.purpose = 'PBVA' 
                                       """, (str(filters.fiscal_year) + "-01-01", str(filters.fiscal_year) + "-12-31"), as_dict=1)
-                for b in pbva:
-                        amt = frappe.db.sql("""
+		for b in pbva:
+			amt = frappe.db.sql("""
                                         select amount, tax_amount, balance_amount  
                                         from `tabPBVA Details` 
                                         where parent = %s and employee = %s
                                       """, (b.name, filters.employee), as_dict=1)
-                        for a in amt:
-                                row = [str(b.posting_date)[5:7], "PBVA", a.amount, 0, a.amount, a.amount, 0, 0, a.amount, a.tax_amount, 0, b.receipt_number, b.receipt_date]
-                                data.append(row)
-
+			for a in amt:
+				row = [str(b.posting_date)[5:7], "PBVA", a.amount, 0, a.amount, a.amount, 0, 0, a.amount, a.tax_amount, 0, b.receipt_number, b.receipt_date]
+				data.append(row)
+                
+            #Salary arrear 
+		salary_arrear = frappe.db.sql(""" SELECT
+                                t3.month,
+                                t3.tds_receipt_date as receipt_date, 
+                                t3.purpose,
+                                ifnull(t2.arrear_corporate_allowance+t2.arrear_contract_allowance+t2.arrear_project_allowance+t2.arrear_mpi+t2.arrear_scarcity_allowance+t2.arrear_officiating_allowance,0) as others,
+                                t3.tds_receipt_number as receipt_number,
+                                t2.arrear_basic_pay as basic,
+                                t2.new_gross_pay as gross,
+                                t2.new_gross_pay as total,
+                                t2.arrear_salary_tax as tds,
+                                0 as gis,
+                                t3.purpose as type,
+                                t2.arrear_hc as health,
+                                t2.arrear_pf as nppf,
+                                t2.new_gross_pay - t2.arrear_pf  AS taxable
+                                FROM `tabSalary Arrear Payment Item` t2 left JOIN `tabRRCO Receipt Tool` t3 ON t3.purpose = "Salary Arrears" 
+                                where t3.docstatus = 1 and t2.docstatus=1 and t2.employee ='{employee}' and t3.fiscal_year = '{fiscal_year}' 
+                                
+                                
+                                
+                           """.format(employee = filters.employee,fiscal_year = filters.fiscal_year),as_dict=True)
+		frappe.errprint(str(salary_arrear))
+		for a in salary_arrear:
+			
+			row =[a.month, a.type,a.basic,a.others,a.gross,a.total,a.nppf,a.gis,a.taxable,a.tds,a.health,a.receipt_number, a.receipt_date]	
+			data.append(row)
+   
+   
 	data = sorted(data, key=itemgetter(0))
-        for a in data:
-                a[0] = get_month(a[0])
+	for a in data:
+		a[0] = get_month(a[0])
 
 	return data
 
@@ -81,11 +112,11 @@ def construct_query(filters=None):
 	 where a.fiscal_year = r.fiscal_year and a.month = r.month and a.docstatus = 1 and a.fiscal_year = """ + str(filters.fiscal_year)
 
 	if filters.employee:
-		query = query + " AND a.employee = \'" + str(filters.employee) + "\'";
+		query = query + " AND a.employee = \'" + str(filters.employee) + "\'"
 
-	query+=";";
+	query+=";"
 	
-	return query;
+	return query
 
 def validate_filters(filters):
 
