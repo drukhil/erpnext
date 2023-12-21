@@ -69,7 +69,7 @@ def get_data(query, filters=None):
                                 t3.month,
                                 t3.tds_receipt_date as receipt_date, 
                                 t3.purpose,
-                                ifnull(t2.arrear_corporate_allowance+t2.arrear_contract_allowance+t2.arrear_project_allowance+t2.arrear_mpi+t2.arrear_scarcity_allowance+t2.arrear_officiating_allowance,0) as others,
+                                ifnull(t2.arrear_corporate_allowance+t2.arrear_contract_allowance+t2.arrear_project_allowance+t2.arrear_scarcity_allowance+t2.arrear_officiating_allowance,0) as others,
                                 t3.tds_receipt_number as receipt_number,
                                 t2.arrear_basic_pay as basic,
                                 t2.new_gross_pay as gross,
