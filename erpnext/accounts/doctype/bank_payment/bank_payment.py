@@ -352,6 +352,7 @@ class BankPayment(Document):
 
 	def get_transactions(self):
 		data = []
+		# frappe.throw('message'+ self.transaction_type)
 		if self.transaction_type == "Mechanical Payment":
 			data = self.get_mechanical_payments()
 		elif self.transaction_type == "Salary":
@@ -374,6 +375,8 @@ class BankPayment(Document):
 			data = self.get_imprest_recoup_payment()
 		elif self.transaction_type == "Employee Loan Payment":
 			data = self.get_loan_detail()
+		elif self.transaction_type == "HSD Payment":
+			data = self.get_hsd_payment()
 		return data
 	
 	def get_salary_arrear(self):
@@ -825,6 +828,15 @@ class BankPayment(Document):
 			bank_payment = self.name,
 			branch = self.branch,
 			cond = cond), as_dict=True)
+	# HSD payment 
+	def get_hsd_payment(self):
+     cond = ""
+     if self.transactoin_no:
+         cond = 'and hsd.name ="{}"'
+
+
+     
+     
 	#added by cety on 12/8/2021 to make payment for imprest recoup
 	def get_imprest_recoup_payment(self):
 		cond = ""
@@ -1169,8 +1181,11 @@ def upload_files(doc):
 	sftp.close()
 		
 def get_transaction_id(bank="BOBL"):
-	promo_code = frappe.db.get_value('Bank Payment Settings', bank, 'promo_code')
-	return make_autoname(str(promo_code) + '.YYYY.MM.DD.########')
+    promo_code, company_code = frappe.db.get_value('Bank Payment Settings', bank, ['promo_code','company_specific_code'])
+    # return make_autoname(str(promo_code) + '.YYYY.MM.DD.##' + str(company_code) + '###')
+    formatted_company_code = '{:05d}'.format(int(company_code))
+    name_format = "{}.YYYY.MM.DD.{}.###".format(promo_code, formatted_company_code)
+    return make_autoname(name_format)
 
 def get_filename(note_type, posting_date, pi_number):
 	posting_date = posting_date.strftime('%Y%m%d%H%M%S')
