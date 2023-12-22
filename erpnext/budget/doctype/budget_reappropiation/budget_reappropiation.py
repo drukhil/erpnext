@@ -11,11 +11,55 @@ from erpnext.custom_utils import check_budget_available
 class BudgetReappropiation(Document):
 	
 	def validate(self):
+     	
+		others = 'select distinct(account_type) from `tabAccount` where account_type is not null and account_type!="Fixed Asset"'
+		other_asset = frappe.db.sql(others,as_dict=True)
+		other_assets  = [item['account_type'] for item in other_asset]
+		frappe.errprint(other_assets)
+		
+		
 		for a in self.items:
+			to_account = frappe.db.get_values('Account',a.to_account, 'account_type')
+			from_account = frappe.db.get_values('Account', a.from_account, 'account_type')
+			frappe.errprint(from_account)
+			frappe.errprint(to_account)
+
+				
 			if not flt(a.amount) > 0:
 				frappe.throw("Amount should be greater than 0 on row " + str(a.idx))
 			if self.from_cost_center == self.to_cost_center and a.from_account == a.to_account:
 				frappe.throw("From and To Account cannot be same")
+			if from_account not in other_assets and to_account != from_account :
+				frappe.throw("to_account type must be "+ str(from_account[0][0]))
+			if from_account in other_assets and to_account != from_account:
+				frappe.throw("to_account type must be "+ str(from_account[0][0]))
+				
+    
+			# if from_account  not in   other_assets and to_account  in other_assets:
+			# 	frappe.throw("to_account mus be " + str(from_account))
+			# if to_account not in other_assets and from_account in other_assets:
+			# 	frappe.throw("to_account must be " + str(from_account))
+    
+			# if from_account  in  other_assets and to_account in other_assets:
+			# 	frappe.throw("to_account must be" + str(from_account))
+					
+			# if from_account == 'Fixed Asset' and to_account != 'Fixed Asset':
+			# 	frappe.throw('to_Account should be '+ str(from_account))
+			
+			# for type in other_assets:
+			# 	# frappe.errprint(type)
+			# 	if from_account not in  type and to_account in type:
+			# 		frappe.throw("to_account must be" + str(from_account))
+					
+			# if from_account== 'Fixed Asset' and to_account != 'Fixed Asset':
+			# 	frappe.throw('to_Account should be '+ str(from_account))
+    
+			# check = """ 
+			# 			SELECT  account_type, name from `tabAccount` 
+            #         """.format( as_dict =True)
+			# query = frappe.db.sql(check)
+			
+			# frappe.errprint(str(query))
 		
 		self.budget_check()
 		self.update_users()
@@ -100,6 +144,7 @@ class BudgetReappropiation(Document):
 		from_cc = self.from_cost_center
 		to_cc = self.to_cost_center
 		fiscal_year = self.fiscal_year
+		
 
 		to_account = self.get_cc_acc_budget(to_cc, to_acc, fiscal_year)
 		from_account = self.get_cc_acc_budget(from_cc, from_acc, fiscal_year)
