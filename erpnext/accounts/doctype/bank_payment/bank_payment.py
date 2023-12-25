@@ -220,7 +220,7 @@ class BankPayment(Document):
 						rec.payment_status = status
 						rec.bank_payment = self.name
 				doc.save(ignore_permissions=True)
-			elif self.transaction_type in ['Payment Entry', 'Journal Entry']:
+			elif self.transaction_type in ['Payment Entry', 'Journal Entry',"HSD Payment"]:
 				doc = frappe.get_doc(self.transaction_type, i.transaction_id)
 				doc.payment_status = status
 				doc.bank_payment = self.name
@@ -377,7 +377,49 @@ class BankPayment(Document):
 			data = self.get_loan_detail()
 		elif self.transaction_type == "HSD Payment":
 			data = self.get_hsd_payment()
+			frappe.errprint(str(data))
+			# frappe.errprint("sdfsdfsd" +self.bank_payment)
 		return data
+	def get_hsd_payment(self):
+		cond = ""
+		if self.transaction_no:
+			cond = " pe.name = '{}'".format(self.transaction_no)
+	
+		elif not self.transaction_no and self.from_date and self.to_date:
+				cond = 'AND pe.posting_date BETWEEN "{}" AND "{}"'.format(str(self.from_date), str(self.to_date))
+		
+		return frappe.db.sql("""SELECT
+                       "HSD Payment" transaction_type,
+                        pe.name transaction_id, 
+						pe.name transaction_reference,
+      					pe.posting_date transaction_date, 
+						pe.supplier as supplier,
+      					pe.supplier as beneficiary_name, 
+						s.bank_name as bank_name,
+                        pe.branch,	
+                     fib.financial_system_code,
+                        pe.bank_account, 
+                        s.account_number as bank_account_no,
+						pe.amount
+						
+					FROM `tabHSD Payment` pe
+					JOIN `tabSupplier` s ON s.supplier_name = pe.supplier
+					LEFT JOIN `tabFinancial Institution Branch` fib ON fib.name = pe.branch
+					WHERE pe.branch = "{branch}" and
+					{cond}
+                    and pe.docstatus = 1
+                    and pe.supplier is not null 
+                    and ifnull(pe.amount,0) > 0
+                    and not exists(select 1 from `tabBank Payment Item` bpi
+                    where bpi.transaction_type = "HSD Payment"
+                    and bpi.transaction_id = pe.name
+                   
+                 
+                    and bpi.docstatus!=2 and bpi.status not in ('Cancelled','Failed'))order by pe.posting_date, pe.name
+                    
+					
+		 """.format( cond = cond,branch = self.branch , bank_payment = self.name), as_dict=True)
+
 	
 	def get_salary_arrear(self):
 		cond = ""
@@ -454,7 +496,7 @@ class BankPayment(Document):
 										AND bpi.docstatus != 2
 										AND bpi.status NOT IN ('Cancelled', 'Failed')
 							)
-							""".format( cond = cond, bank_payment = self.name), as_dict=1)
+							""".format( cond = cond, bank_payment = self.name,), as_dict=1)
 
 	"""
 	# Fetch Employee Loan Details
@@ -828,14 +870,7 @@ class BankPayment(Document):
 			bank_payment = self.name,
 			branch = self.branch,
 			cond = cond), as_dict=True)
-	# # HSD payment 
-	# def get_hsd_payment(self):
-	#  cond = ""
-	#  if self.transactoin_no:
-	# 	 cond = 'and hsd.name ="{}"'
-
-	#added by cety on 12/8/2021 to make payment for imprest recoup
-	def get_imprest_recoup_payment(self):
+	
 		cond = ""
 		if self.transaction_no:
 			cond = 'AND ir.name = "{}"'.format(self.transaction_no)

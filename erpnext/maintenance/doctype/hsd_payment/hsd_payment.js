@@ -13,6 +13,7 @@ frappe.ui.form.on('HSD Payment', {
 	},
 
 	refresh: function(frm) {
+		create_custom_buttons(frm);
 		if(frm.doc.docstatus == 1) {
 			cur_frm.add_custom_button(__('Accounting Ledger'), function() {
 				frappe.route_options = {
@@ -135,3 +136,18 @@ frappe.ui.form.on("HSD Payment Item", {
                 cur_frm.trigger("amount")
         }
 })
+var create_custom_buttons = function(frm){
+	var status = ["Failed", "Upload Failed", "Cancelled"];
+
+	if(frm.doc.docstatus == 1 && frm.doc.amount>0  /*&& !frm.doc.cheque_no*/){
+		console.log(frm.doc.docstatus, frm.doc.amount)
+		if(!frm.doc.bank_payment || status.includes(frm.doc.payment_status) ){
+			frm.page.set_primary_action(__('Process Payment'), () => {
+				frappe.model.open_mapped_doc({
+					method: "erpnext.maintenance.doctype.hsd_payment.hsd_payment.make_bank_payment",
+					frm: cur_frm
+				})
+			});
+		}
+	}
+}

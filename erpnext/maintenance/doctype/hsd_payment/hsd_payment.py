@@ -12,8 +12,10 @@ Version          Author          CreatedOn          ModifiedOn          Remarks
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
-from frappe.utils import flt
+from frappe.utils import flt, get_datetime
+# from frappe.utils import flt, comma_or, nowdate, getdate,
 from erpnext.custom_utils import prepare_gl, check_future_date
+from frappe.model.mapper import get_mapped_doc
 
 class HSDPayment(Document):
 	def validate(self):
@@ -155,3 +157,29 @@ class HSDPayment(Document):
 			row.update(d)
 		self.amount = total_amount
 		self.actual_amount = total_amount
+  
+  
+  
+	# ePayment Begins
+@frappe.whitelist()
+def make_bank_payment(source_name, target_doc=None):
+    def set_missing_values(obj, target, source_parent):
+        target.payment_type = None
+        target.transaction_type = "HSD Payment"
+        target.posting_date = get_datetime()
+        target.from_date = None
+        target.payment_type ="One-One Payment"
+        target.to_date = None
+
+    doc = get_mapped_doc("HSD Payment", source_name, {
+            "HSD Payment": {
+                "doctype": "Bank Payment",
+                "field_map": {
+                    "name": "transaction_no",
+                    "bank_account": "paid_from"
+                },
+                "postprocess": set_missing_values,
+            },
+    }, target_doc, ignore_permissions=True)
+    return doc
+# ePayment Ends
