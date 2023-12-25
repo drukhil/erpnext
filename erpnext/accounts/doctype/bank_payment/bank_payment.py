@@ -377,8 +377,6 @@ class BankPayment(Document):
 			data = self.get_loan_detail()
 		elif self.transaction_type == "HSD Payment":
 			data = self.get_hsd_payment()
-			frappe.errprint(str(data))
-			# frappe.errprint("sdfsdfsd" +self.bank_payment)
 		return data
 	def get_hsd_payment(self):
 		cond = ""
