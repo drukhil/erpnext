@@ -405,7 +405,7 @@ class BankPayment(Document):
 					FROM `tabHSD Payment` pe
 					JOIN `tabSupplier` s ON s.supplier_name = pe.supplier
 					LEFT JOIN `tabFinancial Institution Branch` fib ON fib.name = pe.branch
-					WHERE pe.branch = "{branch}" and
+					WHERE pe.branch = "{branch}" AND
 					{cond}
                     and pe.docstatus = 1
                     and pe.supplier is not null 
