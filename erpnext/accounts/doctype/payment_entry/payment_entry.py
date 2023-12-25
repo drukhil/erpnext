@@ -229,10 +229,15 @@ class PaymentEntry(AccountsController):
 						
 	""" Jai, vendor inv for RTGS purpose """
 	def set_vendor_invoice(self):
+		data = []
+		bill_no = ''
 		for d in self.get("references"):
 			ref_doc = frappe.get_doc(d.reference_doctype, d.reference_name)
-			if ref_doc.doctype == "Purchase Invoice":
-				self.vendor_invoice_no = ref_doc.bill_no
+			if ref_doc.doctype == "Purchase Invoice" and ref_doc.bill_no not in data:
+				data.append(ref_doc.bill_no)
+				
+		bill_no = ', '.join(map(str, data))
+		self.vendor_invoice_no = bill_no
 
 	def validate_journal_entry(self):
 		for d in self.get("references"):
