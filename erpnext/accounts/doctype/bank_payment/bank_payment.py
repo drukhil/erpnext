@@ -386,7 +386,7 @@ class BankPayment(Document):
 			cond = " pe.name = '{}'".format(self.transaction_no)
 	
 		elif not self.transaction_no and self.from_date and self.to_date:
-				cond = 'AND pe.posting_date BETWEEN "{}" AND "{}"'.format(str(self.from_date), str(self.to_date))
+				cond = 'pe.posting_date BETWEEN "{}" AND "{}"'.format(str(self.from_date), str(self.to_date))
 		
 		return frappe.db.sql("""SELECT
                        "HSD Payment" transaction_type,
