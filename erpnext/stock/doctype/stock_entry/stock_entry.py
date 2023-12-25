@@ -33,7 +33,7 @@ class StockEntry(StockController):
 			series = 'SEMR'
 		elif self.purpose == 'Material Transfer':
 			series = 'SEMT'
-		elif self.purpose == 'Material Write Off':
+		elif self.purpose == 'Stock Adjustment':
 			series = 'SEMW'
 		else:
 			series = 'SE'
@@ -147,7 +147,7 @@ class StockEntry(StockController):
 
 	def validate_purpose(self):
 		valid_purposes = ["Material Issue", "Material Receipt", "Material Transfer", "Material Transfer for Manufacture", "Material Consumption for Manufacture",
-			"Manufacture", "Repack", "Subcontract", "Material Write Off"]
+			"Manufacture", "Repack", "Subcontract", "Stock Adjustment"]
 		if self.purpose not in valid_purposes:
 			frappe.throw(_("Purpose must be one of {0}").format(comma_or(valid_purposes)))
 
@@ -196,7 +196,7 @@ class StockEntry(StockController):
 	def validate_warehouse(self):
 		"""perform various (sometimes conditional) validations on warehouse"""
 
-		source_mandatory = ["Material Issue", "Material Transfer", "Subcontract", "Material Transfer for Manufacture", "Material Write Off"]
+		source_mandatory = ["Material Issue", "Material Transfer", "Subcontract", "Material Transfer for Manufacture", "Stock Adjustment"]
 		target_mandatory = ["Material Receipt", "Material Transfer", "Subcontract", "Material Transfer for Manufacture"]
 
 		validate_for_manufacture_repack = any([d.bom_no for d in self.get("items")])
@@ -650,7 +650,7 @@ class StockEntry(StockController):
 		# update uom
 		if args.get("uom") and for_update:
 			ret.update(self.get_uom_details(args))
-		if self.purpose == 'Material Write Off':
+		if self.purpose == 'Stock Adjustment':
 			ret["expense_account"] = frappe.db.get_value('Company', self.company, "write_off_account")
 
 		if not ret["expense_account"]:
@@ -758,7 +758,7 @@ class StockEntry(StockController):
 
 		if self.bom_no:
 			if self.purpose in ["Material Issue", "Material Transfer", "Manufacture", "Repack",
-					"Subcontract", "Material Transfer for Manufacture", "Material Write Off"]:
+					"Subcontract", "Material Transfer for Manufacture", "Stock Adjustment"]:
 				if self.work_order and self.purpose == "Material Transfer for Manufacture":
 					item_dict = self.get_pending_raw_materials()
 					if self.to_warehouse and self.pro_doc:
