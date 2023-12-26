@@ -14,14 +14,15 @@ class AssetIssueDetails(Document):
 	def validate_balance(self):
 		received = frappe.db.sql(""" 
 				select sum(ifnull(re.qty, 0)) qty from `tabAsset Received Entries` re 
-				where re.docstatus = 1 and re.item_code = '{0}'
-			""".format(self.item_code), as_dict =1)
+				where re.docstatus = 1 and re.item_code = '{0}' and re.ref_doc = '{1}'
+			""".format(self.item_code, self.purchase_receipt), as_dict =1)
 
 
 		issue = frappe.db.sql(""" 
 				select sum(ifnull(ie.qty, 0)) qty from `tabAsset Issue Details` ie 
-				where ie.docstatus = 1 and ie.item_code = '{0}'
-			""".format(self.item_code), as_dict =1)
+				where ie.docstatus = 1 and ie.item_code = '{0}' and ie.purchase_receipt = '{1}' and ie.name != '{2}'
+					and ie.branch = '{3}'
+			""".format(self.item_code, self.purchase_receipt, self.name, self.branch), as_dict =1)
 
 		if flt(received[0].qty) < flt(issue[0].qty) + flt(self.qty):
 			diff = flt(received[0].qty) - flt(issue[0].qty)
@@ -85,6 +86,7 @@ def check_item_code(doctype=None, txt=None, searchfield=None, start=None, page_l
 	cond = ""
 	if filters.get('item_code'):
 		cond += " item_code = '{}' and reference_doctype = '{}' ".format(filters.get('item_code'), filters.get('ref_type'))
+		cond += " and branch = '{}'".format(filters.get('branch'))
 	query = "select ref_doc from `tabAsset Received Entries` where {cond}".format(cond=cond)
  
 	return frappe.db.sql(query)

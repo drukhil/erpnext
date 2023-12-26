@@ -10,7 +10,8 @@ frappe.ui.form.on('Asset Issue Details', {
 				query: "erpnext.buying.doctype.asset_issue_details.asset_issue_details.check_item_code",
 				filters: {
 					'item_code': frm.doc.item_code,
-					'ref_type': frm.doc.document_source
+					'ref_type': frm.doc.document_source,
+					'branch': frm.doc.branch
 				}
 			}
 		});
