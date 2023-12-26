@@ -377,14 +377,15 @@ class BankPayment(Document):
 			data = self.get_loan_detail()
 		elif self.transaction_type == "HSD Payment":
 			data = self.get_hsd_payment()
+			frappe.errprint(str(data))
 		return data
 	def get_hsd_payment(self):
 		cond = ""
 		if self.transaction_no:
-			cond = " pe.name = '{}'".format(self.transaction_no)
+			cond = " AND pe.name = '{}'".format(self.transaction_no)
 	
 		elif not self.transaction_no and self.from_date and self.to_date:
-				cond = 'and pe.posting_date BETWEEN "{}" AND "{}"'.format(str(self.from_date), str(self.to_date))
+				cond = 'AND pe.posting_date BETWEEN "{}" AND "{}"'.format(self.from_date, self.to_date)
 		
 		return frappe.db.sql("""SELECT
                        "HSD Payment" transaction_type,
@@ -403,7 +404,7 @@ class BankPayment(Document):
 					FROM `tabHSD Payment` pe
 					JOIN `tabSupplier` s ON s.supplier_name = pe.supplier
 					LEFT JOIN `tabFinancial Institution Branch` fib ON fib.name = pe.branch
-					WHERE pe.branch = "{branch}" AND
+					WHERE pe.branch = "{branch}" 
 					{cond}
                     and pe.docstatus = 1
                     and pe.supplier is not null 
