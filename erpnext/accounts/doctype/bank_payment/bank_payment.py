@@ -373,13 +373,15 @@ class BankPayment(Document):
 			data = self.get_mr_payment()
 		elif self.transaction_type == "Imprest Recoup":
 			data = self.get_imprest_recoup_payment()
+			frappe.errprint(str(data))
 		elif self.transaction_type == "Employee Loan Payment":
 			data = self.get_loan_detail()
 		elif self.transaction_type == "HSD Payment":
 			data = self.get_hsd_payment()
-			frappe.errprint(str(data))
+			# frappe.errprint(str(data))
 		return data
 	def get_hsd_payment(self):
+		frappe.errprint(type(self.from_date))
 		cond = ""
 		if self.transaction_no:
 			cond = " AND pe.name = '{}'".format(self.transaction_no)
@@ -867,7 +869,7 @@ class BankPayment(Document):
 			bank_payment = self.name,
 			branch = self.branch,
 			cond = cond), as_dict=True)
-	
+	def get_imprest_recoup_payment(self): 
 		cond = ""
 		if self.transaction_no:
 			cond = 'AND ir.name = "{}"'.format(self.transaction_no)
