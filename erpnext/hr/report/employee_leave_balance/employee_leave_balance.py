@@ -42,10 +42,10 @@ def get_data(filters, leave_types):
 	allocation_records_based_on_to_date = get_leave_allocation_records(filters.to_date)
 	filters_dict = { "status": "Active", "company": filters.company}
 
-        if filters.branch:
-                filters_dict['branch'] = filters.branch
-        if filters.employee:
-                filters_dict['name'] = filters.employee
+	if filters.branch:
+		filters_dict['branch'] = filters.branch
+	if filters.employee:
+		filters_dict['name'] = filters.employee
 
 	if filters.employee_type:
 		filters_dict['employment_type'] = filters.employee_type
@@ -53,6 +53,20 @@ def get_data(filters, leave_types):
 	active_employees = frappe.get_all("Employee",
 		filters = filters_dict,
 		fields = ["name", "employee_name", "department", "designation", "branch", "employment_type"])
+	
+	if filters.organization:
+		cond = ""
+		if filters.branch:
+			cond += " and e.branch = '{}'".format(filters.branch)
+		if filters.employee:
+			cond += " and e.name = '{}'".format(filters.employee)
+		if filters.employee_type:
+			cond += " and e.employment_type = '{}'".format(filters.employee_type)
+		
+		active_emps = frappe.db.sql("""select e.* from tabEmployee as e, `tabEmployee External Work History` h where e.name=h.parent 
+					and e.status='Active' and h.company_name = '{0}' and e.company = '{1}' {2}"""
+					.format(filters.organization, filters.company, cond), as_dict=True)
+		active_employees = active_emps
 
 	data = []
 	for employee in active_employees:

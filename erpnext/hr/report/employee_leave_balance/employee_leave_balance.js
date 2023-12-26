@@ -47,11 +47,11 @@ frappe.query_reports["Employee Leave Balance"] = {
 			"fieldtype": "Link",
 			"options": "Employment Type" 
 		},
-                {
-                        "fieldname":"employee",
-                        "label": __("Employee"),
-                        "fieldtype": "Link",
-                        "options": "Employee",
+		{
+			"fieldname":"employee",
+			"label": __("Employee"),
+			"fieldtype": "Link",
+			"options": "Employee",
 			"get_query": function() {
 				var branch = frappe.query_report.filters_by_name.branch.get_value();
 				var employee_type = frappe.query_report.filters_by_name.employee_type.get_value();
@@ -59,13 +59,20 @@ frappe.query_reports["Employee Leave Balance"] = {
 					return {"doctype": "Employee", "filters": {"branch": branch, "status": "Active"}}
 				}
 				else if (employee_type){
-				return {"doctype": "Employee", "filters": {"employment_type": employee_type, "status": "Active"}}
+					return {"doctype": "Employee", "filters": {"employment_type": employee_type, "status": "Active"}}
 				} 
 				else 
 				{
 					return {"doctype": "Employee", "filters": {"status": "Active"}}
 				}
 			}
-                }
+		},
+		{
+			"fieldname":"organization",
+			"label": __("Organization"),
+			"fieldtype": "Link",
+			"options": "Organization",
+			"reqd": 0,
+		}
 	]
 }
