@@ -396,16 +396,17 @@ class BankPayment(Document):
       					pe.posting_date transaction_date, 
 						pe.supplier as supplier,
       					pe.supplier as beneficiary_name, 
-						s.bank_name as bank_name,
+						s.bank_name_new as bank_name,
                         pe.branch,	
                      fib.financial_system_code,
                         pe.bank_account, 
                         s.account_number as bank_account_no,
+                        s.bank_account_type,
 						pe.amount
 						
 					FROM `tabHSD Payment` pe
 					JOIN `tabSupplier` s ON s.supplier_name = pe.supplier
-					LEFT JOIN `tabFinancial Institution Branch` fib ON fib.name = pe.branch
+					LEFT JOIN `tabFinancial Institution Branch` fib ON fib.name = s.bank_branch
 					WHERE pe.branch = "{branch}" 
 					{cond}
                     and pe.docstatus = 1
