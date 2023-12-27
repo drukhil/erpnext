@@ -135,6 +135,7 @@ frappe.ui.form.on('Bank Payment', {
 		// $(".grid-footer-toolbar").hide();
    	},
 	get_transactions: function(frm){
+		// frappe.throw('ejelle')
 		get_entries(frm);
 	},
 	bank_account_no: function(frm){
