@@ -21,18 +21,26 @@ class BudgetReappropiation(Document):
 		for a in self.items:
 			to_account = frappe.db.get_values('Account',a.to_account, 'account_type')
 			from_account = frappe.db.get_values('Account', a.from_account, 'account_type')
+			is_group  = frappe.db.get_values('Account', a.from_account, 'is_group')
+			
 			frappe.errprint(from_account)
 			frappe.errprint(to_account)
+			val = str(is_group[0][0])
+			
 
 				
 			if not flt(a.amount) > 0:
 				frappe.throw("Amount should be greater than 0 on row " + str(a.idx))
 			if self.from_cost_center == self.to_cost_center and a.from_account == a.to_account:
 				frappe.throw("From and To Account cannot be same")
+			if str(is_group[0][0]) == "1":
+				frappe.throw("From Account cannot be a Group")
 			if from_account not in other_assets and to_account != from_account :
 				frappe.throw("to_account type must be "+ str(from_account[0][0]))
 			if from_account in other_assets and to_account != from_account:
 				frappe.throw("to_account type must be "+ str(from_account[0][0]))
+			
+			
 				
     
 			# if from_account  not in   other_assets and to_account  in other_assets:
