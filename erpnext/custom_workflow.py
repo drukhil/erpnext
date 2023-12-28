@@ -44,61 +44,65 @@ def validate_workflow_states(doc):
 
 #LA, TA, OT 
 def verify_workflow(doc):
-	reports_to  = frappe.db.get_value("Employee", frappe.db.get_value("Employee", doc.employee, "reports_to"), ["user_id","employee_name","designation","name"])
+        reports_to  = frappe.db.get_value("Employee", frappe.db.get_value("Employee", doc.employee, "reports_to"), ["user_id","employee_name","designation","name"])
         if not reports_to:
                 frappe.throw("Set Up Reports to in Employee Master")
 
-	final_approver  = frappe.db.get_value("Employee", frappe.db.get_value("Employee", doc.employee, "second_approver"), ["user_id","employee_name","designation","name"])
+        final_approver  = frappe.db.get_value("Employee", frappe.db.get_value("Employee", doc.employee, "second_approver"), ["user_id","employee_name","designation","name"])
         if not final_approver:
                 frappe.throw("Set Up Reports to in Employee Master")
 
 	
-	verifier_officiating = get_officiating_employee(reports_to[3]) 
+        verifier_officiating = get_officiating_employee(reports_to[3]) 
         approver_officiating = get_officiating_employee(final_approver[3])
 	
 	
-	verifier = frappe.get_doc("Employee", verifier_officiating[0].officiate).user_id if verifier_officiating else reports_to[0]
+        verifier = frappe.get_doc("Employee", verifier_officiating[0].officiate).user_id if verifier_officiating else reports_to[0]
         approver = frappe.get_doc("Employee", approver_officiating[0].officiate).user_id if approver_officiating else final_approver[0]	
 		
-	if doc.workflow_state == "Waiting Approval":
-		if doc.owner != frappe.session.user:
-			doc.workflow_state = "Draft"
-			frappe.throw("Only Mr/Mrs. <b> '{0}' </b>  can Apply/Reapply this Document".format(frappe.get_doc("User", frappe.db.get_value("Employee", doc.employee, "user_id")).full_name))
-		doc.workflow_state = "Waiting Approval"
-		doc.docstatus = 0
+        hr_approver = frappe.db.get_value("Employee", frappe.db.get_single_value("HR Settings", "hr_approver"), "user_id")
+        if not hr_approver:
+                frappe.throw(_("Missing HR Approver user set from HR Setting."))
+        
+        if doc.workflow_state == "Waiting Approval":
+                if frappe.session.user not in (doc.owner, hr_approver):
+                        doc.workflow_state = "Draft"
+                        frappe.throw("Only Mr/Mrs. <b> '{0}' </b>  can Apply/Reapply this Document".format(frappe.get_doc("User", frappe.db.get_value("Employee", doc.employee, "user_id")).full_name))
+                doc.workflow_state = "Waiting Approval"
+                doc.docstatus = 0
 
-	if doc.workflow_state == "Verified":
-		if verifier != frappe.session.user:
-			doc.workflow_state = "Waiting Approval"
-			frappe.throw("Only Mr/Mrs. <b> {0} </b> can verify this Document".format(frappe.get_doc("User", verifier).full_name))
-		doc.workflow_state == "Verified"
-		doc.docstatus = 0
-		doc.verifier = verifier
+        if doc.workflow_state == "Verified":
+                if frappe.session.user not in (verifier, hr_approver):
+                        doc.workflow_state = "Waiting Approval"
+                        frappe.throw("Only Mr/Mrs. <b> {0} </b> can verify this Document".format(frappe.get_doc("User", verifier).full_name))
+                doc.workflow_state == "Verified"
+                doc.docstatus = 0
+                doc.verifier = frappe.session.user
 
-	if doc.workflow_state == "Approved":
-		if approver != frappe.session.user:
-			doc.workflow_state = "Verified"
-			doc.docstatus = 0
-			frappe.throw("Only Mr/Mrs. <b> {0} </b> can approve this Documentmt".format(frappe.get_doc("User", approver).full_name))
-		if doc.get_db_value("workflow_state") != "Verified":
-			doc.workflow_state = "Verified"
-			doc.docstatus = 0
-			fappe.throw("Only Verified Document Can be approved")
-		doc.workflow_state = "Approved"
-		doc.docstatus = 1
-		doc.w_approver = approver
+        if doc.workflow_state == "Approved":
+                if frappe.session.user not in (approver, hr_approver):
+                        doc.workflow_state = "Verified"
+                        doc.docstatus = 0
+                        frappe.throw("Only Mr/Mrs. <b> {0} </b> can approve this Documentmt".format(frappe.get_doc("User", approver).full_name))
+                if doc.get_db_value("workflow_state") != "Verified":
+                        doc.workflow_state = "Verified"
+                        doc.docstatus = 0
+                        frappe.throw("Only Verified Document Can be approved")
+                doc.workflow_state = "Approved"
+                doc.docstatus = 1
+                doc.w_approver = frappe.session.user
 
-	if doc.workflow_state in ("Rejected", "Cancelled"):
-		if doc.get_db_value("workflow_state") == 'Waiting Approval':
-			if verifier != frappe.session.user:
-				doc.workflow_state = 'Waiting Approval'
-				frappe.throw("Only Mr/Mrs. <b> {0} </b> can reject this document".format(frappe.get_doc("User", verifier).full_name))
+        if doc.workflow_state in ("Rejected", "Cancelled"):
+                if doc.get_db_value("workflow_state") == 'Waiting Approval':
+                        if frappe.session.user not in (verifier, hr_approver):
+                                doc.workflow_state = 'Waiting Approval'
+                                frappe.throw("Only Mr/Mrs. <b> {0} </b> can reject this document".format(frappe.get_doc("User", verifier).full_name))
 
-		elif doc.get_db_value("workflow_state") in ('Verified', 'Approved'):
-			if approver != frappe.session.user:
-				doc.workflow_state = doc.get_db_value("workflow_state")
-				frappe.throw("Only Mr/Mrs. <b> {0} </b> can reject/cancel this Document".format(frappe.get_doc("User", approver).full_name))
-		doc.rejector = frappe.session.user
+                elif doc.get_db_value("workflow_state") in ('Verified', 'Approved'):
+                        if frappe.session.user not in (approver, hr_approver):
+                                doc.workflow_state = doc.get_db_value("workflow_state")
+                                frappe.throw("Only Mr/Mrs. <b> {0} </b> can reject/cancel this Document".format(frappe.get_doc("User", approver).full_name))
+                doc.rejector = frappe.session.user
 
 #Travel Claim
 def verify_workflow_tc(doc):
@@ -134,7 +138,7 @@ def verify_workflow_tc(doc):
                 doc.docstatus = 0
 
         if doc.workflow_state == "Verified By Supervisor":
-		if verifier != frappe.session.user:
+		if frappe.session.user not in (verifier, hr_approver[3]):
                         doc.workflow_state = "Waiting Approval"
                         frappe.throw("Only Mr/Mrs. <b> {0} </b> can verify this Document".format(frappe.get_doc("User", verifier).full_name))
                 doc.workflow_state = "Verified By Supervisor"
@@ -161,12 +165,12 @@ def verify_workflow_tc(doc):
 	
 	if doc.workflow_state in ("Rejected", "Cancelled"):
                 if doc.get_db_value("workflow_state") == 'Waiting Approval':
-			if verifier != frappe.session.user:
+			if frappe.session.user not in (verifier, hr_approver[3]):
                                 doc.workflow_state = 'Waiting Approval'
                                 frappe.throw("Only Mr/Mrs. <b> {0} </b> can Reject this Document".format(frappe.get_doc("User", verifier).full_name))
 
 		elif doc.get_db_value("workflow_state") in ('Verified', 'Approved'):
-			if approver != frappe.session.user:
+			if frappe.session.user not in (approver, hr_approver[3]):
 				doc.workflow_state = doc.get_db_value("workflow_state")
 			frappe.throw("Only <b> Mr/Mrs. {0} </b> can reject/cancel this Document".format(frappe.get_doc("User", approver).full_name))
 		doc.rejector = frappe.session.user
