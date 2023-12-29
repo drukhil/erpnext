@@ -2,6 +2,9 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Bulk Leave Encashment', {
+	refresh: function(frm) {
+		frm.get_docfield("items").allow_bulk_edit = 1;
+	},
 	setup: function(frm) {
 		// frm.set_query("leave_period", function() {
 		// 	return {
