@@ -27,8 +27,8 @@ class MergeCLToEL(Document):
 
 	def validate_duplicate(self):
 		current_fiscal_year = get_fiscal_year(getdate(nowdate()), company=self.company)[0]
-		if self.fiscal_year == current_fiscal_year:
-			frappe.throw("You are not allowed to merge CL balance from current Fiscal year {} to EL".format(current_fiscal_year))
+		# if self.fiscal_year == current_fiscal_year:
+		# 	frappe.throw("You are not allowed to merge CL balance from current Fiscal year {} to EL".format(current_fiscal_year))
 		query = """select name from `tabMerge CL To EL` where docstatus != 2 and fiscal_year = '{0}' and name != '{1}'
 			""".format(self.fiscal_year, self.name)
 		if self.branch:
