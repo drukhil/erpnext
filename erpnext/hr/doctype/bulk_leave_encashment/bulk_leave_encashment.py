@@ -100,7 +100,7 @@ class BulkLeaveEncashment(Document):
 			# if not emp.employee_group:
 			# 	emp.employee_group = frappe.db.get_value("Employee", emp.employee, "employee_group")
 			
-			# emp.encashable_days = 30 if emp.leave_balance >= 30 else emp.leave_balance
+			emp.encashable_days = 30 if emp.leave_balance >= 30 else emp.leave_balance
 
 			# if emp.encashable_days > emp.leave_balance:
 			# 	frappe.throw("Encashable Days  cannot be more than Leave Balance")
