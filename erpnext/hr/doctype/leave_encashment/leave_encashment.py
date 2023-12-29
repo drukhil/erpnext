@@ -269,7 +269,7 @@ def get_salary_struct(employee):
         if salary_struc_list:
                 return salary_struc_list[0][0]
         else:
-                frappe.throw(_("No Active Salary Structure found for the employee."))
+                frappe.throw(_("No Active Salary Structure found for the employee {}.".format(employee)))
                 
         return salary_struc_list[0][0]
 
