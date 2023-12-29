@@ -74,12 +74,12 @@ class BulkLeaveEncashment(Document):
 			if leave_allocation:
 					doc = frappe.get_doc("Leave Allocation", leave_allocation[0].name)
 					if cancel:
-							new_total = (flt(doc.total_leaves_allocated) + flt(self.encashed_days))
-							days = flt(self.encashed_days)
+							new_total = (flt(doc.total_leaves_allocated) + flt(d.encashable_days))
+							days = flt(self.encashable_days)
 							self.db_set("leave_adjusted", 0)
 					else:
-							new_total = (flt(doc.total_leaves_allocated) - flt(self.encashed_days))
-							days = 0 - flt(self.encashed_days)
+							new_total = (flt(doc.total_leaves_allocated) - flt(d.encashable_days))
+							days = 0 - flt(d.encashalbe_days)
 							self.db_set("leave_adjusted", 1)
 					doc.db_set("total_leaves_allocated", new_total)
 					doc.db_set("leave_encashment", self.name)
