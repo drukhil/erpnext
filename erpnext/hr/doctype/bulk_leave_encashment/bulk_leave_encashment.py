@@ -17,18 +17,18 @@ class BulkLeaveEncashment(Document):
 		# self.validate_workflow_state()
 		if not self.encashment_date:
 			self.encashment_date = getdate(nowdate())
-		self.get_leave_details_for_encashment()
+		# self.get_leave_details_for_encashment()
 		self.calculate_amount()
 		# notify_workflow_states(self)
 
 	def on_submit(self):
-		self.update_encashed_in_leave_allocation()
+		# self.update_encashed_in_leave_allocation()
 		self.adjust_leave()
 		self.post_accounts_entry()
 		# notify_workflow_states(self)
 
 	def on_cancel(self):
-		self.update_encashed_in_leave_allocation(cancel=1)
+		# self.update_encashed_in_leave_allocation(cancel=1)
 		self.adjust_leave(cancel=True)
 		# notify_workflow_states(self)
 	
