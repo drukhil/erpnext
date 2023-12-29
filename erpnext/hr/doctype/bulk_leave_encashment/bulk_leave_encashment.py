@@ -17,7 +17,7 @@ class BulkLeaveEncashment(Document):
 		# self.validate_workflow_state()
 		if not self.encashment_date:
 			self.encashment_date = getdate(nowdate())
-		# self.get_leave_details_for_encashment()
+		self.get_leave_details_for_encashment()
 		self.calculate_amount()
 		# notify_workflow_states(self)
 
@@ -94,21 +94,21 @@ class BulkLeaveEncashment(Document):
 			if not allocation:
 				frappe.throw(_("No Leaves Allocated to Employee: {0} for Leave Type: {1}").format(emp.employee, self.leave_type))
 
-			emp.leave_balance = get_leave_balance_on(emp.employee, today(), self.leave_type, consider_all_leaves_in_the_allocation_period=True)
+			# emp.leave_balance = get_leave_balance_on(emp.employee, today(), self.leave_type, consider_all_leaves_in_the_allocation_period=True)
 
-			if not emp.employee_group:
-				emp.employee_group = frappe.db.get_value("Employee", emp.employee, "employee_group")
+			# if not emp.employee_group:
+			# 	emp.employee_group = frappe.db.get_value("Employee", emp.employee, "employee_group")
 			
-			emp.encashable_days = 30 if emp.leave_balance >= 30 else emp.leave_balance
+			# emp.encashable_days = 30 if emp.leave_balance >= 30 else emp.leave_balance
 
-			if emp.encashable_days > emp.leave_balance:
-				frappe.throw("Encashable Days  cannot be more than Leave Balance")
+			# if emp.encashable_days > emp.leave_balance:
+			# 	frappe.throw("Encashable Days  cannot be more than Leave Balance")
 
 			pay = get_basic_and_gross_pay(employee=emp.employee, effective_date=today())
-			if pay.get("basic_pay") is not None:
-				emp.current_basic_pay = pay.get("basic_pay")
-				emp.encashment_amount = flt((pay.get("basic_pay")/30) * flt(emp.encashable_days),2)
-				emp.salary_structure = pay.get("name")
+			if pay[0].basic_pay is not None:
+				emp.current_basic_pay = pay[0].basic_pay
+				emp.encashment_amount = flt((pay[0].basic_pay/30) * flt(emp.encashable_days),2)
+				emp.salary_structure = pay[0].name
 				emp.encashment_tax = get_salary_tax(emp.encashment_amount)
 				emp.payable_amount = flt((emp.encashment_amount) - flt(emp.encashment_tax),2)
 
