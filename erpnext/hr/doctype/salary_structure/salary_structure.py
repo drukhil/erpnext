@@ -35,7 +35,7 @@ from __future__ import unicode_literals
 import frappe
 
 from frappe import msgprint
-from frappe.utils import cstr, flt, cint, getdate, date_diff, nowdate
+from frappe.utils import cstr, flt, cint, getdate, date_diff, nowdate, today
 from frappe.utils.data import get_first_day, get_last_day, add_days
 from frappe.model.naming import make_autoname
 from frappe import _
@@ -544,3 +544,20 @@ def salary_component_query(doctype, txt, searchfield, start, page_len, filters):
                 "page_len": page_len,
                 "component_type": 'Earning' if filters['parentfield'] == 'earnings' else 'Deduction'
             })
+@frappe.whitelist()
+def get_basic_and_gross_pay(employee, effective_date=today()):
+    struc = frappe.db.sql(""" select sst.name,
+			sum(case when sd.salary_component = "Basic Pay" then coalesce(sd.amount,0) else 0 end) basic_pay,
+			sum(case when (sc.type = 'Earning' and (sd.salary_component = "Basic Pay" or coalesce(sc.field_name,'') != '')) then ifnull(sd.amount,0) else 0 end) gross_pay
+		from `tabSalary Structure` sst, `tabSalary Detail` sd, `tabSalary Component` sc
+		where sst.employee = '{employee}'
+		and '{effective_date}' between sst.from_date and coalesce(sst.to_date,now())
+		and sd.parent = sst.name
+		and sc.name = sd.salary_component
+		order by coalesce(sst.to_date,now()), sst.from_date
+		limit 1
+	""".format(employee=employee, effective_date=effective_date), as_dict=True)
+
+    if not struc:
+        frappe.throw(_("Salary Structure not found"))
+
