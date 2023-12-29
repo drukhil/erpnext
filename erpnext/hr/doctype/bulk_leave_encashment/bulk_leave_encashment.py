@@ -94,8 +94,7 @@ class BulkLeaveEncashment(Document):
 			if not allocation:
 				frappe.throw(_("No Leaves Allocated to Employee: {0} for Leave Type: {1}").format(emp.employee, self.leave_type))
 
-			emp.leave_balance = get_leave_balance_on(employee=emp.employee, date=today(), \
-				to_date=today(), leave_type=self.leave_type, consider_all_leaves_in_the_allocation_period=True)
+			emp.leave_balance = get_leave_balance_on(emp.employee, today(), self.leave_type, consider_all_leaves_in_the_allocation_period=True)
 
 			if not emp.employee_group:
 				emp.employee_group = frappe.db.get_value("Employee", emp.employee, "employee_group")
