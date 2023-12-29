@@ -405,7 +405,7 @@ class BankPayment(Document):
 						pe.amount
 						
 					FROM `tabHSD Payment` pe
-					JOIN `tabSupplier` s ON s.supplier_name = pe.supplier
+					JOIN `tabSupplier` s ON s.name = pe.supplier
 					LEFT JOIN `tabFinancial Institution Branch` fib ON fib.name = s.bank_branch
 					WHERE pe.branch = "{branch}" 
 					{cond}
@@ -414,6 +414,7 @@ class BankPayment(Document):
                     and ifnull(pe.amount,0) > 0
                     and not exists(select 1 from `tabBank Payment Item` bpi
                     where bpi.transaction_type = "HSD Payment"
+                    and bpi.parent != '{bank_payment}'
                     and bpi.transaction_id = pe.name
                     and bpi.docstatus!=2 and bpi.status not in ('Cancelled','Failed'))order by pe.posting_date, pe.name
                     
