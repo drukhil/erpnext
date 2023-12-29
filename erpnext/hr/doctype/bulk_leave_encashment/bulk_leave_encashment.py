@@ -85,8 +85,8 @@ class BulkLeaveEncashment(Document):
 					doc.db_set("leave_encashment", self.name)
 					doc.db_set("encashed_days", days)
 	def get_leave_details_for_encashment(self):
-		if not frappe.db.get_value("Leave Type", self.leave_type, 'allow_encashment'):
-			frappe.throw(_("Leave Type {0} is not encashable").format(self.leave_type))
+		# if not frappe.db.get_value("Leave Type", self.leave_type, 'allow_encashment'):
+		# 	frappe.throw(_("Leave Type {0} is not encashable").format(self.leave_type))
 
 		for emp in self.items:
 			allocation = self.get_leave_allocation(emp.employee)
@@ -121,99 +121,20 @@ class BulkLeaveEncashment(Document):
 		between from_date and to_date and docstatus=1 and leave_type='{1}'
 		and employee = '{2}'""".format(self.encashment_date or getdate(nowdate()), self.leave_type, employee), as_dict=1)
 		return leave_allocation[0] if leave_allocation else None
-	
+	@frappe.whitelist()
 	def get_employees(self):
 		# if not self.leave_period or not self.leave_type:
 		# 	frappe.throw("Either Leave Type/Leave Period is missing")
 		
 		self.set('items', [])
 		query = """
-				select name as employee, employee_name, branch, designation, employment_type, grade,
+				select name as employee, employee_name, branch, designation, employment_type, employee_subgroup as grade,
 				employee_group, bank_name, bank_ac_no
 				from `tabEmployee` where status = 'Active'
 		"""
 		
 		entries = frappe.db.sql(query, as_dict=True)
 		self.set('items', entries)
-
-        def post_accounts_entry(self):
-                employee = frappe.get_doc("Employee", self.employee)
-
-		cost_center = employee.cost_center
-		if not cost_center:
-			frappe.throw("Setup Cost Center for employee in Employee Information")
-
-		expense_bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
-		if not expense_bank_account:
-			frappe.throw("Setup Default Expense Bank Account for your Branch")
-
-		expense_account = frappe.db.get_single_value("HR Accounts Settings", "leave_encashment_account")
-		if not expense_account:
-			frappe.throw("Setup Leave Encashment Accounts in HR Accounts Settings")
-
-		tax_account = frappe.db.get_single_value("HR Accounts Settings", "salary_tax_account")
-		if not tax_account:
-			frappe.throw("Setup Leave Tax Accounts in HR Accounts Settings")
-
-                sal_struc_name = self.get_salary_structure()
-                if sal_struc_name:
-                        sal_struc= frappe.get_doc("Salary Structure",sal_struc_name)
-                        for d in sal_struc.earnings:
-                                if d.salary_component == 'Basic Pay':
-                                        basic_pay = flt(d.amount)
-                else:
-                        frappe.throw(_("No Active salary structure found."))
-                        
-                if basic_pay:
-                        salary_tax = get_salary_tax(basic_pay)
-
-                salary_tax = flt(salary_tax) if salary_tax else 0.00                
-                
-                je = frappe.new_doc("Journal Entry")
-		je.flags.ignore_permissions = 1 
-		je.title = 'Leave Encashment - '+str(employee.employee_name)
-                je.voucher_type = 'Bank Entry'
-                je.naming_series = 'Bank Payment Voucher'
-                je.company = employee.company
-		je.branch = self.branch
-                je.remark = 'Payment against Leave Encashment: ' + self.name;
-                je.posting_date = self.application_date
-                je.total_amount_in_words =  money_in_words(flt(basic_pay)-flt(salary_tax))
-
-                je.append("accounts", {
-                        "account": expense_account,
-                        "debit_in_account_currency": flt(basic_pay),
-                        "debit": flt(basic_pay),
-                        "reference_type": "Leave Encashment",
-                        "reference_name": self.name,
-                        "cost_center": cost_center,
-			"business_activity": employee.business_activity,
-                })
-
-                je.append("accounts", {
-                        "account": tax_account,
-                        "credit_in_account_currency": flt(salary_tax),
-                        "credit": flt(salary_tax),
-                        "reference_type": "Leave Encashment",
-                        "reference_name": self.name,
-                        "cost_center": cost_center,
-			"business_activity": employee.business_activity,
-                })
-
-                je.append("accounts", {
-                        "account": expense_bank_account,
-                        "credit_in_account_currency": (flt(basic_pay)-flt(salary_tax)),
-                        "credit": (flt(basic_pay)-flt(salary_tax)),
-                        "reference_type": "Leave Encashment",
-                        "reference_name": self.name,
-			"business_activity": employee.business_activity,
-                        "cost_center": cost_center
-                })
-                je.insert()
-
-		self.db_set("encash_journal", je.name)
-		self.db_set("encashment_amount", flt(basic_pay))
-		self.db_set("tax_amount", flt(salary_tax))
 	
 	def post_accounts_entry(self):
 		if not self.cost_center:

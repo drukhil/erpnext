@@ -11,16 +11,16 @@ frappe.ui.form.on('Bulk Leave Encashment', {
 		// 	}
 		// });
 
-		frm.set_query("leave_type", function() {
-			return {
-				filters: {
-					allow_encashment: 1
-				}
-			}
-		});
+		// frm.set_query("leave_type", function() {
+		// 	return {
+		// 		filters: {
+		// 			allow_encashment: 1
+		// 		}
+		// 	}
+		// });
 	},
 	get_employees: function(frm) {
-		if(frm.doc.docstatus == 0 && frm.doc.leave_type && frm.doc.leave_period) {
+		if(frm.doc.docstatus == 0 && frm.doc.leave_type) {
 			return frappe.call({
 				method: "get_employees",
 				doc: frm.doc,
