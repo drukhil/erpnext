@@ -80,7 +80,7 @@ class BulkLeaveEncashment(Document):
 							self.db_set("leave_adjusted", 0)
 					else:
 							new_total = (flt(doc.total_leaves_allocated) - flt(d.encashable_days))
-							days = 0 - flt(d.encashalbe_days)
+							days = 0 - flt(d.encashable_days)
 							self.db_set("leave_adjusted", 1)
 					doc.db_set("total_leaves_allocated", new_total)
 					doc.db_set("leave_encashment", self.name)
