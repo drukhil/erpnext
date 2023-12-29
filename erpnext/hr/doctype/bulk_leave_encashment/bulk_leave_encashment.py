@@ -9,6 +9,7 @@ from frappe.model.document import Document
 from frappe.utils import getdate, nowdate, flt, today, money_in_words, cint
 from erpnext.hr.doctype.leave_application.leave_application import get_leave_balance_on
 from erpnext.hr.doctype.salary_structure.salary_structure import get_basic_and_gross_pay
+from erpnext.hr.doctype.leave_encashment.leave_encashment import get_salary_structure
 from erpnext.hr.hr_custom_functions import get_salary_tax
 from datetime import *
 
@@ -103,12 +104,18 @@ class BulkLeaveEncashment(Document):
 
 			# if emp.encashable_days > emp.leave_balance:
 			# 	frappe.throw("Encashable Days  cannot be more than Leave Balance")
-
-			pay = get_basic_and_gross_pay(employee=emp.employee, effective_date=today())
-			if pay[0].basic_pay is not None:
-				emp.current_basic_pay = pay[0].basic_pay
-				emp.encashment_amount = flt((pay[0].basic_pay/30) * flt(emp.encashable_days),2)
-				emp.salary_structure = pay[0].name
+			sal_struc_name = get_salary_structure()
+			if sal_struc_name:
+				sal_struc= frappe.get_doc("Salary Structure",sal_struc_name)
+				for d in sal_struc.earnings:
+					if d.salary_component == 'Basic Pay':
+						basic_pay = flt(d.amount)
+			else:
+				frappe.throw(_("No Active salary structure found for employee {}.".format(emp.employee)))
+			if basic_pay > 0:
+				emp.current_basic_pay = basic_pay
+				emp.encashment_amount = flt((basic_pay/30) * flt(emp.encashable_days),2)
+				emp.salary_structure = sal_struc_name
 				emp.encashment_tax = get_salary_tax(emp.encashment_amount)
 				emp.payable_amount = flt((emp.encashment_amount) - flt(emp.encashment_tax),2)
 
