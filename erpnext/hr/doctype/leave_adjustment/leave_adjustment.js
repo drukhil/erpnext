@@ -3,7 +3,7 @@
 
 frappe.ui.form.on('Leave Adjustment', {
 	refresh: function(frm) {
-
+		frm.get_docfield("items").allow_bulk_edit = 1;
 	},
 	get_employees: function(frm) {
 		return frappe.call({
