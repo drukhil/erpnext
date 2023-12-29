@@ -145,9 +145,6 @@ class BulkLeaveEncashment(Document):
 		self.set('items', entries)
 	
 	def post_accounts_entry(self):
-		if not self.cost_center:
-			frappe.throw("Setup Cost Center for employee in Employee Information")
-
 		expense_bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
 		if not expense_bank_account:
 			frappe.throw("Setup Default Expense Bank Account for your Branch")
