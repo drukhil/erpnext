@@ -117,7 +117,7 @@ class BulkLeaveEncashment(Document):
 		return True
 	
 	def get_leave_allocation(self, employee=None):
-		leave_allocation = frappe.db.sql("""select name, to_date, total_leaves_allocated, carry_forwarded_leaves_count from `tabLeave Allocation` where '{0}'
+		leave_allocation = frappe.db.sql("""select name, to_date, total_leaves_allocated from `tabLeave Allocation` where '{0}'
 		between from_date and to_date and docstatus=1 and leave_type='{1}'
 		and employee = '{2}'""".format(self.encashment_date or getdate(nowdate()), self.leave_type, employee), as_dict=1)
 		return leave_allocation[0] if leave_allocation else None
