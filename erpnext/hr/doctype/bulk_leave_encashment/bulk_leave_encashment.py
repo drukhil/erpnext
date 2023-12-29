@@ -9,7 +9,7 @@ from frappe.model.document import Document
 from frappe.utils import getdate, nowdate, flt, today, money_in_words, cint
 from erpnext.hr.doctype.leave_application.leave_application import get_leave_balance_on
 from erpnext.hr.doctype.salary_structure.salary_structure import get_basic_and_gross_pay
-from erpnext.hr.doctype.leave_encashment.leave_encashment import get_salary_structure
+from erpnext.hr.doctype.leave_encashment.leave_encashment import get_salary_struct
 from erpnext.hr.hr_custom_functions import get_salary_tax
 from datetime import *
 
@@ -104,7 +104,7 @@ class BulkLeaveEncashment(Document):
 
 			# if emp.encashable_days > emp.leave_balance:
 			# 	frappe.throw("Encashable Days  cannot be more than Leave Balance")
-			sal_struc_name = get_salary_structure()
+			sal_struc_name = get_salary_struct(emp.employee)
 			if sal_struc_name:
 				sal_struc= frappe.get_doc("Salary Structure",sal_struc_name)
 				for d in sal_struc.earnings:

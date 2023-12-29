@@ -255,6 +255,24 @@ class LeaveEncashment(Document):
 		self.db_set("encashment_amount", flt(basic_pay))
 		self.db_set("tax_amount", flt(salary_tax))
 
+
+@frappe.whitelist()
+def get_salary_struct(employee):
+        salary_struc_list = frappe.db.sql("""
+                select name from `tabSalary Structure`
+                where employee = %s
+                and is_active = 'Yes'
+                and now() between ifnull(from_date,'0000-00-00') and ifnull(to_date,'2050-12-31')
+                order by ifnull(from_date,'0000-00-00') desc limit 1
+        """,(employee))
+
+        if salary_struc_list:
+                return salary_struc_list[0][0]
+        else:
+                frappe.throw(_("No Active Salary Structure found for the employee."))
+                
+        return salary_struc_list[0][0]
+
 # Following code commented by SHIV on 2018/10/12
 '''
 @frappe.whitelist()
