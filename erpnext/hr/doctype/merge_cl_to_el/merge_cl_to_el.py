@@ -37,8 +37,8 @@ class MergeCLToEL(Document):
 
                 '''doc = frappe.db.sql("select name from `tabMerge CL To EL` where docstatus != 2 and fiscal_year = \'"+str(self.fiscal_year)+"\' and name != \'"+str(self.name)+"\'")
                 '''
-		if doc:
-                        frappe.throw("Can not create multiple Entries for the same year")
+		# if doc:
+        #                 frappe.throw("Can not create multiple Entries for the same year")
 
 
 	def get_data(self):
