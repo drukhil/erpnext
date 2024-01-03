@@ -96,11 +96,11 @@ def get_data():
                                         "name": "dfg-housing",
                                         "label": "DFG Housing Progress"
                                 },
-								{
-                                        "type": "page",
-                                        "name": "rba-project",
-                                        "label": "RBA Project Progress"
-                                },
+								# {
+                                #         "type": "page",
+                                #         "name": "rba-project",
+                                #         "label": "RBA Project Progress"
+                                # },
 			]
 		},
 		{
@@ -196,7 +196,7 @@ def get_data():
 				{
                                         "type": "page",
                                         "name": "bongdeyma-dashboard",
-                                        "label": "Bongdeyma Dashboard"
+                                        "label": "Gyalpozhing Dashboard"
                                 },
 				{
                                         "type": "page",
