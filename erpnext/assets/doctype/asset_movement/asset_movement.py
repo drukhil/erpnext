@@ -144,6 +144,11 @@ class AssetMovement(Document):
 				equip.branch = branch
 				equip.save()
 				#save_equipment(equipment, branch, self.posting_date, self.name, purpose)
+			fuelbook = frappe.db.get_value("Equipment", {"asset_code": self.asset}, "fuelbook")
+			if fuelbook:
+				fuelb = frappe.get_doc("Fuelbook", fuelbook)
+				fuelb.branch = branch
+				fuelb.save()
 
 	def set_latest_cc_in_asset(self, cancel=None):
 		#latest_movement_entry = frappe.db.sql("""select target_cost_center from `tabAsset Movement`
