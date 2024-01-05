@@ -26,8 +26,9 @@ class Attendance(Document):
 				and docstatus = 1""", (self.employee, self.att_date))
 
 			if leave:
-				frappe.throw(_("Employee {0} was on leave on {1}. Cannot mark attendance.").format(self.employee,
-					self.att_date))
+				self.status = 'Leave'
+				# frappe.throw(_("Employee {0} was on leave on {1}. Cannot mark attendance.").format(self.employee,
+				# 	self.att_date))
 
 	def validate_att_date(self):
 		if self.reference_name:
