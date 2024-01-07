@@ -264,7 +264,14 @@ class TravelAuthorization(Document):
 				
 			las = frappe.db.sql("select name from `tabLeave Application` where docstatus = 1 and employee = %s and (from_date between %s and %s or to_date between %s and %s)", (str(self.employee), str(start_date), str(end_date), str(start_date), str(end_date)), as_dict=True)					
 			if las:
-				frappe.throw("The dates in your current travel authorization has been used in leave application " + str(las[0].name))
+				# frappe.throw("The dates in your current travel authorization has been used in leave application " + str(las[0].name))
+				leave_from_date, leave_to_date = frappe.db.get_value("Leave Application", las, ["from_date","to_date"])
+				quarantine_flag = 0
+				for d in self.items:
+					if getdate(d.date) == getdate(leave_from_date) and getdate(d.till_date) == getdate(leave_to_date):
+						quarantine_flag = d.quarantine
+				if not quarantine_flag:
+					frappe.throw("The dates in your current travel authorization has been used in leave application " + str(las[0].name))
 
 
 	def set_estimate_amount(self):
