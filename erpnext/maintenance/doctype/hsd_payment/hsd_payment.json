@@ -767,7 +767,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "payment_status", 
@@ -852,7 +852,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2023-12-25 10:44:57.916830", 
+ "modified": "2024-01-15 14:32:39.405720", 
  "modified_by": "Administrator", 
  "module": "Maintenance", 
  "name": "HSD Payment", 
