@@ -25,7 +25,11 @@ frappe.ui.form.on('Assign Branch', {
 				frm.refresh_fields();
 			}
 		});
-	}
+	},
+    refresh_branch_list: function(frm) {
+        frm.clear_table("items");
+		frm.refresh_fields();
+    }
 });
 
 /*frappe.ui.form.on("Purchase Invoice", "refresh", function(frm) {

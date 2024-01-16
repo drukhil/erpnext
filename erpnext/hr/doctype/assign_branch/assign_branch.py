@@ -75,7 +75,7 @@ class AssignBranch(Document):
 			query += " and c.parent_cost_center = '{0}'".format(self.parent_cc)
 
 		entries = frappe.db.sql(query, as_dict=True)
-		self.set('items', [])
+		# self.set('items', [])
 		
 		for d in entries:
 			row = self.append('items', {})
