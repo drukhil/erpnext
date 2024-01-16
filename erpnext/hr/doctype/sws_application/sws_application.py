@@ -18,7 +18,9 @@ class SWSApplication(Document):
 		# self.validate_save()
 		self.validate_dead()
 		self.validate_amount()
-
+		if self.workflow_state == "Approved":
+			self.docstatus = 1
+			self.approval_status = "Approved"
 				
 	def validate_amount(self):
 		total_amount = 0
