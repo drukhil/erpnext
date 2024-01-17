@@ -551,7 +551,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 1, 
    "collapsible": 0, 
    "fieldname": "expected_end_date", 
@@ -2056,7 +2056,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 4, 
- "modified": "2023-12-05 17:29:10.028281", 
+ "modified": "2024-01-10 11:33:34.135819", 
  "modified_by": "Administrator", 
  "module": "Projects", 
  "name": "Project", 

@@ -26,7 +26,7 @@ class GLEntry(Document):
 		self.validate_party()
 		self.validate_currency()
 		self.validate_and_set_fiscal_year()
-		self.get_expense()
+		# self.get_expense()
 
 	def on_update_with_args(self, adv_adj, update_outstanding = 'Yes'):
 		self.validate_account_details(adv_adj)

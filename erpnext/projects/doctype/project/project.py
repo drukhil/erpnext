@@ -106,7 +106,7 @@ class Project(Document):
 			if getdate(a.start_date) < getdate(self.expected_start_date):
 				frappe.throw("Task Start Date Cannot be before Activity Start Date at Row {0}".format(a.idx))
 
-			if getdate(a.end_date) > getdate(self.expected_end_date):
+			if not a.is_milestone and getdate(a.end_date) > getdate(self.expected_end_date):
 				frappe.throw("Task End Date Cannot Exceed the Activity End Date at Row {0}".format(a.idx))
 			
 			if not a.is_milestone:
@@ -499,3 +499,84 @@ def holiday_list(from_date, to_date, hol_list):
 	and h2.name = %s""", (from_date, to_date, hol_list))[0][0]
 	return holidays
 
+""" This function exec from hooks daily """
+def update_project_expense():
+    previous_date = add_days(nowdate(), -1)
+    next_date = add_days(nowdate(), 1)
+
+    distinct_activities = frappe.db.sql("""SELECT DISTINCT cost_center 
+                                            FROM `tabGL Entry` 
+                                            WHERE modified BETWEEN %s AND %s""",
+                                        (getdate(previous_date), getdate(next_date)),
+                                        as_dict=True)
+
+    for activity in distinct_activities:
+        cost_center = activity.cost_center
+
+        if frappe.get_value("Project", cost_center, "name"):
+            update_project_expense_for_cost_center(cost_center)
+
+def update_project_expense_for_cost_center(cost_center):
+    doc = frappe.get_doc("Project", cost_center)
+    parent_cc = frappe.get_value("Cost Center", cost_center, "parent_cost_center")
+    # cost_centers = frappe.get_all("Cost Center", filters={"parent_cost_center": parent_cc}, pluck="name")
+    cost_centers = [row[0] for row in frappe.db.sql("""SELECT name FROM `tabCost Center` WHERE parent_cost_center = %s""", (parent_cc,))]
+
+    overall_total_expense = frappe.db.sql("""SELECT SUM(debit) - SUM(credit) AS expense 
+                                     FROM `tabGL Entry` 
+                                     WHERE cost_center IN %s 
+                                     AND account IN (SELECT name FROM `tabAccount` WHERE root_type = 'Expense') 
+                                     AND docstatus = 1""",
+                                 (cost_centers,),
+                                 as_dict=True)[0].expense
+
+    if not doc.is_group:
+        total_expense_cost_center = frappe.db.sql("""SELECT SUM(debit) - SUM(credit) AS expense 
+                                                    FROM `tabGL Entry` 
+                                                    WHERE cost_center = %s 
+                                                    AND account IN (SELECT name FROM `tabAccount` WHERE root_type = 'Expense') 
+                                                    AND docstatus = 1""",
+                                                (doc.name,),
+                                                as_dict=True)[0].expense
+        total_expense = flt(total_expense_cost_center)
+
+    if doc.is_group:
+        frappe.db.sql("""UPDATE `tabProject` SET expense = %s WHERE name = %s""", (flt(overall_total_expense), doc.name))
+    else:
+        frappe.db.sql("""UPDATE `tabProject` SET expense = %s WHERE name = %s""", (flt(total_expense), doc.name))
+        frappe.db.sql("""UPDATE `tabProject` SET expense = %s WHERE name = %s""", (flt(overall_total_expense), doc.parent_project))
+
+def old_update_project_expense():
+	previous_date = add_days(nowdate(), -1)
+	next_date = add_days(nowdate(), 1)
+	distinct_activities = frappe.db.sql("""Select distinct cost_center From `tabGL Entry` Where modified Between 
+				'{}' And '{}' """.format(getdate(previous_date), getdate(next_date)), as_dict=True)
+	if len(distinct_activities):
+		for d in distinct_activities:
+			if frappe.db.exists("Project", str(d.cost_center)):
+				
+				doc = frappe.get_doc("Project", d.cost_center)
+				from erpnext.accounts.accounts_custom_functions import get_child_cost_centers
+				parent_cc = frappe.get_doc("Cost Center", d.cost_center).parent_cost_center
+				cost_centers = get_child_cost_centers(parent_cc)
+
+				all_total_exp = frappe.db.sql(""" select sum(debit) - sum(credit) as expense from `tabGL Entry` 
+							where cost_center IN %(cost_center)s  and account in (select name from `tabAccount` where root_type = 'Expense') 
+							and docstatus = 1""", {"cost_center": cost_centers}, as_dict = 1)
+				if not doc.is_group:
+						total_exp = frappe.db.sql(""" select sum(debit) - sum(credit) as expense 
+								from `tabGL Entry` where cost_center = "{0}" and 
+								account in (select name from `tabAccount` where root_type = 'Expense')""".format(doc.name), as_dict = 1)
+						
+						frappe.db.sql(""" update `tabProject` set expense = {0} where 
+								name = "{1}" """.format(flt(total_exp[0].expense), doc.name))
+
+						'''if total_exp:
+						doc = frappe.get_doc("Project", parent)
+						doc.db_set('expense', flt(total_exp[0].expense))'''
+
+						frappe.db.sql(""" update `tabProject` set expense = {0}
+								where name = "{1}" """.format(flt(all_total_exp[0].expense), doc.parent_project))
+				else:
+					frappe.db.sql(""" update `tabProject` set expense = {0}
+							where name = "{1}" """.format(flt(all_total_exp[0].expense), doc.name))

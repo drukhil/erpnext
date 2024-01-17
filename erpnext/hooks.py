@@ -193,7 +193,8 @@ scheduler_events = {
 		"erpnext.hr.hr_custom_functions.post_leave_credits",
 		"erpnext.custom_functions.check_pending_approvers",
 		"erpnext.projects.doctype.priority_project.priority_project.update_priority",
-        "erpnext.projects.doctype.bmt_project.bmt_project.update_bmt"
+        "erpnext.projects.doctype.bmt_project.bmt_project.update_bmt",
+        "erpnext.projects.doctype.project.project.update_project_expense"
 	],
 }
 
