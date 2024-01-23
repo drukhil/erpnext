@@ -100,7 +100,7 @@ class PurchaseInvoice(BuyingController):
                 }[str(self.docstatus or 0)]
 
 	def adjust_add_ded(self):
-                self.total_add_ded = flt(self.freight_and_insurance_charges) - flt(self.discount) + flt(self.royalty) + flt(self.tax) + flt(self.other_charges)-flt(self.ld_total)
+                self.total_add_ded = flt(self.freight_and_insurance_charges) - flt(self.discount) + flt(self.royalty) + flt(self.tax) + flt(self.other_charges)
                 self.discount_amount = -1 * flt(self.total_add_ded)
 	
 	def pull_ld(self):
@@ -349,6 +349,8 @@ class PurchaseInvoice(BuyingController):
 			from erpnext.stock.doctype.serial_no.serial_no import update_serial_nos_after_submit
 			update_serial_nos_after_submit(self, "items")
 
+		if self.ld_total > 0 and not self.ld_account:
+			frappe.throw("Missing LD Account value!")
 		# this sequence because outstanding may get -negative
 		self.make_gl_entries()
 
@@ -408,7 +410,8 @@ class PurchaseInvoice(BuyingController):
 		self.make_payment_gl_entries(gl_entries)
 
 		self.make_write_off_gl_entry(gl_entries)
-		
+		if self.ld_total > 0:
+			self.make_ld_gl_entry(gl_entries)
 
 		if gl_entries:
 			update_outstanding = "No" if (cint(self.is_paid) or self.write_off_account) else "Yes"
@@ -434,6 +437,10 @@ class PurchaseInvoice(BuyingController):
 			# Didnot use base_grand_total to book rounding loss gle
 			grand_total_in_company_currency = flt(self.grand_total * self.conversion_rate,
 				self.precision("grand_total"))
+			if self.ld_total > 0:
+				grand_total_in_company_currency = flt((self.grand_total-self.ld_total) * self.conversion_rate,
+					self.precision("grand_total"))
+
 
 			gl_entries.append(
 				self.get_gl_dict({
@@ -675,7 +682,20 @@ class PurchaseInvoice(BuyingController):
 						"cost_center": self.write_off_cost_center
 					})
 				)	
-
+	""" ld gl entry 23 Jan 2024, Jai """
+	def make_ld_gl_entry(self, gl_entries):
+		gl_entries.append(
+			self.get_gl_dict({
+				"account": self.ld_account,
+				"party_type": "Supplier",
+				"party": self.supplier,
+				"credit": self.ld_total,
+				"credit_in_account_currency": self.ld_total,
+				"against": self.supplier,
+				"cost_center": self.buying_cost_center,
+				"remarks": "Liquidated Damage deducted from Bill amount"
+			})
+		)
 	# make tds gl entry (Kinley) customisation for tds incorporation 
 	def make_tds_gl_entry(self, gl_entries):
 		if self.tds_account and flt(self.tds_amount):
