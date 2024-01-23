@@ -14,7 +14,7 @@ class SupplierMonitoring(Document):
 		self.check_requirements()
 		self.update_ld()
 		self.check_duplicate()
-		self.validate_smt_po_qty()
+		# self.validate_smt_po_qty()
 		self.calc_ld_total()
 
 	def calc_ld_total(self):
@@ -69,7 +69,7 @@ class SupplierMonitoring(Document):
 			frappe.throw("No items found for the Purchase Order {}".format(po))
 		self.set('items', [])
 		for d in data:
-			if flt(d.qty) == flt(d.received_qty):
+			if flt(d.qty) == flt(d.received_qty) and frappe.db.get_value("Item", d.item_code, "is_stock_item"):
 				continue
 			row = self.append('items', {})
 			row.received_quantity = flt(d.qty) - flt(d.received_qty)
