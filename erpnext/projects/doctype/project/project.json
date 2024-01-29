@@ -676,7 +676,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "man_power_required", 
@@ -726,7 +726,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "physical_progress_weightage", 
@@ -2056,7 +2056,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 4, 
- "modified": "2024-01-10 11:33:34.135819", 
+ "modified": "2024-01-25 11:08:17.443090", 
  "modified_by": "Administrator", 
  "module": "Projects", 
  "name": "Project", 
