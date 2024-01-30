@@ -1,6 +1,7 @@
 // Copyright (c) 2016, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
-
+cur_frm.add_fetch("project", "expected_start_date", "project_from_date");
+cur_frm.add_fetch("project", "expected_end_date", "project_end_date");
 frappe.ui.form.on('Delay Factor', {
 	setup: function(frm) {
 		frm.get_field('items').grid.editable_fields = [
