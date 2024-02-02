@@ -30,6 +30,7 @@ frappe.ui.form.on('Imprest Recoup', {
 				frappe.set_route("query-report", "General Ledger");
 			}, __("View"));
 		}
+
 	},
 	onload: function(frm) {
 		// Updating default information based on loggedin user
@@ -62,16 +63,6 @@ frappe.ui.form.on('Imprest Recoup', {
 			cur_frm.set_value("entry_date", frappe.datetime.now_datetime());
 		}
 		*/
-		
-		frm.fields_dict['items'].grid.get_field('budget_account').get_query = function(){
-			return{
-				filters: {
-					'root_type': 'Expense',
-					'is_group': 0
-				}
-			}
-		};
-		
 		cur_frm.set_query("select_cheque_lot", function(){
 			return {
 				"filters": [
@@ -164,6 +155,16 @@ frappe.ui.form.on('Imprest Recoup', {
 		enable_disable(frm);
 	}
 });
+
+cur_frm.fields_dict['items'].grid.get_field('budget_account').get_query = function(){
+	return{
+		filters: {
+			'root_type': 'Expense',
+			'account_type': 'Expense Account',
+			'is_group': 0
+		}
+	}
+};
 
 frappe.ui.form.on('Imprest Recoup Item',{
 	quantity: function(frm, cdt, cdn){
