@@ -13,6 +13,8 @@ class DelayFactor(Document):
 		if not self.project_end_date:
 			self.project_from_date = frappe.db.get_value("Project", self.project, "expected_start_date")
 			self.project_end_date = frappe.db.get_value("Project", self.project, "expected_end_date")
+		if not self.branch:
+			self.branch = frappe.db.get_value("Project", self.project, "branch")
 
 	def on_submit(self):
 		self.posting_date = now()
