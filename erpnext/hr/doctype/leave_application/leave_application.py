@@ -152,6 +152,10 @@ class LeaveApplication(Document):
 		days = date_diff(e, d) + 1
 		for a in (d + timedelta(n) for n in range(days)):
 			if getdate(a).weekday() != 6:
+				al = frappe.db.sql("select name from tabAttendance where docstatus = 1 and employee = %s and att_date = %s", (self.employee, a), as_dict=True)
+				if al:
+					doc = frappe.get_doc("Attendance", al[0].name)
+					doc.cancel()
 				#create attendance
 				attendance = frappe.new_doc("Attendance")
 				attendance.flags.ignore_permissions = 1
