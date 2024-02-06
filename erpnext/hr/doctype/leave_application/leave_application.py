@@ -60,7 +60,6 @@ class LeaveApplication(Document):
 		self.get_status()
 		self.branch = frappe.db.get_value("Employee", self.employee, "branch")
 		self.cost_center = frappe.db.get_value("Employee", self.employee, "cost_center")
-		self.validate_dates_ta()
 		self.validate_fiscal_year()
 		if not getattr(self, "__islocal", None) and frappe.db.exists(self.doctype, self.name):
 			self.previous_doc = frappe.db.get_value(self.doctype, self.name, "*", as_dict=True)
@@ -70,15 +69,17 @@ class LeaveApplication(Document):
 		if self.status == "Approved":
 			set_employee_name(self)
 
-		self.validate_dates()
-		self.validate_balance_leaves()
-		self.validate_leave_overlap()
-		self.validate_max_days()
-		self.show_block_day_warning()
-		self.validate_block_days()
-		self.validate_salary_processed_days()
-		#self.validate_leave_approver()
-		self.validate_backdated_applications()
+		if self.workflow_state != "Rejected":
+			self.validate_dates_ta()
+			self.validate_dates()
+			self.validate_balance_leaves()
+			self.validate_leave_overlap()
+			self.validate_max_days()
+			self.show_block_day_warning()
+			self.validate_block_days()
+			self.validate_salary_processed_days()
+			#self.validate_leave_approver()
+			self.validate_backdated_applications()
 		verify_workflow(self)                
 	def on_update(self):
 		self.validate_fiscal_year()
@@ -108,44 +109,44 @@ class LeaveApplication(Document):
 			#self.update_cf_entry('Submit')
 		self.update_for_backdated_applications()
 
-        def before_cancel(self):
-                self.get_status()
+	def before_cancel(self):
+		self.get_status()
                 
 	def on_cancel(self):
 		# notify leave applier about cancellation
 		self.notify_employee("cancelled")
 		self.cancel_attendance()
 		self.update_for_backdated_applications()
-		#self.update_cf_entry('Cancel')
-        # ++++++++++++++++++++ Ver 2.0 BEGINS ++++++++++++++++++++
-        # Following methods created by SHIV on 2018/02/12
-        def validate_backdated_applications(self):
-                if self.leave_balance:
-                        to_date = get_leave_allocation_records(self.from_date, self.employee).get(self.employee, frappe._dict()).get(self.leave_type, frappe._dict()).to_date
-                        balance = get_leave_balance_on(self.employee, self.leave_type, to_date)
+	#self.update_cf_entry('Cancel')
+	# ++++++++++++++++++++ Ver 2.0 BEGINS ++++++++++++++++++++
+	# Following methods created by SHIV on 2018/02/12
+	def validate_backdated_applications(self):
+			if self.leave_balance:
+					to_date = get_leave_allocation_records(self.from_date, self.employee).get(self.employee, frappe._dict()).get(self.leave_type, frappe._dict()).to_date
+					balance = get_leave_balance_on(self.employee, self.leave_type, to_date)
 
-                        if balance:
-                                if flt(balance) < flt(self.total_leave_days):
-                                        frappe.throw(_("Insufficient Leave Balance {0}/{1}").format(flt(balance),flt(self.total_leave_days)),title="Insufficient Leave Balance")
+					if balance:
+							if flt(balance) < flt(self.total_leave_days):
+									frappe.throw(_("Insufficient Leave Balance {0}/{1}").format(flt(balance),flt(self.total_leave_days)),title="Insufficient Leave Balance")
 
-        def update_for_backdated_applications(self):
-                is_carry_forward = frappe.db.get_value("Leave Type", self.leave_type, "is_carry_forward")
-                leave_days       = -1*flt(self.total_leave_days) if self.docstatus == 2 else flt(self.total_leave_days)
-                
-                if is_carry_forward:
-                        frappe.db.sql("""
-                                update
-                                        `tabLeave Allocation`
-                                set
-                                        carry_forwarded_leaves = carry_forwarded_leaves - {0},
-                                        total_leaves_allocated = total_leaves_allocated - {0}
-                                where   employee = '{1}'
-                                and     leave_type = '{2}'
-                                and     docstatus = 1
-                                and     from_date > '{3}'
-                        """.format(leave_days, self.employee, self.leave_type, self.from_date))
-        # +++++++++++++++++++++ Ver 2.0 ENDS +++++++++++++++++++++
-                
+	def update_for_backdated_applications(self):
+			is_carry_forward = frappe.db.get_value("Leave Type", self.leave_type, "is_carry_forward")
+			leave_days       = -1*flt(self.total_leave_days) if self.docstatus == 2 else flt(self.total_leave_days)
+			
+			if is_carry_forward:
+					frappe.db.sql("""
+							update
+									`tabLeave Allocation`
+							set
+									carry_forwarded_leaves = carry_forwarded_leaves - {0},
+									total_leaves_allocated = total_leaves_allocated - {0}
+							where   employee = '{1}'
+							and     leave_type = '{2}'
+							and     docstatus = 1
+							and     from_date > '{3}'
+					""".format(leave_days, self.employee, self.leave_type, self.from_date))
+	# +++++++++++++++++++++ Ver 2.0 ENDS +++++++++++++++++++++
+			
 	def create_attendance(self):
 		d = getdate(self.from_date)
 		e = getdate(self.to_date)
@@ -186,7 +187,7 @@ class LeaveApplication(Document):
 
 		tas = frappe.db.sql("select a.name from `tabTravel Authorization` a, `tabTravel Authorization Item` b where a.employee = %s and a.docstatus = 1 and a.name = b.parent and (b.date between %s and %s or %s between b.date and b.till_date or %s between b.date and b.till_date)", (str(self.employee), str(start_date), str(end_date), str(start_date), str(end_date)), as_dict=True)
 		if tas:
-			frappe.throw("The dates in your current Travel Authorization has already been used in " + str(tas[0].name))
+			frappe.throw("The dates in your current Leave Application has already been used in Travel Authorization " + str(tas[0].name))
 
 	def validate_dates_acorss_allocation(self):
 		def _get_leave_alloction_record(date):
