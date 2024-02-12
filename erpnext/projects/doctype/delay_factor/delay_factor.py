@@ -42,7 +42,7 @@ class DelayFactor(Document):
 	def update_tasks(self):
 		self.set('items', [])
 		tasks = frappe.db.sql(""" select name, parent, task,  start_date, end_date from `tabActivity Tasks` where 
-			parent = "{0}" and start_date >= '{1}'
+			parent = "{0}" and start_date >= '{1}' order by idx
 			""".format(self.project, self.from_date), as_dict = 1, debug = 1)
 		if not tasks:
 			frappe.throw(""" No Work Schedule Defined for "{0}" """.format(self.project))
