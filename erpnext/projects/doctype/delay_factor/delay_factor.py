@@ -17,7 +17,8 @@ class DelayFactor(Document):
 			self.branch = frappe.db.get_value("Project", self.project, "branch")
 
 	def on_submit(self):
-		self.posting_date = now()
+		# self.posting_date = now()
+		self.db_set('posting_date', now())
 		for d in frappe.db.get_list("Delay Factor", {"posting_date": ("<", self.posting_date), "docstatus": 0, "project": self.project}):
 			frappe.throw("Another Delay Factor {} created before this for same Project. Please complete it first.".format(frappe.get_desk_link("Delay Factor", d.name)))
 		self.update_project()
