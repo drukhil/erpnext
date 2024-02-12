@@ -70,7 +70,7 @@ class DelayFactor(Document):
 				doc.db_set('end_date', a.new_to_date)
 		
 		project = frappe.get_doc("Project", self.project)
-		max_end_date = frappe.db.sql("select max(end_date) m_end_date from `tabActivity Tasks` where parent='{}'".format(self.project), as_dict=1)
+		max_end_date = frappe.db.sql("select max(end_date) m_end_date from `tabActivity Tasks` where parent='{}'".format(frappe.db.escape(self.project)), as_dict=1)
 
 		project.db_set('expected_end_date', getdate(max_end_date[0]['m_end_date']))
 		#if project.expected_end_date < max_date:
