@@ -4,7 +4,7 @@
  "docstatus": 0, 
  "doctype": "Page", 
  "idx": 0, 
- "modified": "2023-11-15 10:40:41.009723", 
+ "modified": "2024-02-14 16:04:20.085703", 
  "modified_by": "Administrator", 
  "module": "Management Dashboard", 
  "name": "asset-management", 
@@ -24,7 +24,7 @@
    "role": "HR User"
   }, 
   {
-   "role": "Projects User"
+   "role": "Employee"
   }
  ], 
  "script": null, 
