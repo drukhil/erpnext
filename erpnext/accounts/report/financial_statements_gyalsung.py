@@ -102,6 +102,8 @@ def get_label(periodicity, from_date, to_date):
 			label = formatdate(from_date, "YYYY")
 		else:
 			#label = formatdate(from_date, "YYYY") + "-" + formatdate(to_date, "YYYY")
+			# below date -2 added by Jai, since 2024-12-31 is getting to 2025
+			to_date = add_days(to_date, -2)
 			label = formatdate(to_date, 'YYYY')
 	else:
 		if formatdate(from_date, "YYYY") == formatdate(to_date, "YYYY"):
