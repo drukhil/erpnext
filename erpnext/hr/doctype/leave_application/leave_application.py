@@ -536,6 +536,7 @@ def get_approved_leaves_for_period(employee, leave_type, from_date, to_date):
 		and     leave_type=%(leave_type)s
 		and     status="Approved"
 		and     docstatus=1
+		and employee_type != "GCE"
 		and     (
                                 (from_date between %(from_date)s and %(to_date)s)
 				or
