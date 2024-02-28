@@ -375,49 +375,58 @@ class Employee(Document):
 	def update_assign_branch(self):
 		parent_cc = frappe.get_doc("Cost Center", self.cost_center).parent_cost_center
 		frappe.msgprint("{0}".format(parent_cc))
-
-
+	
 	def post_casual_leave(self):
-                if not cint(self.casual_leave_allocated):
-                        credits_per_year = frappe.db.get_value("Employee Group Item", {"parent": self.employee_group, "leave_type": 'Casual Leave'}, "credits_per_year")
+		if not cint(self.casual_leave_allocated):
+			credits_per_year = frappe.db.get_value("Employee Group Item", {"parent": self.employee_group, "leave_type": ('in',['Casual Leave','GCE Casual Leave'])}, "credits_per_year")
 
-                        if flt(credits_per_year):
-                                from_date = getdate(self.date_of_joining)
-                                to_date = get_year_end_date(from_date);
+			if flt(credits_per_year):
+				from_date = getdate(self.date_of_joining)
+				to_date = get_year_end_date(from_date);
 
-                                no_of_months = frappe.db.sql("""
-                                        select (
-                                                case
-                                                        when day('{0}') > 1 and day('{0}') <= 15
-                                                        then timestampdiff(MONTH,'{0}','{1}')+1 
-                                                        else timestampdiff(MONTH,'{0}','{1}')       
-                                                end
-                                                ) as no_of_months
-                                """.format(str(self.date_of_joining),str(add_days(to_date,1))))[0][0]
+				no_of_months = frappe.db.sql("""
+						select (
+								case
+										when day('{0}') > 1 and day('{0}') <= 15
+										then timestampdiff(MONTH,'{0}','{1}')+1 
+										else timestampdiff(MONTH,'{0}','{1}')       
+								end
+								) as no_of_months
+				""".format(str(self.date_of_joining),str(add_days(to_date,1))))[0][0]
 
-                                new_leaves_allocated = round5((flt(no_of_months)/12)*flt(credits_per_year))
-                                new_leaves_allocated = new_leaves_allocated if new_leaves_allocated <= flt(credits_per_year) else flt(credits_per_year)
+				new_leaves_allocated = round5((flt(no_of_months)/12)*flt(credits_per_year))
+				new_leaves_allocated = new_leaves_allocated if new_leaves_allocated <= flt(credits_per_year) else flt(credits_per_year)
 
 				if self.employment_type == 'GCE':
 					if not self.contract_end_date:
 						frappe.throw("Missing value for Contract End Date")
 					to_date = self.contract_end_date
 					new_leaves_allocated = cint(5)
+					leave_allocation = frappe.db.sql("""
+						select name, from_date, to_date
+						from `tabLeave Allocation`
+						where employee=%s and leave_type=%s and docstatus=1
+						and to_date >= %s and from_date <= %s""", 
+						(self.name, "GCE Casual Leave", from_date, to_date))
+					if leave_allocation:
+						return
 
+				
 				if flt(new_leaves_allocated):
-        	                	la = frappe.new_doc("Leave Allocation")
-                	        	la.employee = self.employee
-                        	 	la.employee_name = self.employee_name
-                           		la.leave_type = "Casual Leave"
-                              	 	la.from_date = str(from_date)
-                             		la.to_date = str(to_date)
-       		                       	la.carry_forward = cint(0)
-                	            	la.new_leaves_allocated = flt(new_leaves_allocated)
-                        	     	la.submit()
-                             		self.db_set("casual_leave_allocated", 1)
-					frappe.db.commit()
+					la = frappe.new_doc("Leave Allocation")
+					la.employee = self.employee
+					la.employee_name = self.employee_name
+					la.leave_type = "GCE Casual Leave" if self.employment_type == 'GCE' else "Casual Leave"
+					la.from_date = str(from_date)
+					la.to_date = str(to_date)
+					la.carry_forward = cint(0)
+					la.new_leaves_allocated = flt(new_leaves_allocated)
+					la.submit()
+					if self.employment_type != 'GCE':
+						self.db_set("casual_leave_allocated", 1)
+				frappe.db.commit()
 			                
-                '''
+	'''
 		if not self.casual_leave_allocated:
 			date = getdate(self.date_of_joining)
 			start = date;
