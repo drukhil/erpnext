@@ -308,14 +308,31 @@ def get_data(filters, show_party_name):
 	
 	return data
 """
+def get_cost_centers_with_children(cost_centers):
+	if not isinstance(cost_centers, list):
+		cost_centers = [d.strip() for d in cost_centers.strip().split(",") if d]
+
+	all_cost_centers = []
+	for d in cost_centers:
+		if frappe.db.exists("Cost Center", d):
+			lft, rgt = frappe.db.get_value("Cost Center", d, ["lft", "rgt"])
+			children = frappe.get_all("Cost Center", filters={"lft": [">=", lft], "rgt": ["<=", rgt]})
+			all_cost_centers += [c.name for c in children]
+		else:
+			frappe.throw(_("Cost Center: {0} does not exist").format(d))
+
+	return list(set(all_cost_centers))
 
 def get_balances(filters):
         filters.accounts    = None if filters.get("accounts") == '%' else filters.get("accounts")
-        filters.cost_center = None if filters.get("cost_center") == '%' else filters.get("cost_center")
+        # filters.cost_center = None if filters.get("cost_center") == '%' else filters.get("cost_center")
+        filters.cost_center = None if filters.get("cost_center") == '%' else get_cost_centers_with_children(filters.get("cost_center"))
         
         cond = ""
         cond += " and account = '{0}'".format(filters.accounts) if filters.get("accounts") else ""
-        cond += " and cost_center = '{0}'".format(filters.cost_center) if filters.get("cost_center") else ""
+        # cond += " and cost_center in '{0}'".format(filters.cost_center) if filters.get("cost_center") else ""
+        cond += " and cost_center in %(cost_center)s" if filters.get("cost_center") else ""
+        
         sql = """
 		select
                         {group_by} as cost_center,
@@ -328,10 +345,6 @@ def get_balances(filters):
 		and ifnull(party_type, '') = '{party_type}' and ifnull(party, '') != ''
 		and posting_date <= '{to_date}'
 		{cond}
-		and ge.account not in ('Normal Loss - SMCL','Abnormal Loss - SMCL', 'TDS - 2%% - CDCL', 'TDS - 3%% - CDCL', 'TDS - 5%% - CDCL', 'TDS - 10%% - CDCL')
-		and not exists(select 1 from `tabAccount` as ac
-                                where ac.name = ge.account
-                                and ac.parent_account = 'Sale of mines product - SMCL')
 	group by {group_by}""".format(
                 company = filters.company,
                 from_date = filters.from_date,
@@ -340,7 +353,7 @@ def get_balances(filters):
                 group_by = "party,''" if filters.get("group_by_party") else "party, cost_center",
                 cond = cond
         )
-	gle = frappe.db.sql(sql, as_dict=True)
+	gle = frappe.db.sql(sql, {"cost_center": filters.cost_center}, as_dict=True)
 	
 	balances = frappe._dict()
 	for d in gle:
