@@ -303,3 +303,22 @@ def get_production_groups(group):
 		groups.append(str(a.item_sub_group))
 	return groups
 
+
+
+def correct_incomeAcc():
+        sale_invoice_item = frappe.db.sql("select name, income_account, parent from `tabSales Invoice Item` where item_code='600635' and creation between '2022-01-01' and '2024-03-03' and docstatus=1")
+        for itemy in sale_invoice_item:
+                name_sli, income_account, parent = itemy
+                frappe.db.set_value("Sales Invoice Item", name_sli, "income_account", "Sale of Sand - NRDCL")
+                print("SL : {} {} {} ".format(name_sli, parent, income_account))
+                Glitems = frappe.db.sql("select name, voucher_no,account from `tabGL Entry` where voucher_no='{}'".format(parent))
+                for item_gl in Glitems:
+                        name_gli,voucher_no,account = item_gl
+                        if account == "Sale of Timber and by-product - NRDCL":
+                                frappe.db.set_value("GL Entry", name_gli, "account", "Sale of Sand - NRDCL")
+                                print("JE : {} {} {}".format(name_gli, voucher_no, account))
+                                
+                        
+                # break
+        
+                
