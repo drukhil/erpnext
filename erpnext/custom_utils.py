@@ -305,20 +305,23 @@ def get_production_groups(group):
 
 
 
+
+
 def correct_incomeAcc():
-        sale_invoice_item = frappe.db.sql("select name, income_account, parent from `tabSales Invoice Item` where item_code='600635' and creation between '2022-01-01' and '2024-03-03' and docstatus=1")
-        for itemy in sale_invoice_item:
-                name_sli, income_account, parent = itemy
+        sales_invoices = frappe.db.sql("select sl.name as sl_name, sli.name as name_sli, sli.income_account as income_account from `tabSales Invoice` as sl inner join  `tabSales Invoice Item` as sli on sl.name=sli.parent where sl.posting_date between '2024-01-01' and '2024-03-10' and sli.item_code='700038' and sl.docstatus!=2; ")
+        for itemy in sales_invoices:
+                sl_name, income_account, name_sli = itemy
                 frappe.db.set_value("Sales Invoice Item", name_sli, "income_account", "Sale of Sand - NRDCL")
-                print("SL : {} {} {} ".format(name_sli, parent, income_account))
-                Glitems = frappe.db.sql("select name, voucher_no,account from `tabGL Entry` where voucher_no='{}'".format(parent))
+                print("SL : {} {} ".format(name_sli, income_account))
+                Glitems = frappe.db.sql("select name, voucher_no,account from `tabGL Entry` where voucher_no='{}'".format(sl_name))
                 for item_gl in Glitems:
                         name_gli,voucher_no,account = item_gl
                         if account == "Sale of Timber and by-product - NRDCL":
+        
                                 frappe.db.set_value("GL Entry", name_gli, "account", "Sale of Sand - NRDCL")
                                 print("JE : {} {} {}".format(name_gli, voucher_no, account))
                                 
                         
-                # break
+                
         
                 
