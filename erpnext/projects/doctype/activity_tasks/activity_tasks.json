@@ -37,7 +37,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "task", 
@@ -954,7 +954,7 @@
  "issingle": 0, 
  "istable": 1, 
  "max_attachments": 0, 
- "modified": "2021-03-30 15:57:39.143641", 
+ "modified": "2024-03-13 10:55:01.807820", 
  "modified_by": "Administrator", 
  "module": "Projects", 
  "name": "Activity Tasks", 
