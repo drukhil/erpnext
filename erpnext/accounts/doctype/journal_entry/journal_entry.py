@@ -136,6 +136,8 @@ class JournalEntry(AccountsController):
 				frappe.get_doc(voucher_type, voucher_no).set_total_advance_paid()
 
 	def on_cancel(self):
+		if self.clearance_date:
+			frappe.throw("Already done bank reconciliation.")
 		from erpnext.accounts.utils import unlink_ref_doc_from_payment_entries
 		unlink_ref_doc_from_payment_entries(self.doctype, self.name)
 
