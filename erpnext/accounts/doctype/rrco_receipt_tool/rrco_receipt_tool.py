@@ -19,7 +19,7 @@ class RRCOReceiptTool(Document):
 				if frappe.db.exists("RRCO Receipt Entries", {"fiscal_year":self.fiscal_year, "month": self.month, "docstatus": 1}):
 					frappe.throw("RRCO Receipt and date has been already assigned for the given month {} and fiscal year {}".format(self.month, self.fiscal_year))
 
-		elif self.purpose in ["PBVA","Annual Bonus"]:
+		elif self.purpose in ["PBVA","Annual Bonus","Bulk Leave Encashment"]:
 			if not self.fiscal_year:
 				frappe.throw("Fiscal Year value is missing")
 
@@ -63,15 +63,26 @@ class RRCOReceiptTool(Document):
 					rrco.flags.ignore_permissions = True
 					rrco.submit()
 					
-		elif self.purpose in ["Employee Salary","PBVA","Annual Bonus"]:
-			rrco = frappe.new_doc("RRCO Receipt Entries")
-			rrco.purpose = str(self.purpose)
-			rrco.fiscal_year = str(self.fiscal_year)
-			rrco.receipt_date = self.tds_receipt_date
-			rrco.receipt_number = str(self.tds_receipt_number)
-			rrco.cheque_number = str(self.cheque_number)
-			rrco.cheque_date = self.cheque_date
-			rrco.rrco_receipt_tool = self.name
+		elif self.purpose in ["Employee Salary","PBVA","Annual Bonus","Bulk Leave Encashment"]:
+			if self.purpose=="Bulk Leave Encashment":
+				rrco = frappe.new_doc("RRCO Receipt Entries")
+				rrco.purpose = str(self.purpose)
+				rrco.fiscal_year = str(self.fiscal_year)
+				rrco.receipt_date = self.tds_receipt_date
+				rrco.receipt_number = str(self.tds_receipt_number)
+				rrco.cheque_number = str(self.cheque_number)
+				rrco.cheque_date = self.cheque_date
+				rrco.rrco_receipt_tool = self.name
+			
+			else:
+				rrco = frappe.new_doc("RRCO Receipt Entries")
+				rrco.purpose = str(self.purpose)
+				rrco.fiscal_year = str(self.fiscal_year)
+				rrco.receipt_date = self.tds_receipt_date
+				rrco.receipt_number = str(self.tds_receipt_number)
+				rrco.cheque_number = str(self.cheque_number)
+				rrco.cheque_date = self.cheque_date
+				rrco.rrco_receipt_tool = self.name
 
 			if self.purpose == "Employee Salary":
 				rrco.month = str(self.month)
