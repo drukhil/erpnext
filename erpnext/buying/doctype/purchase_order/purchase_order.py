@@ -48,7 +48,8 @@ class PurchaseOrder(BuyingController):
 	def validate(self):
 		check_future_date(self.transaction_date)
 		super(PurchaseOrder, self).validate()
-		self.validate_branch_perm()
+		#added by Jai, commented by jai
+		# self.validate_branch_perm() 
 		cc  = frappe.db.sql(""" select name from `tabCost Center` where branch = "{0}" """.format(self.branch), as_dict = 1)
                 if cc:
                         self.cost_center = cc[0].name
@@ -195,10 +196,11 @@ class PurchaseOrder(BuyingController):
 		clear_doctype_notifications(self)
 
 	def on_submit(self):
-		owner_branch = frappe.db.sql("select branch from `tabEmployee` where user_id = '{0}'".format(self.owner), as_dict=True)
-		boss_branch = frappe.db.sql("select branch from `tabEmployee` where user_id = '{0}'".format(frappe.session.user), as_dict=True)
-		if str(owner_branch[0]['branch']) != str(boss_branch[0]['branch']):
-			frappe.throw ("This Purchase order is created by someone from different Branch than You. Kindly check if you should approve it. ")
+		#added by Jai. commented by Jai
+		# owner_branch = frappe.db.sql("select branch from `tabEmployee` where user_id = '{0}'".format(self.owner), as_dict=True)
+		# boss_branch = frappe.db.sql("select branch from `tabEmployee` where user_id = '{0}'".format(frappe.session.user), as_dict=True)
+		# if str(owner_branch[0]['branch']) != str(boss_branch[0]['branch']):
+		# 	frappe.throw ("This Purchase order is created by someone from different Branch than You. Kindly check if you should approve it. ")
 			
 		self.check_budget_available()
 

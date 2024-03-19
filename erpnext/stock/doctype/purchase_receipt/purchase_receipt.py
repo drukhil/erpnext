@@ -61,7 +61,8 @@ class PurchaseReceipt(BuyingController):
 	def validate(self):
 		check_future_date(self.posting_date)
 		check_future_date(self.actual_receipt_date)
-		self.validate_branch_perm()
+		#added by Jai, commented by jai
+		# self.validate_branch_perm()
 		super(PurchaseReceipt, self).validate()
 		self.set_status()
 		self.po_required()

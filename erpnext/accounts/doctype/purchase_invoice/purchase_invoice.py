@@ -44,7 +44,8 @@ class PurchaseInvoice(BuyingController):
 
 	def validate(self):
 		check_future_date(self.posting_date)
-		self.validate_branch_perm()
+		#added by Jai, commented by jai
+		# self.validate_branch_perm()
 		self.set_status()
 		if self.lds:
 			total = 0
