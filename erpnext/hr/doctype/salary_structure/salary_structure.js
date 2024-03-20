@@ -311,6 +311,42 @@ frappe.ui.form.on('Salary Structure', {
 	one_off_fixed_payment: function(frm){
                 calculate_others(frm.doc);
         },
+	eligible_for_oneoff_5_indexation_gi: function(frm){
+                calculate_others(frm.doc);
+        },
+	oneoff_5_indexation_gi_method: function(frm){
+                calculate_others(frm.doc);
+        },
+	oneoff_5_indexation_gi: function(frm){
+                calculate_others(frm.doc);
+        },
+	eligible_for_lumpsum_fixed_allowance_gi: function(frm){
+                calculate_others(frm.doc);
+        },
+	lumpsum_fixed_allowance_gi_method: function(frm){
+                calculate_others(frm.doc);
+        },
+	lumpsum_fixed_allowance_gi: function(frm){
+                calculate_others(frm.doc);
+        },
+	eligible_for_oneoff_fixed_payment_gi: function(frm){
+                calculate_others(frm.doc);
+        },
+	oneoff_fixed_payment_gi_method: function(frm){
+                calculate_others(frm.doc);
+        },
+	oneoff_fixed_payment_gi: function(frm){
+                calculate_others(frm.doc);
+        },
+	eligible_for_salary_arrears: function(frm){
+                calculate_others(frm.doc);
+        },
+	salary_arrears_method: function(frm){
+                calculate_others(frm.doc);
+        },
+	salary_arrears: function(frm){
+                calculate_others(frm.doc);
+        },
 
 
 })
