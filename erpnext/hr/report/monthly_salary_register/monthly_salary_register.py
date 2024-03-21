@@ -20,8 +20,113 @@ def execute(filters=None):
     columns = []
     if filters.get("report_type") == "Salary":
         salary_slips = get_salary_slips(filters)
+    if filters.get("report_type") == "Bulk Leave Encashment":
+        columns = [
+             {
+				"fieldname":"employee",
+				"label":_("employee"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			},
+               {
+				"fieldname":"employee_name",
+				"label":_("Employee Name"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			},
+               
+             {
+				"fieldname":"branch",
+				"label":_("Branch"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			},
+               
+            {
+				"fieldname":"leave_balance",
+				"label":_("leave_balance"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			},
+               
+             {
+				"fieldname":"bank_name",
+				"label":_("Bank Name"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			},
+             {
+				"fieldname":"encashable_days",
+				"label":_("Encashable Days"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			}, {
+				"fieldname":"designation",
+				"label":_("designation"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			}, {
+				"fieldname":"employment_type",
+				"label":_("employment_type"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			}, {
+				"fieldname":"employee_grade",
+				"label":_("employee_grade"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			}, {
+				"fieldname":"leave_allocation",
+				"label":_("leave_allocation"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			},
+               {
+				"fieldname":"encashment_amount",
+				"label":_("encashment_amount"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			},
+               {
+				"fieldname":"payable_amount",
+				"label":_("payable_amount"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			},
+               {
+				"fieldname":"encashment_tax",
+				"label":_("encashment_tax"),
+				"fieldtype":"data",
+				"options":"Item",
+				"width":160
+			},
+        ]
+
+
+        data = frappe.db.sql('''
+                    select lei.employee, lei.employee_name, lei.branch, lei.leave_balance, lei.bank_name, 
+                             lei.encashable_days, lei.designation,
+                              lei.employment_type, lei.employee_grade, lei.employee_group, lei.leave_allocation, 
+                             lei.encashment_amount, lei.payable_amount, lei.encashment_tax 
+                             from `tabBulk Leave Encashment` 
+                             as le inner join `tabBulk Leave Encashment Item` as lei on le.name=lei.parent where le.fiscal_year={}
+                             '''.format(filters.get("fiscal_year")),as_dict=1)
+        return columns, data
     else:
         salary_slips = get_salary_arrears(filters)
+        
     if not salary_slips:
                 return columns, data
         
@@ -248,3 +353,5 @@ def get_ss_ded_map(salary_slips):
         ss_ded_map[d.parent][d.salary_component] = flt(d.amount)
     
     return ss_ded_map
+
+
