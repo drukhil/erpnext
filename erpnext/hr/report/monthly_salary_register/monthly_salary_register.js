@@ -63,7 +63,7 @@ frappe.query_reports["Monthly Salary Register"] = {
 			"fieldname": "report_type",
 			"label": __("Report Type"),
 			"fieldtype": "Select",
-			"options": "Salary\nArrear",
+			"options": "Salary\nArrear\nBulk Leave Encashment",
 			"default": "Salary"
 		},
 	]
