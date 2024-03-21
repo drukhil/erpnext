@@ -344,7 +344,7 @@ frappe.ui.form.on('Salary Structure', {
 	salary_arrears_method: function(frm){
                 calculate_others(frm.doc);
         },
-	salary_arrears: function(frm){
+	salary_arrear: function(frm){
                 calculate_others(frm.doc);
         },
 
