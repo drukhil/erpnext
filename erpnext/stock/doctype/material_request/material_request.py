@@ -80,7 +80,7 @@ class MaterialRequest(BuyingController):
 	def validate(self):
 		check_future_date(self.transaction_date)
 		super(MaterialRequest, self).validate()
-		self.validate_branch_perm()
+		# self.validate_branch_perm() //comment out by Jai 25/03/2024
 		cc  = frappe.db.sql(""" select name from `tabCost Center` where branch = "{0}" """.format(self.branch), as_dict = 1)
                 if cc:
                         self.cost_center = cc[0].name
