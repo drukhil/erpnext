@@ -284,10 +284,11 @@ class SalaryStructure(Document):
 						calc_amt = roundoff(calc_amt)
 						comm_allowance += round(flt(calc_amt) if m['name'] == 'Communication Allowance' else 0)
 						total_earning += calc_amt
-						if m['name'] == 'Salary Arrears':
-							calc_map.append({'salary_component': m['name'], 'amount': calc_amt, 'from_date': '2024-03-01', 'to_date': '2024-03-31'})
-						else:
-							calc_map.append({'salary_component': m['name'], 'amount': calc_amt})
+						calc_map.append({'salary_component': m['name'], 'amount': calc_amt})
+						# if m['name'] == 'Salary Arrears':
+						# 	calc_map.append({'salary_component': m['name'], 'amount': calc_amt, 'from_date': '2024-03-01', 'to_date': '2024-03-31'})
+						# else:
+						# 	calc_map.append({'salary_component': m['name'], 'amount': calc_amt})
 				else:
 					if self.get(m['field_name']) and m['name'] == 'SWS':
 						sws_amt = round(flt(settings.get("sws_contribution")))
