@@ -124,7 +124,7 @@ def execute(filters=None):
                              as le inner join `tabBulk Leave Encashment Item` as lei on le.name=lei.parent where le.fiscal_year={}
                              '''.format(filters.get("fiscal_year")),as_dict=1)
         return columns, data
-    else:
+    elif filters.get("report_type") == "Arrear":
         salary_slips = get_salary_arrears(filters)
         
     if not salary_slips:
@@ -245,8 +245,27 @@ def get_salary_slips(filters):
 
 def get_salary_arrears(filters):
     conditions, filters = get_arrear_conditions(filters)
-    salary_slips = frappe.db.sql("""select sapi.*, sap.*, e.employee_subgroup as employee_grade, e.designation, e.employment_type, e.cost_center, e.branch, e.department, e.division, e.section from `tabSalary Arrear Payment` sap, `tabSalary Arrear Payment Item` sapi, `tabEmployee` e where e.name = sapi.employee and sapi.parent = sap.name {}
-        order by sap.from_month, sap.fiscal_year""".format(conditions), as_dict=1)
+    query="""select sapi.*, sap.*, e.employee_subgroup as employee_grade, 
+            e.designation, e.employment_type, e.cost_center, e.branch, e.department,
+            e.division, e.section 
+            from `tabSalary Arrear Payment` sap, 
+            `tabSalary Arrear Payment Item` sapi, 
+            `tabEmployee` e 
+            where e.name = sapi.employee 
+            and sapi.parent = sap.name {}
+            rder by sap.from_month, 
+            sap.fiscal_year""".format(conditions)
+    frappe.throw("{}".format(query))
+    salary_slips = frappe.db.sql("""select sapi.*, sap.*, e.employee_subgroup as employee_grade, 
+                                 e.designation, e.employment_type, e.cost_center, e.branch, e.department, 
+                                 e.division, e.section 
+                                 from `tabSalary Arrear Payment` sap, 
+                                 `tabSalary Arrear Payment Item` sapi, 
+                                 `tabEmployee` e 
+                                 where e.name = sapi.employee 
+                                 and sapi.parent = sap.name {}
+                                order by sap.from_month, 
+                                 sap.fiscal_year""".format(conditions), as_dict=1)
     '''
     if not salary_slips:
         msgprint(_("No salary slip found for month: ") + cstr(filters.get("month")) + 
@@ -353,5 +372,3 @@ def get_ss_ded_map(salary_slips):
         ss_ded_map[d.parent][d.salary_component] = flt(d.amount)
     
     return ss_ded_map
-
-
