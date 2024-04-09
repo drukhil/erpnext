@@ -238,7 +238,7 @@ class ImprestRecoup(StockController):
 		sl_entries = []
 		wh = frappe.get_doc("Cost Center", self.cost_center).warehouse
 		for a in self.get("items"):
-			if a.item and frappe.db.exists("Item", {"name": a.item, "is_stock_item": 1}):
+			if a.item and (a.maintain_stock_asset and frappe.db.exists("Item", {"name": a.item, "is_stock_item": 1})):
 			       sl_entries.append(
 					prepare_sli(self, {
 						"item_code": a.item,
