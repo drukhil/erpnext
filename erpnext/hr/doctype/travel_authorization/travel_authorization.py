@@ -119,21 +119,23 @@ class TravelAuthorization(Document):
 			e = getdate(self.items[len(self.items) - 1].date)
 		days = date_diff(e, d) + 1
 		for a in (d + timedelta(n) for n in range(days)):
-			al = frappe.db.sql("select name from tabAttendance where docstatus = 1 and employee = %s and att_date = %s", (self.employee, a), as_dict=True)
+			al = frappe.db.sql("select name, status from tabAttendance where docstatus = 1 and employee = %s and att_date = %s", (self.employee, a), as_dict=True)
 			if len(al):
-				doc = frappe.get_doc("Attendance", al[0].name)
-				doc.cancel()
-			#create attendance
-			attendance = frappe.new_doc("Attendance")
-			attendance.flags.ignore_permissions = 1
-			attendance.employee = self.employee
-			attendance.employee_name = self.employee_name 
-			attendance.att_date = a
-			attendance.status = "Tour"
-			attendance.branch = self.branch
-			attendance.company = frappe.db.get_value("Employee", self.employee, "company")
-			attendance.reference_name = self.name
-			attendance.submit()
+				# doc = frappe.get_doc("Attendance", al[0].name)
+				# doc.cancel()
+				frappe.db.sql("update tabAttendance set status = 'Tour', reference_name = %s where name = %s", (self.name, al[0].name))
+			else:
+				#create attendance
+				attendance = frappe.new_doc("Attendance")
+				attendance.flags.ignore_permissions = 1
+				attendance.employee = self.employee
+				attendance.employee_name = self.employee_name 
+				attendance.att_date = a
+				attendance.status = "Tour"
+				attendance.branch = self.branch
+				attendance.company = frappe.db.get_value("Employee", self.employee, "company")
+				attendance.reference_name = self.name
+				attendance.submit()
 
 	def cancel_attendance(self):
 		frappe.db.sql("delete from tabAttendance where reference_name = %s", (self.name))
