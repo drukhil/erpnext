@@ -37,7 +37,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "task", 
@@ -954,7 +954,7 @@
  "issingle": 0, 
  "istable": 1, 
  "max_attachments": 0, 
- "modified": "2022-10-14 10:36:14.584848", 
+ "modified": "2024-04-15 16:40:26.846358", 
  "modified_by": "Administrator", 
  "module": "Projects", 
  "name": "DFG Activity Tasks", 
