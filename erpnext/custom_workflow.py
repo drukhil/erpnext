@@ -12,6 +12,7 @@ Version          Author         Ticket#           CreatedOn          ModifiedOn 
 from __future__ import unicode_literals
 import frappe
 from frappe import _
+from frappe.utils import get_link_to_form
 #from erpnext.hr.doctype.approver_settings.approver_settings import get_final_approver
 from erpnext.hr.hr_custom_functions import get_officiating_employee
 
@@ -236,7 +237,7 @@ def verify_mr_workflow(doc):
                         frappe.throw("Only Mr/Mrs. <b> '{0}' </b>  can Apply/Reapply this Document".format(frappe.get_doc("User", doc.owner).full_name))
                 doc.workflow_state = "Waiting Approval"
                 doc.docstatus = 0
-		message = """Dear Sir/Madam, <br>  {0} has requested you to verify the Material Request <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(frappe.get_desk_link("Material Request", doc.name)))
+		message = """Dear Sir/Madam, <br>  {0} has requested you to verify the Material Request <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Material Request", doc.name)))
                 try:
                         frappe.sendmail(recipients=verifier, sender=None, subject=subject, message=message)
                 except:
@@ -250,10 +251,10 @@ def verify_mr_workflow(doc):
                 doc.workflow_state == "Verified By Supervisor"
                 doc.docstatus = 0
                 doc.verifier = verifier
-		message = """Dear Sir/Madam, <br>  {0} has requested you to Approve the Material Request <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(frappe.get_desk_link("Material Request", doc.name)))
+		message = """Dear Sir/Madam, <br>  {0} has requested you to Approve the Material Request <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Material Request", doc.name)))
                 try:
                         frappe.sendmail(recipients=approver, sender=None, subject=subject, message=message)
-			frappe.sendmail(recipients= doc.owner, sender = None, subject = subject, message = "Material Request {0} verified".format(str(frappe.get_desk_link("Material Request", doc.name))))
+			frappe.sendmail(recipients= doc.owner, sender = None, subject = subject, message = "Material Request {0} verified".format(str(get_link_to_form("Material Request", doc.name))))
                 except:
                         pass
 
@@ -268,7 +269,7 @@ def verify_mr_workflow(doc):
                 doc.workflow_state = "Approved"
                 doc.docstatus = 1
                 doc.w_approver = approver
-		message = """Dear {0}, <br>  Your Material Request {1} is approved. Check ERP System for More Info. <br>  Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(frappe.get_desk_link("Material Request", doc.name)))
+		message = """Dear {0}, <br>  Your Material Request {1} is approved. Check ERP System for More Info. <br>  Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Material Request", doc.name)))
                 try:
                         frappe.sendmail(recipients=doc.owner, sender=None, subject=subject, message=message)
                 except:
@@ -285,7 +286,7 @@ def verify_mr_workflow(doc):
                                 doc.workflow_state = doc.get_db_value("workflow_state")
                                 frappe.throw("Only Mr/Mrs. <b> {0} </b> can reject/cancel this Document".format(frappe.get_doc("User", approver).full_name))
                 doc.rejector = frappe.session.user
-		message = """Dear {0},  Your Material Request {1} is <b> {2} </b>. Check ERP System for More Info. <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(frappe.get_desk_link("Material Request", doc.name)))
+		message = """Dear {0},  Your Material Request {1} is <b> {2} </b>. Check ERP System for More Info. <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Material Request", doc.name)))
                 try:
                         frappe.sendmail(recipients=doc.owner, sender=None, subject=subject, message=message)
                 except:
