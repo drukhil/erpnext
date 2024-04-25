@@ -29,6 +29,10 @@ class BulkAssetDisposal(Document):
 			self.scrap_asset()
 		# else: 
 		# 	self.sale_asset()
+	def on_cancel(self):
+		for data in self.item:
+			if frappe.db.get_value("Asset", data.asset, "journal_entry_for_scrap"):
+				frappe.throw("Journal Entry {} created when this Disposal was Submitted. Cannot cancel.".format(frappe.db.get_value("Asset", data.asset, "journal_entry_for_scrap")))
 	
 	def scrap_asset(self):
 		for data in self.item: 
