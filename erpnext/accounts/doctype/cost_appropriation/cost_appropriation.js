@@ -92,30 +92,54 @@ frappe.ui.form.on('Cost Appropriation', {
                         	});
 
 				break;
-				case "GCE": 
+			case "GCE": 
 				frappe.model.get_value('Accounts Settings',{'name': 'Accounts Settings'},  'gce',
 				function(d) {
 						frm.set_value("account",d.gce);
 				});
-
-
 				break;
-		case "Overtime Payment": 
-			frappe.model.get_value('Accounts Settings',{'name': 'Accounts Settings'},  'overtime_payment',
+			case "Overtime Payment": 
+				frappe.model.get_value('Accounts Settings',{'name': 'Accounts Settings'},  'overtime_payment',
 						function(d) {
 								frm.set_value("account",d.overtime_payment);
 
 						});
-
-			break;
-		case "Muster Roll Employee": 
-			frappe.model.get_value('Accounts Settings',{'name': 'Accounts Settings'},  'muster_roll_employee',
+				break;
+			case "Muster Roll Employee": 
+				frappe.model.get_value('Accounts Settings',{'name': 'Accounts Settings'},  'muster_roll_employee',
 						function(d) {
 								frm.set_value("account",d.muster_roll_employee);
 
 						});
+				break;
+			case "Thai Salary": 
+				frappe.model.get_value('Accounts Settings',{'name': 'Accounts Settings'},  'thai_salary',
+						function(d) {
+								frm.set_value("account",d.thai_salary);
 
-			break;
+						});
+				break;
+			case "DFG Soelra": 
+				frappe.model.get_value('Accounts Settings',{'name': 'Accounts Settings'},  'dfg_soelra',
+						function(d) {
+								frm.set_value("account",d.dfg_soelra);
+
+						});
+				break;
+			case "Indian Operators Salary": 
+				frappe.model.get_value('Accounts Settings',{'name': 'Accounts Settings'},  'indian_operators_salary',
+						function(d) {
+								frm.set_value("account",d.indian_operators_salary);
+
+						});
+				break;
+			case "Repair and Maintenance": 
+				frappe.model.get_value('Accounts Settings',{'name': 'Accounts Settings'},  'repair_and_maintenance',
+						function(d) {
+								frm.set_value("account",d.repair_and_maintenance);
+
+						});
+				break;
 			
 		}
 	}
