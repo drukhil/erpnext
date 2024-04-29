@@ -23,6 +23,14 @@ class CostAppropriation(AccountsController):
 	def validate__accounts(self):
 		if self.cost_type == 'Hire Charge':
 			self.account = frappe.db.get_single_value ("Accounts Settings", "hire_charge")
+		if self.cost_type == 'DFG Soelra':
+			self.account = frappe.db.get_single_value ("Accounts Settings", "dfg_soelra")
+		if self.cost_type == 'Thai Salary':
+			self.account = frappe.db.get_single_value ("Accounts Settings", "thai_salary")
+		if self.cost_type == 'Indian Operators Salary':
+			self.account = frappe.db.get_single_value ("Accounts Settings", "indian_operators_salary")
+		if self.cost_type == 'Repair and Maintenance':
+			self.account = frappe.db.get_single_value ("Accounts Settings", "repair_and_maintenance")
 		if self.cost_type == 'HSD':
 			self.hsd = frappe.db.get_single_value ("Accounts Settings", "hsd")
 		
