@@ -14,7 +14,10 @@ def execute(filters=None):
 def get_data(filters):
 	# data = []
 	data = """ select b.parent_project, b.expected_start_date, b.expected_end_date, a.weightage as weightage,  round(sum(b.physical_progress * 100),3) as physical_progress, round((a.weightage * sum(b.physical_progress)), 3) as achivement,
-		  b.status, b.architecture, b.a_name, b.contact from `tabDesign Weightage Item` a left join `tabDesign` b on b.parent_project= a.parent_project where a.docstatus <= 1  group by parent_project"""
+		  b.status, (select c.architecture from tabDesign c where c.name like 'Final Master Plan%' and c.project_category='Master Plan' and c.parent_project= b.parent_project) as architecture, 
+		  (select c.a_name from tabDesign c where c.name like 'Final Master Plan%' and c.project_category='Master Plan' and c.parent_project= b.parent_project) as a_name, 
+		  (select c.contact from tabDesign c where c.name like 'Final Master Plan%' and c.project_category='Master Plan' and c.parent_project= b.parent_project) as contact 
+		  from `tabDesign Weightage Item` a left join `tabDesign` b on b.parent_project= a.parent_project where a.docstatus <= 1  group by parent_project"""
 	# data.append(1,2,3,4,5,6)
 	cond = ""
 	if filters.get("project"):
