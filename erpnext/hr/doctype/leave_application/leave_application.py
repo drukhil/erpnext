@@ -805,3 +805,33 @@ def check_cancelled_leaves():
 		doc = frappe.get_doc("Leave Application", l.name)
 		doc.db_set("status", "Cancelled")
 '''
+""" moved from BTL, by Jai """
+def get_permission_query_conditions(user):
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+
+	if user == "Administrator":
+		return
+	if "HR User" in user_roles or "HR Manager" in user_roles:
+		return
+
+	return """(
+		`tabLeave Application`.owner = '{user}'
+		or
+		exists(select 1
+				from `tabEmployee`
+				where `tabEmployee`.name = `tabLeave Application`.employee
+				and `tabEmployee`.user_id = '{user}')
+		or
+		(`tabLeave Application`.leave_approver = '{user}' and `tabLeave Application`.workflow_state not in  ('Draft','Approved','Rejected','Cancelled'))
+		or
+		exists(select 1
+				from `tabEmployee`
+				where name in (select second_approver from `tabEmployee`
+				where `tabEmployee`.name = `tabLeave Application`.employee
+				and `tabLeave Application`.workflow_state not in  ('Draft','Approved','Rejected','Cancelled')
+				)
+				and `tabEmployee`.user_id = '{user}'
+		)
+		
+	)""".format(user=user)
