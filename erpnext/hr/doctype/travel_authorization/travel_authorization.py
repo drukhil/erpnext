@@ -400,3 +400,33 @@ def get_exchange_rate(from_currency, to_currency):
 	else:
 		return ex_rate
 
+""" moved from BTL, by Jai """
+def get_permission_query_conditions(user):
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+
+	if user == "Administrator":
+		return
+	if "HR User" in user_roles or "HR Manager" in user_roles:
+		return
+
+	return """(
+		`tabTravel Authorization`.owner = '{user}'
+		or
+		exists(select 1
+				from `tabEmployee`
+				where `tabEmployee`.name = `tabTravel Authorization`.employee
+				and `tabEmployee`.user_id = '{user}')
+		or
+		(`tabTravel Authorization`.supervisor = '{user}' and `tabTravel Authorization`.workflow_state not in  ('Draft','Approved','Rejected','Cancelled'))
+		or
+		exists(select 1
+				from `tabEmployee`
+				where name in (select second_approver from `tabEmployee`
+				where `tabEmployee`.name = `tabTravel Authorization`.employee
+				and `tabTravel Authorization`.workflow_state not in  ('Draft','Approved','Rejected','Cancelled')
+				)
+				and `tabEmployee`.user_id = '{user}'
+		)
+		
+	)""".format(user=user)

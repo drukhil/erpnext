@@ -396,4 +396,33 @@ class TravelClaim(Document):
 			except:
 				pass
 
+""" moved from BTL, by Jai """
+def get_permission_query_conditions(user):
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
 
+	if user == "Administrator":
+		return
+	if "HR User" in user_roles or "HR Manager" in user_roles:
+		return
+
+	return """(
+		`tabTravel Claim`.owner = '{user}'
+		or
+		exists(select 1
+				from `tabEmployee`
+				where `tabEmployee`.name = `tabTravel Claim`.employee
+				and `tabEmployee`.user_id = '{user}')
+		or
+		(`tabTravel Claim`.supervisor = '{user}' and `tabTravel Claim`.workflow_state not in  ('Draft','Approved','Rejected','Cancelled','Waiting HR Verification'))
+		or
+		exists(select 1
+				from `tabEmployee`
+				where name in (select second_approver from `tabEmployee`
+				where `tabEmployee`.name = `tabTravel Claim`.employee
+				and `tabTravel Claim`.workflow_state not in  ('Draft','Approved','Rejected','Cancelled','Waiting HR Verification')
+				)
+				and `tabEmployee`.user_id = '{user}'
+		)
+		
+	)""".format(user=user)

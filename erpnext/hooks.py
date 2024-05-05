@@ -120,7 +120,9 @@ permission_query_conditions = {
 	"Contact": "erpnext.utilities.address_and_contact.get_permission_query_conditions_for_contact",
 	"Address": "erpnext.utilities.address_and_contact.get_permission_query_conditions_for_address",
 	"Meeting": "erpnext.hr.doctype.meeting.meeting.get_permission_query_conditions",
-	"Leave Application": "erpnext.hr.doctype.leave_application.leave_application.get_permission_query_conditions"
+	"Leave Application": "erpnext.hr.doctype.leave_application.leave_application.get_permission_query_conditions",
+	"Travel Authorization": "erpnext.hr.doctype.travel_authorization.travel_authorization.get_permission_query_conditions",
+	"Travel Claim": "erpnext.hr.doctype.travel_claim.travel_claim.get_permission_query_conditions"
 }
 
 has_permission = {
