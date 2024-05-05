@@ -216,7 +216,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "start_date", 
@@ -265,7 +265,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "end_date", 
@@ -905,7 +905,7 @@
  "issingle": 0, 
  "istable": 1, 
  "max_attachments": 0, 
- "modified": "2021-10-28 16:02:57.009816", 
+ "modified": "2024-05-03 12:17:06.768976", 
  "modified_by": "Administrator", 
  "module": "Projects", 
  "name": "Design Tasks", 

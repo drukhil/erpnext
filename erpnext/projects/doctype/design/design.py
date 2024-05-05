@@ -34,6 +34,10 @@ class Design(Document):
 	
 	def on_update_after_submit(self):
 		# frappe.throw("inside update")
+		self.total_duration = calculate_durations(self.expected_start_date, self.expected_end_date)
+		for a in self.get("activity_tasks"):
+			a.task_duration = calculate_durations(a.start_date, a.end_date)
+		
 		self.flags.dont_sync_tasks = True
 		if not self.completion_date:
 			frappe.throw("Date of Update is Required", title="Missing Input")
