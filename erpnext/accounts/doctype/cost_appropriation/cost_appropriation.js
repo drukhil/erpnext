@@ -140,7 +140,20 @@ frappe.ui.form.on('Cost Appropriation', {
 
 						});
 				break;
-			
+			case "OJT": 
+				frappe.model.get_value('Accounts Settings',{'name': 'Accounts Settings'},  'ojt',
+						function(d) {
+								frm.set_value("account",d.ojt);
+
+						});
+				break;
+			case "Contract Employee": 
+				frappe.model.get_value('Accounts Settings',{'name': 'Accounts Settings'},  'contract_employee',
+						function(d) {
+								frm.set_value("account",d.contract_employee);
+
+						});
+				break;
 		}
 	}
 });
