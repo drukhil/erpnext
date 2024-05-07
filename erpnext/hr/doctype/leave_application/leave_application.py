@@ -814,6 +814,13 @@ def get_permission_query_conditions(user):
 		return
 	if "HR Manager" in user_roles:
 		return
+	if "HR User" in user_roles:
+		""" get all list with branch same as the branch of login user """
+		user_branch = frappe.db.get_value("Employee", {"user_id": user}, "branch")
+
+		return """(
+			`tabLeave Application`.branch = '{branch}'
+		)""".format(branch=user_branch)
 
 	return """(
 		`tabLeave Application`.owner = '{user}'
