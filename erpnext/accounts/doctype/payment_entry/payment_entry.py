@@ -234,7 +234,7 @@ class PaymentEntry(AccountsController):
 		for d in self.get("references"):
 			ref_doc = frappe.get_doc(d.reference_doctype, d.reference_name)
 			if ref_doc.doctype == "Purchase Invoice" and ref_doc.bill_no not in data:
-				data.append(str(ref_doc.bill_no).replace('\xa0', ' '))
+				data.append(ref_doc.bill_no)
 				
 		bill_no = ', '.join(map(str, data))
 		self.vendor_invoice_no = bill_no
