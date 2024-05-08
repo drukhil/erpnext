@@ -105,7 +105,7 @@ class DeliveryNote(SellingController):
 			earlier = today - DD
 			date = earlier.strftime("%Y-%m-%d")
 			if (self.posting_date < date or get_first_day(self.posting_date)!=get_first_day(today)):
-				frappe.throw("You Can Not Save or Submit For Posting Date Beyond Past 3 Days or For Previous Month")
+				frappe.throw("You Cannot Save or Submit For Posting Date Beyond Past 3 Days or For Previous Month")
 				frappe.validated = false
 		check_future_date(self.posting_date)
 		self.calculate_transportation()
