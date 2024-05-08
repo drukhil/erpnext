@@ -97,7 +97,6 @@ class DeliveryNote(SellingController):
 			 for d in self.get('items'):
 				 if not d.against_sales_order:
 					 frappe.throw(_("Sales Order required for Item {0}").format(d.item_code))
-
 	def validate(self):
 		if 'Sales Master' not in frappe.get_roles(frappe.session.user):
 			today = datetime.datetime.now()
@@ -106,7 +105,7 @@ class DeliveryNote(SellingController):
 			date = earlier.strftime("%Y-%m-%d")
 			if (self.posting_date < date or get_first_day(self.posting_date)!=get_first_day(today)):
 				frappe.throw("You Cannot Save or Submit For Posting Date Beyond Past 3 Days or For Previous Month")
-				frappe.validated = false
+				frappe.validated = False
 		check_future_date(self.posting_date)
 		self.calculate_transportation()
 		super(DeliveryNote, self).validate()
