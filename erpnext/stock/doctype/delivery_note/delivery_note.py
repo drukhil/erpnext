@@ -144,6 +144,7 @@ class DeliveryNote(SellingController):
 		self.update_stock_qty()
 
 		if not self.installation_status: self.installation_status = 'Not Installed'
+		self.validate_conversion_factor()
 
 	#TTPL Code
 	def update_shipping_address(self):
@@ -153,14 +154,14 @@ class DeliveryNote(SellingController):
 			self.contact_mobile = frappe.db.get_value("Customer", self.customer, "mobile_no")
 		
 		
-        def calculate_transportation(self):
-                total_qty = 0
-                for a in self.items:
-                        total_qty += flt(a.qty)
+	def calculate_transportation(self):
+		total_qty = 0
+		for a in self.items:
+			total_qty += flt(a.qty)
 
-                self.total_quantity = total_qty
-                self.transportation_charges = round(flt(self.total_quantity) * flt(self.total_distance) * flt(self.transportation_rate), 2)
-                self.discount_amount = flt(self.discount_or_cost_amount) - flt(self.transportation_charges) - flt(self.loading_cost) - flt(self.additional_cost) - flt(self.challan_cost)
+		self.total_quantity = total_qty
+		self.transportation_charges = round(flt(self.total_quantity) * flt(self.total_distance) * flt(self.transportation_rate), 2)
+		self.discount_amount = flt(self.discount_or_cost_amount) - flt(self.transportation_charges) - flt(self.loading_cost) - flt(self.additional_cost) - flt(self.challan_cost)
 				
 	def check_transportation_detail(self):
 		if self.naming_series == 'Mineral Products':
@@ -262,9 +263,53 @@ class DeliveryNote(SellingController):
 
 	def update_stock_qty(self):
 		for a in self.items:
-			if(a.conversion_req == 0 or not a.conversion_req):
+			if a.sales_uom == a.stock_uom:
 				a.stock_qty = a.qty
-				
+			else:
+				if a.conversion_factor == 1 and  a.sales_uom != a.stock_uom:
+					frappe.throw("Conversion Factor cannot be 1 as the Stock UOM and Sales UOM are not same")
+				if a.conversion_factor > 1:
+					a.stock_qty = flt(a.qty * a.conversion_factor,2)
+
+def update_stock_qty(self):
+	for a in self.items:
+		if a.sales_uom == a.stock_uom:
+			a.stock_qty = a.qty
+		else:
+			if a.conversion_factor == 1 and  a.sales_uom != a.stock_uom:
+				frappe.throw("Conversion Factor cannot be 1 as the Stock UOM and Sales UOM are not same")
+			if a.conversion_factor > 1:
+				a.stock_qty = flt(a.qty * a.conversion_factor,2)
+
+def update_stock_qty(self):
+	for a in self.items:
+		if a.sales_uom == a.stock_uom:
+			a.stock_qty = a.qty
+		else:
+			if a.conversion_factor == 1 and  a.sales_uom != a.stock_uom:
+				frappe.throw("Conversion Factor cannot be 1 as the Stock UOM and Sales UOM are not same")
+			if a.conversion_factor > 1:
+				a.stock_qty = flt(a.qty * a.conversion_factor,2)
+
+def update_stock_qty(self):
+	for a in self.items:
+		if a.sales_uom == a.stock_uom:
+			a.stock_qty = a.qty
+		else:
+			if a.conversion_factor == 1 and  a.sales_uom != a.stock_uom:
+				frappe.throw("Conversion Factor cannot be 1 as the Stock UOM and Sales UOM are not same")
+			if a.conversion_factor > 1:
+				a.stock_qty = flt(a.qty * a.conversion_factor,2)
+
+
+	def validate_conversion_factor(self):
+		for a in self.items:
+			if a.sales_uom != a.stock_uom and flt(a.stock_qty,2) != flt(a.qty * a.conversion_factor,2):
+				a.stock_qty = flt(a.qty * a.conversion_factor)
+				frappe.msgprint("Stock Quantity set to {} due conversion factor".format(flt(a.qty * a.conversion_factor,2)))
+			else:
+				frappe.msgprint("Stock Qty is after Conversion is {} {}".format(a.stock_qty, a.stock_uom))
+
 	def on_submit(self):
 		self.validate_packed_qty()
 		# Check for Approving Authority
@@ -535,8 +580,8 @@ def make_sales_invoice(source_name, target_doc=None):
 			"doctype": "Sales Invoice",
 			"field_map": {
 				"naming_series" : "naming_series",
-		#		"loading_rate" : "rate_per_unit",
-		#		"loading_cost" : "total_loading_amount"  
+				"loading_rate" : "rate_per_unit",
+				"loading_cost" : "total_loading_amount"  
 			},
 			"validation": {
 				"docstatus": ["=", 1]
