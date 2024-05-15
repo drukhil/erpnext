@@ -22,6 +22,17 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 
 	},
 
+	setup: function() {
+		cur_frm.set_query("write_off_cost_center", function(){
+			return {
+				"filters": {
+					"is_group": 0,
+					"is_disabled": 0
+				}
+			};
+		});
+	},
+
 	refresh: function(doc) {
 		this._super();
 
