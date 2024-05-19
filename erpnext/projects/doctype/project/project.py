@@ -144,6 +144,7 @@ class Project(Document):
 
 		self.physical_progress = round(flt(self.physical_progress), 7)
 		if not self.is_group:
+			self.make_tsk_group()
 			self.update_progress(update=True)
 			# self.update_parent()
 		if self.percent_completed == 100:
@@ -281,15 +282,20 @@ class Project(Document):
 
 
 	def make_tsk_group(self):
-		wt = 0.0
+		wt = percent_comp = 0.0
 		for a in frappe.db.sql(""" select name, idx from `tabActivity Tasks` where is_milestone = 1 and parent = "{0}" 
 			""".format(self.name), as_dict = 1):
-			weightage = frappe.db.sql(""" select sum(ifnull(task_weightage, 0)) as tweightage from `tabActivity Tasks` 
+			weightage = frappe.db.sql(""" select sum(ifnull(task_weightage, 0)) as tweightage, sum(ifnull(task_completion_percent, 0)) as tcompletion from `tabActivity Tasks` 
                         where task_group = '{0}{1}' and is_milestone = 0""".format(a.name, a.idx), as_dict = 1)
-                        if weightage:
-                                wt = weightage[0].tweightage
-                                frappe.db.sql(""" update `tabActivity Tasks` set task_weightage = {0} where  name = '{1}'
-                                """.format(wt, a.name))
+			task_count = frappe.db.sql(""" select count(*) as count from `tabActivity Tasks` 
+                        where task_group = '{0}{1}' and is_milestone = 0""".format(a.name, a.idx), as_dict = 1)
+			date_line = frappe.db.sql(""" select max(end_date) as max_date, min(start_date) as min_date from `tabActivity Tasks` 
+                        where task_group = '{0}{1}' and is_milestone = 0""".format(a.name, a.idx), as_dict = 1)
+			if weightage:
+				wt = weightage[0].tweightage
+				percent_comp = weightage[0].tcompletion / task_count[0].count
+				frappe.db.sql(""" update `tabActivity Tasks` set task_weightage = {0}, task_completion_percent = {2}, start_date='{3}', end_date='{4}' where  name = '{1}'
+							""".format(wt, a.name, percent_comp, date_line[0].min_date, date_line[0].max_date))
 		frappe.db.commit()	
 	def update_task_group(self):
                 group_list = frappe.db.sql("""
@@ -368,6 +374,14 @@ class Project(Document):
 				'entry_name': get_period(to_date, 'Monthly') 
 				})
 			doc.insert()
+		""" convert into 100% work """
+		total_percent = frappe.db.sql("select sum(percent_completed) tot from `tabTarget Entry Sheet` where project=%s", self.name, as_dict=True)
+		
+		if total_percent[0]['tot'] > 100:
+			new_percent = 0
+			for d in frappe.db.sql("select * from `tabTarget Entry Sheet` where project=%s", self.name, as_dict=True):
+				new_percent += flt((flt(d.percent_completed)/flt(total_percent[0]['tot'])) * 100, 6)
+				frappe.db.sql("update `tabTarget Entry Sheet` set percent_completed={} where name='{}'".format(flt(new_percent), d.name))
 
 	def get_tasks_data(self, from_date, to_date):
                 task = frappe.db.sql(""" select name, start_date, end_date, one_day_weightage, one_day_weightage_overall  
