@@ -456,10 +456,22 @@ class JournalEntry(AccountsController):
 		currency = bank_account_currency = party_account_currency = pay_to_recd_from= None
 		for d in self.get('accounts'):
 			if d.party_type and d.party:
+				field_name = ""
 				if not pay_to_recd_from:
+					if d.party_type=="Customer":
+						field_name = "customer_name"
+					elif d.party_type=="Supplier":
+						field_name = "supplier_name"
+					elif d.party_type =="Employee":
+						field_name = "employee_name"
+					elif d.party_type == "Muster Roll Employee":
+						field_name="person_name"
+					pay_to_recd_from = frappe.db.get_value(d.party_type, d.party,field_name)
+					
+					'''
 					pay_to_recd_from = frappe.db.get_value(d.party_type, d.party,
 						"customer_name" if d.party_type=="Customer" else "supplier_name" if d.party_type=="Supplier" else "employee_name")
-
+					'''
 				party_amount += (d.debit_in_account_currency or d.credit_in_account_currency)
 				party_account_currency = d.account_currency
 
