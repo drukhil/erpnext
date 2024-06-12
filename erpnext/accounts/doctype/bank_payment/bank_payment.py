@@ -1171,8 +1171,11 @@ def upload_files(doc):
 	sftp.close()
 		
 def get_transaction_id(bank="BOBL"):
-	promo_code = frappe.db.get_value('Bank Payment Settings', bank, 'promo_code')
-	return make_autoname(str(promo_code) + '.YYYY.MM.DD.########')
+    promo_code, company_code = frappe.db.get_value('Bank Payment Settings', bank, ['promo_code','company_specific_code'])
+    # return make_autoname(str(promo_code) + '.YYYY.MM.DD.##' + str(company_code) + '###')
+    formatted_company_code = '{:05d}'.format(int(company_code))
+    name_format = "{}.YYYY.MM.DD.{}.###".format(promo_code, formatted_company_code)
+    return make_autoname(name_format)
 
 def get_filename(note_type, posting_date, pi_number):
 	posting_date = posting_date.strftime('%Y%m%d%H%M%S')
