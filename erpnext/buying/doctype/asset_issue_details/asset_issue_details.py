@@ -53,6 +53,7 @@ class AssetIssueDetails(Document):
 		asset.credit_account = credit_account
 		asset.asset_account = fixed_asset_account
 		asset.issued_to = self.issued_to
+		asset.employee_name = self.employee_name
 		asset.brand = self.brand
 		asset.serial_number = self.serial_number
 		asset.asset_quantity_ = self.qty
