@@ -24,6 +24,11 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Home Security Skilling",
+					"description": _("HSS"),
+				},
+				{
+					"type": "doctype",
 					"name": "RBA Project",
 					"description": _("RBA Project."),
 				},
