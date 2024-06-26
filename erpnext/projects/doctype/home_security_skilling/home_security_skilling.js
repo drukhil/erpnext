@@ -98,7 +98,7 @@ frappe.ui.form.on('Home Security Skilling', {
 		}
 	},
 	mandays: function() {
-		cur_frm.set_value("overall_mandays", (cur_frm.doc.is_group == 1)?cur_frm.doc.mandays:0);
+		// cur_frm.set_value("overall_mandays", (cur_frm.doc.is_group == 1)?cur_frm.doc.mandays:0);
 		cur_frm.set_value("physical_progress_weightage", (parseFloat(cur_frm.doc.mandays)/parseFloat(cur_frm.doc.overall_mandays)*100).toFixed(3))
 		cur_frm.set_value("man_power_required", Math.round(parseFloat(cur_frm.doc.mandays)/parseFloat(cur_frm.doc.total_duration)))
 	},
@@ -110,9 +110,70 @@ frappe.ui.form.on('Home Security Skilling', {
 	},
 });
 
+frappe.ui.form.on("HSS Activity Task", {
+	task_category: function(frm, doctype, name) {
+		var child = locals[doctype][name]
+		frm.set_query('task_sub_category', 'activity_tasks', function() {
+			return {
+				'filters': {
+					'task_category': child.task_category
+				}
+			};
+		});
+	},
+	
+	start_date: function(frm, doctype, name) {
+		var item = locals[doctype][name]
+		var at = frm.doc.activity_tasks || [];
+		var task_duration = 0.0
+		if(item.end_date) {
+			calculate_duration1(frm, doctype, name, item.start_date, item.end_date);
+		}
+		for(var i=0; i<at.length; i++){
+			task_duration += parseFloat(at[i].task_duration || 0.0);
+		}
+		cur_frm.set_value('duration_sum', task_duration)
+		//frappe.model.set_value(doctype, name, "task_weightage", (parseFloat(item.task_duration)/parseFloat(task_duration) * parseFloat(cur_frm.doc.physical_progress_weightage)).toFixed(7));
+		frappe.model.set_value(doctype, name, "task_weightage", (parseFloat(item.task_duration)/parseFloat(task_duration)*100).toFixed(7));
+		frappe.model.set_value(doctype, name, "one_day_weightage", (parseFloat(item.task_weightage)/parseFloat(item.task_duration)).toFixed(7))
+	},
+	end_date: function(frm, doctype, name) {
+		var item = locals[doctype][name]
+		var at = frm.doc.activity_tasks || [];
+		var task_duration = 0.0
+		if(item.start_date) {
+			calculate_duration1(frm, doctype, name, item.start_date, item.end_date);
+		}
+		for(var i=0; i<at.length; i++){
+			task_duration += parseFloat(at[i].task_duration || 0.0);
+		}
+		cur_frm.set_value('duration_sum', task_duration);
+		//frappe.model.set_value(doctype, name, "task_weightage", (parseFloat(item.task_duration)/parseFloat(task_duration)* parseFloat(cur_frm.doc.physical_progress_weightage)).toFixed(7));
+		frappe.model.set_value(doctype, name, "task_weightage", (parseFloat(item.task_duration)/parseFloat(task_duration)*100).toFixed(7));
+		frappe.model.set_value(doctype, name, "one_day_weightage", (parseFloat(item.task_weightage)/parseFloat(item.task_duration)).toFixed(7))
+	},
+	task_completion_percent: function(frm, doctype, name) {
+		var item = locals[doctype][name]
+		frappe.model.set_value(doctype, name, "task_achievement_percent", (parseFloat(item.task_completion_percent/100)*parseFloat(item.task_weightage)).toFixed(7));
+		frappe.model.set_value(doctype, name, "one_day_achievement", (parseFloat(item.task_achievement_percent)/parseFloat(item.task_duration).toFixed(7)))
+	},
+	task_duration: function(frm, doctype, name) {
+	},
+	task_achievement_percent: function(frm, doctype, name) {
+		var at = frm.doc.activity_tasks || [];
+		var task_achievement_percent1 = 0.0
+		for(var i=0; i<at.length; i++){
+			task_achievement_percent1 += parseFloat(at[i].task_achievement_percent || 0.0);
+		}
+		cur_frm.set_value("percent_completed", (parseFloat(task_achievement_percent1)).toFixed(4))
+		cur_frm.set_value("physical_progress", (parseFloat(cur_frm.doc.percent_completed)/100 * parseFloat(cur_frm.doc.physical_progress_weightage)).toFixed(4))
+	}
+});
+
 var enable_disable = function(frm){
 	//Display tasks only after the project is saved
 	cur_frm.toggle_display("activity_tasks", !frm.doc.__islocal);
+	cur_frm.set_df_property("overall_mandays", "read_only", 1);
 }
 
 function calculate_duration(cur_frm, from_date, to_date) {
@@ -128,5 +189,21 @@ function calculate_duration(cur_frm, from_date, to_date) {
 				cur_frm.set_value('total_duration', r.message);
 		}
 	}
+	})
+}
+
+function calculate_duration1(cur_frm, doctype, name, from_date, to_date) {
+	frappe.call({
+			method: "erpnext.projects.doctype.home_security_skilling.home_security_skilling.calculate_durations",
+			 args: {
+					"hol_list": cur_frm.doc.holiday_list,
+					"from_date": from_date,
+					"to_date": to_date
+			   },
+			callback: function(r) {
+				   if(r.message){
+					   frappe.model.set_value(doctype, name, 'task_duration', r.message);
+					}
+			}
 	})
 }

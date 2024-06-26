@@ -32,6 +32,8 @@ class HomeSecuritySkilling(Document):
 			self.cost_center = frappe.db.get_value("Cost Center", {"branch": self.branch}, "name")
 	
 	def on_submit(self):
+		if not self.is_group and not len(self.get("activity_tasks")):
+			frappe.throw("Activity task detail is missing.")
 		self.validate_dates()
 		self.task_dates()
 		self.update_progress()
@@ -89,7 +91,7 @@ class HomeSecuritySkilling(Document):
 		total_duration = 0.0		
 		for a in self.get("activity_tasks"):
 			""" first task should be a milestone """
-			if a.idx == 1 and a.is_milestone == 0:
+			if a.idx == 1 and not a.is_milestone:
 				frappe.throw("First Task list should start as Milestone at Row: {0}".format(a.idx))
 			if getdate(a.start_date) > getdate(a.end_date):
 				frappe.throw("Task Start Date Cannot be Greater than End Date at Row {0}".format(a.idx))
