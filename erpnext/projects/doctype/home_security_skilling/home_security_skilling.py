@@ -93,7 +93,7 @@ class HomeSecuritySkilling(Document):
 			""" first task should be a milestone """
 			if a.idx == 1 and not a.is_milestone:
 				frappe.throw("First Task list should start as Milestone at Row: {0}".format(a.idx))
-			if getdate(a.start_date) > getdate(a.end_date):
+			if not a.is_milestone and getdate(a.start_date) > getdate(a.end_date):
 				frappe.throw("Task Start Date Cannot be Greater than End Date at Row {0}".format(a.idx))
 			if flt(a.task_completion_percent) > 100:
 				frappe.throw(" Percent Cannot exceed 100%")
@@ -101,7 +101,7 @@ class HomeSecuritySkilling(Document):
 			if flt(a.task_completion_percent) < 0:
 				frappe.throw("Percent Cannot be less than 0%")
 
-			if getdate(a.start_date) < getdate(self.expected_start_date):
+			if not a.is_milestone and getdate(a.start_date) < getdate(self.expected_start_date):
 				frappe.throw("Task Start Date Cannot be before Activity Start Date at Row {0}".format(a.idx))
 
 			if not a.is_milestone and getdate(a.end_date) > getdate(self.expected_end_date):
