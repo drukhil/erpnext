@@ -41,7 +41,7 @@ frappe.ui.form.on('Home Security Skilling', {
 			cur_frm.set_value('parent_project', '');
 			cur_frm.set_value('project_category', '');
 			cur_frm.set_value('project_sub_category', '');
-			cur_frm.set_df_property("overall_mandays", "read_only", 0);
+			cur_frm.set_df_property("overall_mandays", "read_only", 1);
 		} else {
 			cur_frm.set_df_property("overall_mandays", "read_only", 1);
 		}
@@ -98,12 +98,13 @@ frappe.ui.form.on('Home Security Skilling', {
 		}
 	},
 	mandays: function() {
+		cur_frm.set_value("overall_mandays", (cur_frm.doc.is_group == 1)?cur_frm.doc.mandays:0);
 		cur_frm.set_value("physical_progress_weightage", (parseFloat(cur_frm.doc.mandays)/parseFloat(cur_frm.doc.overall_mandays)*100).toFixed(3))
 		cur_frm.set_value("man_power_required", Math.round(parseFloat(cur_frm.doc.mandays)/parseFloat(cur_frm.doc.total_duration)))
 	},
-	overall_mandays: function() {
-		cur_frm.set_value("physical_progress_weightage", (parseFloat(cur_frm.doc.mandays)/parseFloat(cur_frm.doc.overall_mandays)*100).toFixed(3))
-	},
+	// overall_mandays: function() {
+	// 	cur_frm.set_value("physical_progress_weightage", (parseFloat(cur_frm.doc.mandays)/parseFloat(cur_frm.doc.overall_mandays)*100).toFixed(3))
+	// },
 	total_duration: function() {
 		cur_frm.set_value("man_power_required", Math.round(parseFloat(cur_frm.doc.mandays)/parseFloat(cur_frm.doc.total_duration)))
 	},
