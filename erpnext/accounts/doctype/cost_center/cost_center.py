@@ -24,32 +24,36 @@ class CostCenter(NestedSet):
 
 	def on_update(self):
 		self.create_branch()
+		if frappe.local.flags.ignore_on_update:
+			return
+		else:
+			super(CostCenter, self).on_update()
 
-        def create_branch(self):
-                if cint(self.is_group) == 1 or cint(self.branch_created) == 1:
-                        return
-                company = frappe.defaults.get_defaults().company
-                b = frappe.new_doc("Branch")
-                b.branch = self.cost_center_name.strip()
-                b.cost_center = self.name
-                b.company = self.company
-                b.address = "N.A"
-                b.expense_bank_account = frappe.db.get_value("Company", company, "default_bank_account")
-                if not frappe.db.get_value("Branch", {'name': b.name}):
+	def create_branch(self):
+		if cint(self.is_group) == 1 or cint(self.branch_created) == 1:
+			return
+		company = frappe.defaults.get_defaults().company
+		b = frappe.new_doc("Branch")
+		b.branch = self.cost_center_name.strip()
+		b.cost_center = self.name
+		b.company = self.company
+		b.address = "N.A"
+		b.expense_bank_account = frappe.db.get_value("Company", company, "default_bank_account")
+		if not frappe.db.get_value("Branch", {'name': b.name}):
 			b.save()
-                self.create_customer(b.name)
-                self.db_set("branch_created", 1)
+		# self.create_customer(b.name)
+		self.db_set("branch_created", 1)
 		self.db_set("branch", b.name)
 
 	def check_cost_center(self):
-                if self.is_group:
-                        self.branch = ''
-                else:
-                        if not self.branch:
-                                frappe.throw("Non-Group Cost Center should have a Branch linked")
-                        ccs = frappe.db.sql("select name from `tabCost Center` where branch = %s and name != %s", (self.branch, self.name), as_dict=True)
-                        if ccs:
-                                frappe.throw("Branch <b>" + str(self.branch) + "</b> is already linked to Cost Center <b>"+str(ccs[0].name)+"</b>")
+		if self.is_group:
+			self.branch = ''
+		else:
+			if not self.branch:
+				frappe.throw("Non-Group Cost Center should have a Branch linked")
+			ccs = frappe.db.sql("select name from `tabCost Center` where branch = %s and name != %s", (self.branch, self.name), as_dict=True)
+			if ccs:
+				frappe.throw("Branch <b>" + str(self.branch) + "</b> is already linked to Cost Center <b>"+str(ccs[0].name)+"</b>")
 
 	def check_ware_house(self):
 		if not self.is_group and not self.warehouse:
@@ -126,7 +130,14 @@ class CostCenter(NestedSet):
 		else:
 			super(CostCenter, self).after_rename(olddn, newdn, merge)
 
+	def on_trash(self):
+		# checks gl entries and if child exists
+		if self.check_gle_exists():
+			frappe.throw(_("Cost Center with existing transaction can not be deleted"))
+		if self.check_if_child_exists():
+			frappe.throw(_("Cannot delete Cost Center as it has child nodes"))
 
+		super(CostCenter, self).on_trash()
 
 	def create_customer(self, branch):
                 if self.name and branch and not self.is_group:

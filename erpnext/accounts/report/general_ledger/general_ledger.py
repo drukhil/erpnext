@@ -140,7 +140,9 @@ def get_conditions(filters):
 		conditions.append("voucher_no=%(voucher_no)s")
 
 	if filters.get("cost_center"):
-		conditions.append("cost_center=%(cost_center)s")
+		# conditions.append("cost_center=%(cost_center)s")
+		filters.cost_center = get_cost_centers_with_children(filters.cost_center)
+		conditions.append("cost_center in %(cost_center)s")
 
 	if filters.get("party_type"):
 		conditions.append("party_type=%(party_type)s")
@@ -156,6 +158,21 @@ def get_conditions(filters):
 	if match_conditions: conditions.append(match_conditions)
 
 	return "and {}".format(" and ".join(conditions)) if conditions else ""
+
+def get_cost_centers_with_children(cost_centers):
+	if not isinstance(cost_centers, list):
+		cost_centers = [d.strip() for d in cost_centers.strip().split(",") if d]
+
+	all_cost_centers = []
+	for d in cost_centers:
+		if frappe.db.exists("Cost Center", d):
+			lft, rgt = frappe.db.get_value("Cost Center", d, ["lft", "rgt"])
+			children = frappe.get_all("Cost Center", filters={"lft": [">=", lft], "rgt": ["<=", rgt]})
+			all_cost_centers += [c.name for c in children]
+		else:
+			frappe.throw(_("Cost Center: {0} does not exist").format(d))
+
+	return list(set(all_cost_centers))
 
 def get_data_with_opening_closing(filters, account_details, gl_entries):
 	data = []
