@@ -176,7 +176,8 @@ class HomeSecuritySkilling(Document):
 			self.db_set("physical_progress", round(round(total_achievement, 4)/100 * flt(self.physical_progress_weightage), 3))
 			self.reload()
 		#self.percent_completed = round(flt(self.physical_progress)/flt(self.physical_progress_weightage)*100, 3)
-		self.update_parent()
+		if not self.is_group:
+			self.update_parent()
 
 	def update_parent(self):
 		progress = frappe.db.sql(""" select sum(ifnull(physical_progress, 0)) as val from `tabHome Security Skilling` where parent_project = "{0}" 
