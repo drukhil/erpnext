@@ -41,7 +41,7 @@ frappe.ui.form.on('Home Security Skilling', {
 			cur_frm.set_value('parent_project', '');
 			cur_frm.set_value('project_category', '');
 			cur_frm.set_value('project_sub_category', '');
-			cur_frm.set_df_property("overall_mandays", "read_only", 1);
+			cur_frm.set_df_property("overall_mandays", "read_only", 0);
 		} else {
 			cur_frm.set_df_property("overall_mandays", "read_only", 1);
 		}
