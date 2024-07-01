@@ -40,19 +40,20 @@ class HomeSecuritySkilling(Document):
 
 	def on_update_after_submit(self):
 		if getdate(self.completion_date) > getdate(nowdate()):
-			self.db_set('completion_date', nowdate())
+			self.db_set('completion_date', now())
 			frappe.throw(_("Cannot Update For Future Dates"))
+		if getdate(self.completion_date) == '':
+			frappe.throw("Select Date!")
 		self.physical_progress = round(flt(self.physical_progress), 7)
 		if not self.is_group:
 			self.make_tsk_group()
 			self.update_progress(update=True)
 		self.set_status()
 
-		# self.post_achievement_entries()
-		# self.make_target_entries()
-		# self.update_expense()	
-		# if not self.is_group:
-		# 	self.update_total_expense()
+		self.post_achievement_entries()
+		self.update_expense()	
+		if not self.is_group:
+			self.update_total_expense()
 		
 	def check_required_data(self):
 		if not self.expected_start_date or not self.expected_end_date:
@@ -134,26 +135,26 @@ class HomeSecuritySkilling(Document):
 		group_list = frappe.db.sql("""
 								select t1.name, t1.task, t1.idx, t1.is_milestone,
 										(select ifnull(min(t2.idx),9999)
-											from  `tabActivity Tasks` as t2
+											from  `tabHSS Activity Task` as t2
 											where t2.parent  = t1.parent
 											and   t2.is_milestone = t1.is_milestone
 											and   t2.idx > t1.idx
 										) as max_idx
-								from `tabActivity Tasks` as t1
+								from `tabHSS Activity Task` as t1
 								where t1.parent = "{0}"
 								and   t1.is_milestone = 1
 								order by t1.idx
 						""".format(self.name), as_dict=1)
 		for a in group_list:
-			frappe.db.sql(""" update `tabActivity Tasks` set task_group = '' where name = '{0}' and is_milestone = 1 """.format(a.name, self.name))
-			frappe.db.sql(""" update  `tabActivity Tasks` set task_group = '{0}{1}' where  idx between {1} and {2} and parent = "{3}" and name != '{0}'""".format(a.name, a.idx, a.max_idx, self.name))
+			frappe.db.sql(""" update `tabHSS Activity Task` set task_group = '' where name = '{0}' and is_milestone = 1 """.format(a.name, self.name))
+			frappe.db.sql(""" update  `tabHSS Activity Task` set task_group = '{0}{1}' where  idx between {1} and {2} and parent = "{3}" and name != '{0}'""".format(a.name, a.idx, a.max_idx, self.name))
 
 	def update_milestone_date(self):
-		for a in frappe.db.sql(""" select name, idx from `tabActivity Tasks` where is_milestone = 1 and parent = "{0}" 
+		for a in frappe.db.sql(""" select name, idx from `tabHSS Activity Task` where is_milestone = 1 and parent = "{0}" 
 			""".format(self.name), as_dict = 1):
-			date_line = frappe.db.sql(""" select max(end_date) as max_date, min(start_date) as min_date from `tabActivity Tasks` 
+			date_line = frappe.db.sql(""" select max(end_date) as max_date, min(start_date) as min_date from `tabHSS Activity Task` 
                         where task_group = '{0}{1}' and is_milestone = 0""".format(a.name, a.idx), as_dict = 1)
-			frappe.db.sql(""" update `tabActivity Tasks` set start_date='{0}', end_date='{1}' where  name = '{2}'
+			frappe.db.sql(""" update `tabHSS Activity Task` set start_date='{0}', end_date='{1}' where  name = '{2}'
 						""".format(date_line[0].min_date, date_line[0].max_date, a.name))
 
 	def update_progress(self, update=False):
@@ -189,16 +190,16 @@ class HomeSecuritySkilling(Document):
 
 	def make_tsk_group(self):
 		wt = percent_comp = 0.0
-		for a in frappe.db.sql(""" select name, idx from `tabActivity Tasks` where is_milestone = 1 and parent = "{0}" 
+		for a in frappe.db.sql(""" select name, idx from `tabHSS Activity Task` where is_milestone = 1 and parent = "{0}" 
 			""".format(self.name), as_dict = 1):
-			weightage = frappe.db.sql(""" select sum(ifnull(task_weightage, 0)) as tweightage, sum(ifnull(task_completion_percent, 0)) as tcompletion from `tabActivity Tasks` 
+			weightage = frappe.db.sql(""" select sum(ifnull(task_weightage, 0)) as tweightage, sum(ifnull(task_completion_percent, 0)) as tcompletion from `tabHSS Activity Task` 
                         where task_group = '{0}{1}' and is_milestone = 0""".format(a.name, a.idx), as_dict = 1)
-			task_count = frappe.db.sql(""" select count(*) as count from `tabActivity Tasks` 
+			task_count = frappe.db.sql(""" select count(*) as count from `tabHSS Activity Task` 
                         where task_group = '{0}{1}' and is_milestone = 0""".format(a.name, a.idx), as_dict = 1)
 			if weightage:
 				wt = weightage[0].tweightage
-				percent_comp = weightage[0].tcompletion / task_count[0].count
-				frappe.db.sql(""" update `tabActivity Tasks` set task_weightage = {0}, task_completion_percent = {2} where  name = '{1}'
+				percent_comp = flt(weightage[0].tcompletion) / flt(task_count[0].count)
+				frappe.db.sql(""" update `tabHSS Activity Task` set task_weightage = {0}, task_completion_percent = {2} where  name = '{1}'
 							""".format(wt, a.name, percent_comp))
 
 	def set_status(self):
@@ -206,7 +207,47 @@ class HomeSecuritySkilling(Document):
 			self.db_set("status", "Completed")
 		if self.percent_completed < 100:
 			self.db_set("status", "Ongoing")
+
+	def update_expense(self):
+		exp = frappe.db.sql(""" select sum(debit) - sum(credit) as expense 
+                      from `tabGL Entry` where cost_center = "{0}" and account in (select name from `tabAccount` 
+			where root_type = 'Expense') and docstatus = 1""".format(self.name), as_dict = 1)
+		if exp:
+			self.db_set('expense', flt(exp[0].expense))
 				
+	def update_total_expense(self):
+		lft,rgt = frappe.get_value("Cost Center", self.parent_project, ['lft','rgt'])
+
+		exp = frappe.db.sql(""" select sum(debit) - sum(credit) as expense 
+				from `tabGL Entry` where cost_center IN (select name from `tabCost Center` where lft >= {lft} and rgt <= {rgt} and is_group=0 and is_disabled=0) 
+				and account in (select name from `tabAccount` where root_type = 'Expense') and docstatus = 1""".format(lft=lft, rgt=rgt), as_dict = 1)
+
+		if exp:
+				doc = frappe.get_doc("Home Security Skilling", self.parent_project)
+				doc.db_set('expense', flt(exp[0].expense))
+
+	def post_achievement_entries(self):
+		frappe.db.sql(""" delete from `tabHSS Achievement Entry` where project = "{0}" and posting_date = '{1}'
+				""".format(self.name, self.completion_date))
+		entry = frappe.db.sql(""" select sum(percent_completed) as per_completed, sum(percent_completed_overall) as overall from `tabHSS Achievement Entry` where project = "{0}" """.format(self.name), as_dict = 1)
+		en = 0.0
+		if entry:
+			en = entry[0].per_completed
+		com = round(flt(self.percent_completed) - flt(en),9)
+		# if flt(com) <0:
+		# 	frappe.throw("Update Cannot Be Negative")
+
+		doc = frappe.get_doc({
+			'doctype': 'HSS Achievement Entry',
+			'project': self.name,
+			'project_parent': self.parent_project,
+			'percent_completed': com,
+			'posting_date': self.completion_date
+				})
+		doc.insert()
+		self.db_set('percent_completed_old', round(flt(self.percent_completed), 9))
+		self.db_set('physical_progress_old', round(flt(self.physical_progress), 9))
+
 @frappe.whitelist()
 def calculate_durations(hol_list = None, from_date = None, to_date = None):
 	holiday = holiday_list(from_date, to_date, hol_list)
