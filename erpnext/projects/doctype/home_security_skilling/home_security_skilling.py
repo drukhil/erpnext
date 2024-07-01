@@ -43,7 +43,7 @@ class HomeSecuritySkilling(Document):
 			self.db_set('completion_date', now())
 			frappe.throw(_("Cannot Update For Future Dates"))
 		if getdate(self.completion_date) == '':
-			frappe.throw("Select Date!")
+			frappe.throw("Select Date of Update!")
 		self.physical_progress = round(flt(self.physical_progress), 7)
 		if not self.is_group:
 			self.make_tsk_group()
