@@ -70,9 +70,10 @@ class AssignBranch(Document):
 
 	#Populate branches with active branches 
 	def get_all_branches(self):
+		lft, rgt = frappe.get_value("Cost Center", self.parent_cc, ["lft","rgt"])
 		query = """ select b.name as branch from tabBranch b, `tabCost Center` c where b.name = c.branch and b.is_disabled != 1"""
 		if self.parent_cc:
-			query += " and c.parent_cost_center = '{0}'".format(self.parent_cc)
+			query += " and c.name in (select name from `tabCost Center` where lft >= {0} and rgt <= {1} and is_group=0)".format(lft, rgt)
 
 		entries = frappe.db.sql(query, as_dict=True)
 		# self.set('items', [])
