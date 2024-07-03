@@ -164,3 +164,23 @@ def validate_carry_forward(leave_type):
 	if not frappe.db.get_value("Leave Type", leave_type, "is_carry_forward"):
 		frappe.throw(_("Leave Type {0} cannot be carry-forwarded").format(leave_type))
 
+""" added Jai """
+def get_permission_query_conditions(user):
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+
+	if user == "Administrator":
+		return
+	if "HR Master" in user_roles:
+		return
+	if "HR User" in user_roles or "HR Manager" in user_roles:
+		return
+	else:
+		pass
+
+	return """(
+		exists(select 1
+				from `tabEmployee`
+				where `tabEmployee`.name = `tabLeave Allocation`.employee
+				and `tabEmployee`.user_id = '{user}')
+	)""".format(user=user)
