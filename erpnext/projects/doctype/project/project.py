@@ -515,28 +515,32 @@ def holiday_list(from_date, to_date, hol_list):
 
 """ This function exec from hooks daily """
 def update_project_expense():
-    previous_date = add_days(nowdate(), -1)
-    next_date = add_days(nowdate(), 1)
+    # previous_date = add_days(nowdate(), -1)
+    # next_date = add_days(nowdate(), 1)
 
-    distinct_activities = frappe.db.sql("""SELECT DISTINCT cost_center 
-                                            FROM `tabGL Entry` 
-                                            WHERE modified BETWEEN %s AND %s""",
-                                        (getdate(previous_date), getdate(next_date)),
-                                        as_dict=True)
+    # distinct_activities = frappe.db.sql("""SELECT DISTINCT cost_center 
+    #                                         FROM `tabGL Entry` 
+    #                                         WHERE modified BETWEEN %s AND %s""",
+    #                                     (getdate(previous_date), getdate(next_date)),
+    #                                     as_dict=True)
 
-    for activity in distinct_activities:
-        cost_center = activity.cost_center
+    # for activity in distinct_activities:
+    #     cost_center = activity.cost_center
+    for cost_center in frappe.db.sql("select cost_center from tabProject where workflow_state in ('Update','Approved')", as_dict=1):
 
         if frappe.get_value("Project", cost_center, "name"):
             update_project_expense_for_cost_center(cost_center)
 
 def update_project_expense_for_cost_center(cost_center):
     doc = frappe.get_doc("Project", cost_center)
-    parent_cc = frappe.get_value("Cost Center", cost_center, "parent_cost_center")
+    cost_centers = []
+    if doc.is_group:
+        cost_centers = [row[0] for row in frappe.db.sql("""SELECT name FROM `tabCost Center` WHERE parent_cost_center = %s and is_group=0""", (doc.parent_cost_center))]
+    # parent_cc = frappe.get_value("Cost Center", cost_center, "parent_cost_center")
     # cost_centers = frappe.get_all("Cost Center", filters={"parent_cost_center": parent_cc}, pluck="name")
-    cost_centers = [row[0] for row in frappe.db.sql("""SELECT name FROM `tabCost Center` WHERE parent_cost_center = %s""", (parent_cc,))]
+    # cost_centers = [row[0] for row in frappe.db.sql("""SELECT name FROM `tabCost Center` WHERE parent_cost_center = %s and is_group=0""", (parent_cc))]
 
-    overall_total_expense = frappe.db.sql("""SELECT SUM(debit) - SUM(credit) AS expense 
+        total_expense = frappe.db.sql("""SELECT SUM(debit) - SUM(credit) AS expense 
                                      FROM `tabGL Entry` 
                                      WHERE cost_center IN %s 
                                      AND account IN (SELECT name FROM `tabAccount` WHERE root_type = 'Expense') 
@@ -545,20 +549,16 @@ def update_project_expense_for_cost_center(cost_center):
                                  as_dict=True)[0].expense
 
     if not doc.is_group:
-        total_expense_cost_center = frappe.db.sql("""SELECT SUM(debit) - SUM(credit) AS expense 
+        total_expense = frappe.db.sql("""SELECT SUM(debit) - SUM(credit) AS expense 
                                                     FROM `tabGL Entry` 
                                                     WHERE cost_center = %s 
                                                     AND account IN (SELECT name FROM `tabAccount` WHERE root_type = 'Expense') 
                                                     AND docstatus = 1""",
                                                 (doc.name,),
                                                 as_dict=True)[0].expense
-        total_expense = flt(total_expense_cost_center)
-
-    if doc.is_group:
-        frappe.db.sql("""UPDATE `tabProject` SET expense = %s WHERE name = %s""", (flt(overall_total_expense), doc.name))
+        frappe.db.sql("""UPDATE `tabProject` SET expense = %s WHERE name = %s""", (flt(total_expense), doc.name))
     else:
         frappe.db.sql("""UPDATE `tabProject` SET expense = %s WHERE name = %s""", (flt(total_expense), doc.name))
-        frappe.db.sql("""UPDATE `tabProject` SET expense = %s WHERE name = %s""", (flt(overall_total_expense), doc.parent_project))
 
 def old_update_project_expense():
 	previous_date = add_days(nowdate(), -1)
