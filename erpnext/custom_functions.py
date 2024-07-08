@@ -16,17 +16,17 @@ def check_pending_approvers():
 		send_email(a, sorted_list[a], "Material Request")
 
 	#Travel Authorization	
-	mrs = frappe.db.sql("select name, supervisor as approver, creation as date from `tabTravel Authorization` where docstatus = 0 and document_status != 'Rejected' and workflow_state != 'Draft'", as_dict=True)
+	mrs = frappe.db.sql("select name, supervisor as approver, creation as date from `tabTravel Authorization` where docstatus = 0 and workflow_state = 'Waiting Approval'", as_dict=True)
 	sorted_list = segregrate(mrs)
 	for a in sorted_list:
 		send_email(a, sorted_list[a], "Travel Authorization")
 
-	mrs = frappe.db.sql("select name, supervisor as approver, creation as date from `tabTravel Claim` where docstatus = 0 and supervisor_approval = 0 and workflow_state not like '%Rejected%'", as_dict=True)
+	mrs = frappe.db.sql("select name, supervisor as approver, creation as date from `tabTravel Claim` where docstatus = 0 and supervisor_approval = 0 and workflow_state = 'Waiting Approval'", as_dict=True)
 	sorted_list = segregrate(mrs)
 	for a in sorted_list:
 		send_email(a, sorted_list[a], "Travel Claim")
 
-	mrs = frappe.db.sql("select name, leave_approver as approver, creation as date from `tabLeave Application` where docstatus = 0 and workflow_state != 'Rejected'", as_dict=True)
+	mrs = frappe.db.sql("select name, leave_approver as approver, creation as date from `tabLeave Application` where docstatus = 0 and workflow_state not in ('Rejected','Draft')", as_dict=True)
 	sorted_list = segregrate(mrs)
 	for a in sorted_list:
 		send_email(a, sorted_list[a], "Leave Application")
