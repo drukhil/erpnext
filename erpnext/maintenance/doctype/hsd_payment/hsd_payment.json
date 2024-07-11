@@ -62,7 +62,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "cost_center", 
@@ -792,7 +792,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "fieldname": "bank_payment", 
@@ -852,7 +852,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2024-01-15 14:32:39.405720", 
+ "modified": "2024-07-11 12:04:08.249834", 
  "modified_by": "Administrator", 
  "module": "Maintenance", 
  "name": "HSD Payment", 
