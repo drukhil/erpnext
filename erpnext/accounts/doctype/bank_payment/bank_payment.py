@@ -402,8 +402,7 @@ class BankPayment(Document):
                         pe.bank_account, 
                         s.account_number as bank_account_no,
                         s.bank_account_type,
-						pe.amount
-						
+						round(pe.amount,2) as amount						
 					FROM `tabHSD Payment` pe
 					JOIN `tabSupplier` s ON s.name = pe.supplier
 					LEFT JOIN `tabFinancial Institution Branch` fib ON fib.name = s.bank_branch
