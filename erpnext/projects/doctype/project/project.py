@@ -594,3 +594,50 @@ def old_update_project_expense():
 				else:
 					frappe.db.sql(""" update `tabProject` set expense = {0}
 							where name = "{1}" """.format(flt(all_total_exp[0].expense), doc.name))
+
+@frappe.whitelist()
+def capitalize_project(source_name, target_doc=None):
+	def update_date(obj, target, source_parent):
+		target.workflow_state=''
+	doc = get_mapped_doc("Project", source_name, {
+			"Project": {
+				"doctype": "Project Capitalization",
+				"field_map": {
+					"name" : "project",
+					"pe_id" : "user_id"
+				},
+				"postprocess": update_date,
+				"validation": {"percent_completed": ["==", 1]}
+			},
+		}, target_doc)
+	
+	return doc
+
+def notify_project_milestone():
+	milestone_list = frappe.db.sql("""select a.name,a.parent project,a.task,a.task_completion_percent,p.parent_project,pe_id,a.end_date
+			from `tabActivity Tasks` a, tabProject p where p.name=a.parent and p.percent_completed < 100 
+			and p.docstatus=1 and a.is_milestone = 1 and DATEDIFF(a.end_date, NOW()) = 30 order by p.parent_project""", as_dict=1)
+	if not len(milestone_list):
+		return
+	""" send to PD, Pruject Team """
+	message=""
+	message+=" <p>One month left to the expiry of following Milestone in the Project:</p>"
+	message+="<ol>"
+	for d in milestone_list:
+		message+="<li><b>{}</b> - {} - ({}) </li>".format(d.task, d.project, d.end_date)
+	message+="</ol>"
+	
+	receipients = ['projectdirector@gyalsunginfra.bt','karma.karma@gyalsunginfra.bt','yeshinedup@gyalsunginfra.bt','chimidema@gyalsunginfra.bt','jina.sharma@gyalsunginfra.bt','jigme.zangmo@gyalsunginfra.bt']
+	frappe.sendmail(recipients=receipients, sender=None, subject="Project Milestone Expiry Notice", message=message)
+
+	""" send to PE, DPM """
+	for a in milestone_list:
+		dpm = frappe.db.get_value("Project", a.parent_project, "pe_id")
+		receipients_list = []
+		receipients_list.append(a.pe_id)
+		receipients_list.append(dpm)
+
+		msg="One month left to the expiry of the Milestone: <b>{}</b> of the Project: {}".format(a.task, a.project)
+		subject = "Milestone Expiry Notice: {}".format(a.task)
+		
+		frappe.sendmail(recipients=receipients_list, sender=None, subject=subject, message=msg)

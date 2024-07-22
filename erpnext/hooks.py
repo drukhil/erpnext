@@ -123,7 +123,8 @@ permission_query_conditions = {
 	"Leave Application": "erpnext.hr.doctype.leave_application.leave_application.get_permission_query_conditions",
 	"Travel Authorization": "erpnext.hr.doctype.travel_authorization.travel_authorization.get_permission_query_conditions",
 	"Travel Claim": "erpnext.hr.doctype.travel_claim.travel_claim.get_permission_query_conditions",
-	"Leave Allocation": "erpnext.hr.doctype.leave_allocation.leave_allocation.get_permission_query_conditions"
+	"Leave Allocation": "erpnext.hr.doctype.leave_allocation.leave_allocation.get_permission_query_conditions",
+	"Material Request": "erpnext.stock.doctype.material_request.material_request.get_permission_query_conditions"
 }
 
 has_permission = {
@@ -198,7 +199,8 @@ scheduler_events = {
 		"erpnext.custom_functions.check_pending_approvers",
 		"erpnext.projects.doctype.priority_project.priority_project.update_priority",
         "erpnext.projects.doctype.bmt_project.bmt_project.update_bmt",
-        "erpnext.projects.doctype.project.project.update_project_expense"
+        "erpnext.projects.doctype.project.project.update_project_expense",
+        "erpnext.projects.doctype.project.project.notify_project_milestone"
 	],
 }
 
