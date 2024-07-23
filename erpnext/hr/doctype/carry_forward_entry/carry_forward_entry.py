@@ -30,8 +30,8 @@ class CarryForwardEntry(Document):
                 current_fiscal_year = get_fiscal_year(getdate(nowdate()), company=self.company)[0]
                 if self.fiscal_year == current_fiscal_year:
                         frappe.throw("You are not allowed to merge CL balance from current Fiscal year {} to EL".format(current_fiscal_year))
-                query = """select name from `tabCarry Forward Entry` where docstatus != 2 and fiscal_year = '{0}' and name != '{1}'
-                        """.format(self.fiscal_year, self.name)
+                query = """select name from `tabCarry Forward Entry` where docstatus != 2 and fiscal_year = '{0}' and name != '{1}' and job_type='{2}'
+                        """.format(self.fiscal_year, self.name, self.job_type)
                 if self.branch:
                         query += " and branch = '{0}'".format(self.branch)
 		if self.employment_type:
@@ -51,15 +51,15 @@ class CarryForwardEntry(Document):
                 if not fy_start_end_date:
                         frappe.throw(_("Fiscal Year {0} not found.").format(self.fiscal_year))
 
-                from_date = get_first_day(getdate(fy_start_end_date[0]))
-                to_date = get_last_day(getdate(fy_start_end_date[1]))
+                from_date = get_first_day(getdate(fy_start_end_date[0])) if self.job_type == '' else self.from_date
+                to_date = get_last_day(getdate(fy_start_end_date[1])) if self.job_type == '' else self.to_date
                 employee = ''
                 allocation_records_based_on_to_date = get_leave_allocation_records(to_date)
                 filters_dict = { "status": "Active", "company": self.company}
                 if self.branch:
                         filters_dict['branch'] = self.branch
-
-
+                if self.job_type:
+                        filters_dict['job_type'] = self.job_type
 		if self.employment_type:
 			filters_dict['employment_type'] = self.employment_type
 

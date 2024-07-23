@@ -35,16 +35,15 @@ class LeaveEncashment(Document):
                 self.validate_balances()                                                        #Commented by SHIV on 2018/10/12
 
 		#Employees on Deputation are not eligible for Leave Encashment
-		if self.employment_type == "Deputation" and self.workflow_state == "Waiting Approval":
-			frappe.throw("<b> You are not allowed to apply Leave Encashment </b>")
+		# if self.employment_type == "Deputation" and self.workflow_state == "Waiting Approval":
+		# 	frappe.throw("<b> You are not allowed to apply Leave Encashment </b>")
                 
         def on_submit(self):
 		self.adjust_leave()
-		if self.employment_type != 'Deputation':
-			self.post_accounts_entry()
+		self.post_accounts_entry()
 
-		if self.employment_type == 'Deputation':
-			frappe.msgprint("Your Leave Encashment Will Be Processed from Parent Organization, Kindly Contact HR Manager for more info")
+		# if self.employment_type == 'Deputation':
+		# 	frappe.msgprint("Your Leave Encashment Will Be Processed from Parent Organization, Kindly Contact HR Manager for more info")
 	def before_cancel(self):
 		self.check_gl_entry()
 
@@ -126,7 +125,7 @@ class LeaveEncashment(Document):
                 salary_struc_list = frappe.db.sql("""
                         select name from `tabSalary Structure`
                         where employee = %s
-                        and is_active = 'Yes'
+                        and is_active = 'Yes' and eligible_for_leave_encashment = 1
                         and now() between ifnull(from_date,'0000-00-00') and ifnull(to_date,'2050-12-31')
                         order by ifnull(from_date,'0000-00-00') desc limit 1
                 """,(self.employee))
@@ -191,7 +190,7 @@ class LeaveEncashment(Document):
                                 if d.salary_component == 'Basic Pay':
                                         basic_pay = flt(d.amount)
                 else:
-                        frappe.throw(_("No Active salary structure found."))
+                        frappe.throw(_("No Active salary structure found/Not eligible for Leave Encashment"))
                         
                 if basic_pay:
                         salary_tax = get_salary_tax(basic_pay)
