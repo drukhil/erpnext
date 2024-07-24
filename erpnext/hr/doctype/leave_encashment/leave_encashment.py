@@ -104,11 +104,12 @@ class LeaveEncashment(Document):
                 #le = get_le_settings()                                                                         # Line commented by SHIV on 2018/10/15
                 le = frappe.get_doc("Employee Group",frappe.db.get_value("Employee",self.employee,"employee_group")) # Line added by SHIV on 2018/10/15
                 if flt(self.balance_before) < flt(le.encashment_min):
-                        if self.employment_type =="Deputation" and flt(self.balance_before) < 30:
-                                msg = "Minimum leave balance 30 required to encash."
-                        elif self.employment_type !="Deputation":
+                        msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
+                        # if self.employment_type =="Deputation" and flt(self.balance_before) < 30:
+                        #         msg = "Minimum leave balance 30 required to encash."
+                        # elif self.employment_type !="Deputation":
 
-                                msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
+                        #         msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
 
                 if flt(self.balance_after) < 0:
                         msg = "Insufficient leave balance"
