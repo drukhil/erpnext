@@ -83,7 +83,7 @@ class SupplierMonitoring(Document):
 			
 			if flt(a.received_quantity) > flt(a.qty):
 				frappe.throw("Received Quantity cannot be greater than the PO quantity at Row {}".format(a.idx))
-			if flt(a.liquidated_damage) > max_amount:
+			if round(a.liquidated_damage) > round(max_amount):
 				frappe.throw("Liquidated Damage cannot be more than the 10% of the PO Amount")
 			# if flt(a.received_quantity) > a.qty:
 			# 	frappe.throw("Received Quantity cannot be more than the PO quantity")
