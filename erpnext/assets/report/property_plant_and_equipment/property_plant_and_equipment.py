@@ -83,13 +83,13 @@ def get_accounts(filters):
 	return data
 
 def get_values(account, to_date, from_date, cost_center=None, opening=False, cwip=False, adjustment=False):
-	query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account = \'" + str(account) + "\' and docstatus = 1"
+	query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account = \'" + str(account) + "\' and docstatus = 1 and posting_date between \'" + from_date + "\' and \'" + to_date + "\'" 
 	if cwip:
-		query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account in %(account)s and docstatus = 1 "
+		query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account in %(account)s and docstatus = 1 and posting_date between \'" + from_date + "\' and \'" + to_date + "\'" 
 	elif adjustment:
-		query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account = \'" + str(account) + "\' and docstatus = 1 and is_depreciation_adjustment = 'Yes'"
+		query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account = \'" + str(account) + "\' and docstatus = 1 and is_depreciation_adjustment = 'Yes' and posting_date between \'" + from_date + "\' and \'" + to_date + "\'" 
 	else:
-		query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account = \'" + str(account) + "\' and docstatus = 1"
+		query = "select sum(debit) as debit, sum(credit) as credit from `tabGL Entry` where account = \'" + str(account) + "\' and docstatus = 1 and posting_date between \'" + from_date + "\' and \'" + to_date + "\'" 
 	# if not opening:
 	# 	query += " and posting_date between \'" + str(from_date) + "\' and \'" + str(to_date) + "\'"
 	# else:
