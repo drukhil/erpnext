@@ -406,13 +406,6 @@ def get_permission_query_conditions(user):
 		return
 	if "HR Master" in user_roles or "Accounts Manager" in user_roles or "Auditor" in user_roles:
 		return
-	if "HR User" in user_roles or "HR Manager" in user_roles:
-		""" get all list with branch same as the branch of login user """
-		user_branch = frappe.db.get_value("Employee", {"user_id": user}, "branch")
-
-		return """(
-			`tabTravel Claim`.branch = '{branch}'
-		)""".format(branch=user_branch)
 	if "Accounts User" in user_roles:
 		return """(
 			`tabTravel Claim`.owner = '{user}'
@@ -421,6 +414,14 @@ def get_permission_query_conditions(user):
 			where `tabAssign Branch`.name = `tabBranch Item`.parent
 			and `tabAssign Branch`.user = '{user}')
 		)""".format(user=user)
+	
+	if "HR User" in user_roles or "HR Manager" in user_roles:
+		""" get all list with branch same as the branch of login user """
+		user_branch = frappe.db.get_value("Employee", {"user_id": user}, "branch")
+
+		return """(
+			`tabTravel Claim`.branch = '{branch}'
+		)""".format(branch=user_branch)
 
 	return """(
 		`tabTravel Claim`.owner = '{user}'
