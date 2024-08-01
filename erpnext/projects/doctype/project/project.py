@@ -627,7 +627,7 @@ def notify_project_milestone():
 		message+="<li><b>{}</b> - {} - ({}) </li>".format(d.task, d.project, d.end_date)
 	message+="</ol>"
 	
-	receipients = ['projectdirector@gyalsunginfra.bt','karma.karma@gyalsunginfra.bt','yeshinedup@gyalsunginfra.bt','chimidema@gyalsunginfra.bt','jina.sharma@gyalsunginfra.bt','jigme.zangmo@gyalsunginfra.bt']
+	receipients = ['projectdirector@gyalsunginfra.bt','karma.karma@gyalsunginfra.bt','yeshinedup@gyalsunginfra.bt','chimidema@gyalsunginfra.bt','jina.sharma@gyalsunginfra.bt','jigme.zangmo@gyalsunginfra.bt','sangaybidha@gyalsunginfra.bt']
 	frappe.sendmail(recipients=receipients, sender=None, subject="Project Milestone Expiry Notice", message=message)
 
 	""" send to PE, DPM """
