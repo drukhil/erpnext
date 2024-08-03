@@ -836,7 +836,7 @@ def get_permission_query_conditions(user):
 				from `tabEmployee`
 				where name in (select second_approver from `tabEmployee`
 				where `tabEmployee`.name = `tabLeave Application`.employee
-				and `tabLeave Application`.workflow_state not in  ('Draft','Approved','Rejected','Cancelled')
+				and `tabLeave Application`.workflow_state not in  ('Draft','Rejected','Cancelled')
 				)
 				and `tabEmployee`.user_id = '{user}'
 		)
