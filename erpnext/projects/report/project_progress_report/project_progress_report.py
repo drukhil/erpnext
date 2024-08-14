@@ -79,7 +79,7 @@ def construct_query(filters):
 		cond += " and status = '{0}'".format(filters.get('status'))
 	
 	query = """ select name, project_name, expense, expected_start_date, expected_end_date, parent_weightage, 
-			ifnull(total_duration, 0) as total_duration, 
+			ifnull(total_duration, 0) as total_duration, ifnull(provisional_estimated_budget, 0) as provisional_est_budget, ifnull(value_of_work_done, 0) as value_work_done,
 		ifnull(estimated_budget,0) as estimated_budget, {0},
 		  status, project_engineer, pe_name, contact from `tabProject` where docstatus <= 1 """.format(fields)
 	query += cond 
@@ -93,19 +93,21 @@ def get_columns(filters):
                 { "fieldname": "total_duration", "label": _("Duration(Days)"),  "fieldtype": "Int", "width": 100 },
 		{ "fieldname": "estimated_budget", "label": _("Estimated Budget"),  "fieldtype": "Currency", "width": 150 },
                 { "fieldname": "expense_incured", "label": _("Actual Expense"),  "fieldtype": "Currency", "width": 130 },
+		{ "fieldname": "provisional_est_budget", "label": _("Provisional Est. Budget"),  "fieldtype": "Currency", "width": 150 },
+                { "fieldname": "value_work_done", "label": _("Value of Work Done"),  "fieldtype": "Currency", "width": 130 },
                 { "fieldname": "physical_progress_weightage", "label": _("Weightage(%)"),  "fieldtype": "Data",  "width": 100 },
 		{ "fieldname": "project_engineer", "label": _("PM/PE ID"),  "fieldtype": "Link",  "options": "Employee", "width": 90 },
 		{ "fieldname": "engineer_name", "label": _("PM/PE Name"),  "fieldtype": "Data", "width": 140 },
 		{ "fieldname": "contact", "label": _("Contact No."),  "fieldtype": "Data", "width": 90 }
 	]
 	if not filters.get("project"):
-                 cols.insert(6,{
+                 cols.insert(8,{
                   "fieldname": "physical_progress",
                   "label": "Project Progress(%)",
                   "fieldtype": "Data",
                   "width": 140
                  })
-                 cols.insert(7,{
+                 cols.insert(9,{
                   "fieldname": "percent_completed",
                   "label": "Site Progress(%)",
                   "fieldtype": "Data",
@@ -113,13 +115,13 @@ def get_columns(filters):
                  })
 
 	else:
-		cols.insert(6,{
+		cols.insert(8,{
                   "fieldname": "physical_progress",
                   "label": "Site Progress(%)",
                   "fieldtype": "Data",
                   "width": 140
                  })
-		cols.insert(7,{
+		cols.insert(9,{
                   "fieldname": "percent_completed",
                   "label": "Activity Progress(%)",
                   "fieldtype": "Data",
