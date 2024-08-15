@@ -529,20 +529,21 @@ def get_cc_warehouse(user):
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user
 	user_roles = frappe.get_roles(user)
-	return
-	# if user == "Administrator":
-	# 	return
-	# if "Purchase Manager" in user_roles or "Auditor" in user_roles:
-	# 	return
-	# if "Stock User" in user_roles or "Stock Manager" in user_roles:
-	# 	""" get all list with branch same as the branch of login user """
-	# 	user_branch = frappe.db.get_value("Employee", {"user_id": user}, "branch")
+	if user == "Administrator":
+		return
+	if "Purchase Manager" in user_roles or "Auditor" in user_roles:
+		return
+	if "Stock Manager" in user_roles:
+		return
+	if "Stock User" in user_roles:
+		""" get all list with branch same as the branch of login user """
+		user_branch = frappe.db.get_value("Employee", {"user_id": user}, "branch")
 
-	# 	return """(
-	# 		`tabMaterial Request`.branch = '{branch}'
-	# 	)""".format(branch=user_branch)
+		return """(
+			`tabMaterial Request`.branch = '{branch}'
+		)""".format(branch=user_branch)
 
-	# return """(
-	# 	`tabMaterial Request`.owner = '{user}'
+	return """(
+		`tabMaterial Request`.owner = '{user}'
 		
-	# )""".format(user=user)
+	)""".format(user=user)
