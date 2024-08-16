@@ -18,3 +18,29 @@ frappe.ui.form.on('Employee Benefits', {
 		}
 	}
 });
+frappe.ui.form.on("Separation Item", {
+	
+	"benefit_type": function(frm, cdt, cdn) {
+		set_amount(frm, cdt, cdn);
+	},
+				
+});
+var set_amount = function(frm, cdt, cdn){
+	var item = locals[cdt][cdn];
+	frappe.call({
+		method: "erpnext.hr.doctype.employee_benefits.employee_benefits.set_amount",
+		args: {
+			"benefit_type": item.benefit_type,
+			"employee":cur_frm.doc.employee
+			
+
+		},
+		callback: function(r) {
+			if(r.message) {
+				console.log(r.message)
+				frappe.model.set_value(cdt, cdn, "amount", flt(r.message))
+				cur_frm.refresh_field("amount")
+			}
+		}
+	})
+}

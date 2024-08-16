@@ -72,3 +72,16 @@ class EmployeeBenefits(Document):
 		if docs:
 			frappe.throw("Cancel Journal Entry <b>" + str(docs[0].parent) + "</b> before cancelling this document")
 
+@frappe.whitelist()
+def set_amount(benefit_type, employee):
+	salary_structure = frappe.db.get_value("Salary Structure",{"employee" :employee, "is_active":"Yes"},"name")
+	basic_pay = frappe.db.get_value("Salary Detail",{"parent":salary_structure,"salary_component":"Basic Pay"},"amount")
+	employee_grade = frappe.db.get_value("Employee",employee,"employee_subgroup")
+	tada_amount = frappe.db.get_value("Employee Grade",employee_grade,"dsa")
+	if benefit_type =="Transfer Grant":
+		amount= basic_pay
+	elif benefit_type =="TADA-Incountry":
+		amount = tada_amount
+	else:
+		amount =0
+	return amount
