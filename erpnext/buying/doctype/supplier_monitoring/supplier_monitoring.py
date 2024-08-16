@@ -40,7 +40,7 @@ class SupplierMonitoring(Document):
 			a.balance_quantity =flt(a.qty) - flt(a.received_quantity)
 			a.received_amount = flt(a.rate) * flt(a.received_quantity)
 			a.undelivered_amount =flt(a.rate) * flt(a.balance_quantity)
-			if a.liquidated_damage > 0:
+			if a.days_delayed > 0:
 				a.liquidated_damage = flt(a.received_amount) * flt(a.days_delayed) * .001
 			else:
 				a.liquidated_damage == 0
@@ -89,10 +89,15 @@ class SupplierMonitoring(Document):
 			# 	frappe.throw("Received Quantity cannot be more than the PO quantity")
 
 @frappe.whitelist()
-def calculate_durations(from_date = None, to_date = None):
-	duration = date_diff(to_date, from_date)
+def calculate_durations(from_date = None, to_date = None, new_from_date = None, extension_date =None, give_extension=0):
+	# frappe.throw(str(give_extension))
+	if give_extension =="1":
+		duration = date_diff(to_date, extension_date)
+	else:
+		duration = date_diff(to_date, from_date)
 	if duration > 100:
 		frappe.throw("Days Delayed cannot be more than 100 days")
+	
 	elif duration < 0:
 		return 0
 	else:

@@ -43,7 +43,7 @@ frappe.ui.form.on("Supplier Monitoring Item", {
 				var at = frm.doc.items || [];
 		        	var days_delayed = 0.0
 		        	if(item.schedule_date) {
-					calculate_duration(frm, doctype, name, item.schedule_date, item.received_date);
+					calculate_duration(frm, doctype, name, item.schedule_date, item.received_date, item.new_delivery_date, cur_frm.doc.extension_date, cur_frm.doc.give_extension);
 				}	
 				// cur_frm.set_value('days_delayed', days_delayed)
 			},
@@ -70,15 +70,18 @@ frappe.ui.form.on("Supplier Monitoring", "refresh", function(frm) {
     });
 })
 
-function calculate_duration(cur_frm, doctype, name, from_date, to_date) {
+function calculate_duration(cur_frm, doctype, name, from_date, to_date, new_from_date, extension_date, give_extension) {
 	frappe.call({
 			method: "erpnext.buying.doctype.supplier_monitoring.supplier_monitoring.calculate_durations",
 			 args: {
-					
 					"from_date": from_date,
-					"to_date": to_date
+					"to_date": to_date,
+					"new_from_date": new_from_date,
+					"extension_date": extension_date,
+					"give_extension": give_extension
 			   },
 			callback: function(r) {
+					console.log(r.message)
 				   if(r.message){
 					   frappe.model.set_value(doctype, name, 'days_delayed', r.message);
 					   cur_frm.refresh_field()
