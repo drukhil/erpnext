@@ -189,10 +189,15 @@ def get_data():
 					"label": _("Leave Adjustment Tool"),
 				},
 				{
-                                        "type": "doctype",
-                                        "name": "Carry Forward Entry",
-                                        "label": _("CL TO EL Converter"),
-                                },
+					"type": "doctype",
+					"name": "Carry Forward Entry",
+					"label": _("CL TO EL Converter"),
+                },
+				{
+					"type": "doctype",
+					"name": "GCE Leave Cancellation",
+					"label": _("GCE Leave Cancellation"),
+                },
 			]
 		},
 		{
