@@ -33,21 +33,21 @@ def get_accounts(filters):
 		dep_addition = flt(acc_dep.credit) - flt(adj.credit)
 		dep_add = flt(acc_dep.credit)
 		d_total = d_open + dep_add  - flt(dep_adjust)
-
-		row = [ 
-			a.name,
-			g_open,
-			g_addition,
-			g_adjustment,
-			g_total,
-			d_open,
-			dep_addition,
-			dep_adjust,
-			adj_adjust,
-			d_total,
-			flt(g_total) - flt(d_total) 
-		]	
-		data.append(row)
+		if a.name !="Customized Furniture":
+			row = [ 
+				a.name,
+				g_open,
+				g_addition,
+				g_adjustment,
+				g_total,
+				d_open,
+				dep_addition,
+				dep_adjust,
+				adj_adjust, 
+				d_total,
+				flt(g_total) - flt(d_total) 
+			]	
+			data.append(row)
 
 	#FOr CWIP Account
 	cwip_acc = []
