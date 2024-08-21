@@ -209,6 +209,9 @@ def approver_list(doc, employee, action):
 
 @frappe.whitelist()
 def verify_mr_workflow(doc):
+        user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+
         employee = frappe.db.get_value("Employee", {'user_id': doc.owner}, 'name')
         reports_to  = frappe.db.get_value("Employee", frappe.db.get_value("Employee", employee, "reports_to"), ["user_id","employee_name","designation","name"])
         if not reports_to:
@@ -235,23 +238,35 @@ def verify_mr_workflow(doc):
                 if doc.owner != frappe.session.user:
                         doc.workflow_state = "Draft"
                         frappe.throw("Only Mr/Mrs. <b> '{0}' </b>  can Apply/Reapply this Document".format(frappe.get_doc("User", doc.owner).full_name))
-                doc.workflow_state = "Waiting Approval"
+                if doc.title1 =="Material Request":
+                        doc.workflow_state = "Waiting Approval"
+                else:
+                        doc.workflow_state = "Waiting For Verification"
                 doc.docstatus = 0
-		message = """Dear Sir/Madam, <br>  {0} has requested you to verify the Material Request <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Material Request", doc.name)))
+		
+        if doc.workflow_state =="Verified":
+                if verifier != frappe.session.user:
+                        doc.workflow_state = "Verified By Supervisor"
+                        doc.docstatus = 0
+                        frappe.throw("Only Mr/Mrs. <b> {0} </b> can verify this Documentmt".format(frappe.get_doc("User", verifier).full_name))
+                doc.workflow_state = "Verified"
+                doc.docstatus = 0
+                doc.verifier = frappe.session.user
+                message = """Dear Sir/Madam, <br>  {0} has requested you to Verified the Material Request <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Material Request", doc.name)))
                 try:
-                        frappe.sendmail(recipients=verifier, sender=None, subject=subject, message=message)
+                        frappe.sendmail(recipients=approver, sender=None, subject=subject, message=message)
+			frappe.sendmail(recipients= doc.owner, sender = None, subject = subject, message = "Material Request {0} verified".format(str(get_link_to_form("Material Request", doc.name))))
                 except:
                         pass
 
-
         if doc.workflow_state == "Verified By Supervisor":
-                if verifier != frappe.session.user:
+                if "MR Verifier" not in user_roles:
                         doc.workflow_state = "Waiting Approval"
-                        frappe.throw("Only Mr/Mrs. <b> {0} </b> can verify this Document".format(frappe.get_doc("User", verifier).full_name))
+                        frappe.throw("Only MR Verifier role can verify this Document")
                 doc.workflow_state == "Verified By Supervisor"
                 doc.docstatus = 0
-                doc.verifier = verifier
-		message = """Dear Sir/Madam, <br>  {0} has requested you to Approve the Material Request <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Material Request", doc.name)))
+                doc.verifier = frappe.session.user
+		message = """Dear Sir/Madam, <br>  {0} has requested you to Verified the Material Request <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Material Request", doc.name)))
                 try:
                         frappe.sendmail(recipients=approver, sender=None, subject=subject, message=message)
 			frappe.sendmail(recipients= doc.owner, sender = None, subject = subject, message = "Material Request {0} verified".format(str(get_link_to_form("Material Request", doc.name))))
@@ -259,34 +274,49 @@ def verify_mr_workflow(doc):
                         pass
 
 	if doc.workflow_state == "Approved":
-                if approver != frappe.session.user:
-                        doc.workflow_state = "Verified By Supervisor"
-                        doc.docstatus = 0
-                        frappe.throw("Only Mr/Mrs. <b> {0} </b> can approve this Documentmt".format(frappe.get_doc("User", approver).full_name))
-                if doc.get_db_value("workflow_state") != "Verified By Supervisor":
-                        doc.docstatus = 0
-                        fappe.throw("Only Verified Document Can be approved")
-                doc.workflow_state = "Approved"
+                if doc.title1 =="Material Request":
+                        if "MR Approver" not in user_roles:
+                                doc.workflow_state = "Waiting Approval"
+                                frappe.throw("Only MR Approver role can Approved this Document")
+                else:
+                        if approver != frappe.session.user:
+                                doc.workflow_state = "Verified"
+                                doc.docstatus = 0
+                                frappe.throw("Only Mr/Mrs. <b> {0} </b> can approve this Documentmt".format(frappe.get_doc("User", approver).full_name))
+                        if doc.get_db_value("workflow_state") != "Verified":
+                                doc.docstatus = 0
+                                frappe.throw("Only Verified Document Can be approved")
+                doc.workflow_state == "Approved"
                 doc.docstatus = 1
-                doc.w_approver = approver
-		message = """Dear {0}, <br>  Your Material Request {1} is approved. Check ERP System for More Info. <br>  Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Material Request", doc.name)))
+                doc.w_approver = frappe.session.user
+		message = """Dear Sir/Madam, <br>  {0} has requested you to Approve the Material Request <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Material Request", doc.name)))
                 try:
-                        frappe.sendmail(recipients=doc.owner, sender=None, subject=subject, message=message)
+                        frappe.sendmail(recipients=approver, sender=None, subject=subject, message=message)
+			frappe.sendmail(recipients= doc.owner, sender = None, subject = subject, message = "Material Request {0} verified".format(str(get_link_to_form("Material Request", doc.name))))
                 except:
                         pass
 
         if doc.workflow_state in ("Rejected", "Cancelled"):
                 if doc.get_db_value("workflow_state") == 'Waiting Approval':
-                        if verifier != frappe.session.user:
+                        if "MR Verifier" not in user_roles:
                                 doc.workflow_state = 'Waiting Approval'
-                                frappe.throw("Only Mr/Mrs. <b> {0} </b> can reject this document".format(frappe.get_doc("User", verifier).full_name))
+                                frappe.throw("Only MR Verifier role can reject this document")
+                
+                elif doc.get_db_value("workflow_state") == 'Waiting For Verification':
+                        if verifier != frappe.session.user:
+                                frappe.throw("Only Mr/Mrs. <b> {0} </b> can reject/cancel this Document".format(frappe.get_doc("User", verifier).full_name))
 
-		elif doc.get_db_value("workflow_state") in ('Verified By Supervisor', 'Approved'):
-                        if approver != frappe.session.user:
-                                doc.workflow_state = doc.get_db_value("workflow_state")
-                                frappe.throw("Only Mr/Mrs. <b> {0} </b> can reject/cancel this Document".format(frappe.get_doc("User", approver).full_name))
+                elif doc.get_db_value("workflow_state") in ('Verified By Supervisor', 'Approved'):
+                        if doc.title1 =="Material Request":
+                                if "MR Approver" not in user_roles:
+                                        doc.workflow_state = 'Approved'
+                                        frappe.throw("Only MR Approver role can reject this document")
+                        else:
+                                if approver != frappe.session.user:
+                                        doc.workflow_state = doc.get_db_value("workflow_state")
+                                        frappe.throw("Only Mr/Mrs. <b> {0} </b> can reject/cancel this Document".format(frappe.get_doc("User", approver).full_name))
                 doc.rejector = frappe.session.user
-		message = """Dear {0},  Your Material Request {1} is <b> {2} </b>. Check ERP System for More Info. <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Material Request", doc.name)))
+		message = """Dear {0},  Your Material Request {1} is <b> {2} </b>. Check ERP System for More Info. <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Material Request", doc.name)), doc.workflow_state)
                 try:
                         frappe.sendmail(recipients=doc.owner, sender=None, subject=subject, message=message)
                 except:
