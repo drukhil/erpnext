@@ -157,13 +157,13 @@ def get_data():
 				#	"name": "Stock Projected Quantity",
 				#	"doctype": "Item",
 				#},
-				#{
-				#	"type": "report",
-				#	"is_query_report": True,
-				#	"name": "Stock Balance Report",
-				#	"doctype": "Item",
-				#	"label": _("Stock Ageing")
-				#},
+				{
+					"type": "report",
+					"is_query_report": True,
+					"name": "Stock Balance Report",
+					"doctype": "Item",
+					"label": _("Stock Ageing")
+				},
 				#{
 				#	"type": "report",
 				#	"is_query_report": True,
@@ -184,12 +184,12 @@ def get_data():
 					"label": _("Material Prices")
 				},
 				{
-                                        "type": "report",
-                                        "is_query_report": True,
-                                        "name": "Stock Reconciliation Report",
-                                        "doctype": "Stock Reconciliation",
-                                        "label": _("Stock Reconciliation Report")
-                                },
+					"type": "report",
+					"is_query_report": True,
+					"name": "Stock Reconciliation Report",
+					"doctype": "Stock Reconciliation",
+					"label": _("Stock Reconciliation Report")
+                },
 				{
 					"type": "report",
 					"is_query_report": True,
