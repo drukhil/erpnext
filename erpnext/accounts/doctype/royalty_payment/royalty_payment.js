@@ -40,6 +40,12 @@ frappe.ui.form.on('Royalty Payment', {
         }
 
     },
+    "add_amount": function(frm) {
+       
+        cur_frm.set_value("net_royalty",frm.doc.total_royalty+frm.doc.add_amount);
+        
+
+    },
     // "less_cft": function(frm) {
     //     if(frm.doc.less_cft > frm.doc.total_cft){
 	// 				frappe.throw("Volume to be subtracted cannot be greater than the total volume.")

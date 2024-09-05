@@ -80,7 +80,8 @@ class RoyaltyPayment(Document):
 						entries = frappe.db.sql("select a.name, b.item_code, b.reading, sum(b.qty) as qty, b.uom, b.item_sub_group, sum(b.qty_in_no) as qty_in_no, b.reading_inches from `tabProduction` a, `tabProduction Product Item` b where a.name = b.parent and b.item_sub_group != 'Firewood' and a.branch = %s and a.posting_date between %s and %s and a.business_activity = %s and a.docstatus = 1 and a.royalty_paid = 0 and a.production_type = %s group by b.item_code, b.reading", (self.branch, self.from_date, self.to_date, self.business_activity, self.production_type), as_dict=1)
 				else:
 					if self.range_name:
-						entries = frappe.db.sql("select a.name, b.item_code, b.reading, sum(b.qty) as qty, b.uom, b.item_sub_group, sum(b.qty_in_no) as qty_in_no, b.reading_inches from `tabProduction` a, `tabProduction Product Item` b where a.name = b.parent and b.item_sub_group != 'Firewood' and a.branch = %s and a.range = %s and a.posting_date between %s and %s and a.business_activity = %s and a.docstatus = 1 and a.royalty_paid = 0 and a.production_type = %s group by b.item_code, b.reading", (self.branch, self.range_name, self.from_date, self.to_date, self.business_activity, self.production_type), as_dict=1)
+						entries = frappe.db.sql("select a.name, b.item_code, b.reading, sum(b.reading_in_numbers) as reading_in_numbers, sum(b.qty) as qty, b.uom, b.item_sub_group, sum(b.qty_in_no) as qty_in_no, b.reading_inches, b.reading_select from `tabProduction` a, `tabProduction Product Item` b where a.name = b.parent and b.item_sub_group != 'Firewood' and a.branch = %s and a.range = %s and a.posting_date between %s and %s and a.business_activity = %s and a.docstatus = 1 and a.royalty_paid = 0 and a.production_type = %s group by b.item_code, b.reading, b.reading_select", (self.branch, self.range_name, self.from_date, self.to_date, self.business_activity, self.production_type), as_dict=1)
+						# frappe.msgprint(str(entries))
 
 			self.set('adhoc_temp_items', [])
 			frappe.db.sql("delete from `tabRoyalty Adhoc Temp` where parent = %s or parent like %s", (self.name,("%" + "New Royalty Payment" + "%")))
@@ -97,16 +98,23 @@ class RoyaltyPayment(Document):
 						d[0].qty = a.qty
 						d[0].amount = a.qty * d[0].royalty_rate
 				else:
-					d[0].qty = a.qty
-					d[0].amount = a.qty * d[0].royalty_rate
+					if a.item_sub_group == "Pole":
+						d[0].qty = a.reading_in_numbers
+						d[0].amount = a.reading_in_numbers * d[0].royalty_rate
+					else:
+						d[0].qty = a.qty
+						d[0].amount = a.qty * d[0].royalty_rate
 				d[0].uom = a.uom
+				d[0].reading_select = a.reading_select
 				d[0].reference_document = a.name
+				# frappe.msgprint(str(d[0]))
 
 				row = self.append('adhoc_temp_items', {})
 				row.update(d[0])
 				row.save()
 
-			entries = frappe.db.sql("select based_on, particular, timber_class, royalty_rate as rate, from_reading, to_reading, sum(qty) as quantity, uom, sum(amount) as amount, par_name from `tabRoyalty Adhoc Temp` where parent = %s group by particular, timber_class, royalty_rate, from_reading, to_reading order by particular", self.name, as_dict=1)
+			entries = frappe.db.sql("select based_on, particular, timber_class, royalty_rate as rate, from_reading, to_reading, sum(qty) as quantity, uom, sum(amount) as amount, par_name from `tabRoyalty Adhoc Temp` where parent = %s group by particular, timber_class, royalty_rate, from_reading, to_reading,reading_select order by particular", self.name, as_dict=1)
+			# frappe.throw(str(entries))
 			self.set('adhoc_items', [])
 			# Following line replaced by subsequent, by SHIV on 2018/11/13
 			#frappe.db.sql("delete from `tabRoyalty Payment Adhoc` where parent = %s or parent like '%New Royalty Payment%'", self.name)
