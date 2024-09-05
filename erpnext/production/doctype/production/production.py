@@ -150,6 +150,8 @@ class Production(StockController):
 	def validate_raw_materials(self, prod_items):
 		''' validation for raw materials '''
 		total_raw_material_qty = 0
+		if len(self.raw_materials) > 1:
+			frappe.throw("Only One Raw Material can be inserted.")
 		for item in self.get("raw_materials"):
 			if item.item_code not in prod_items:
 				frappe.throw(_("{0} is not a Production Item").format(item.item_code))
