@@ -51,12 +51,15 @@ class StockReconciliation(StockController):
                         doc = frappe.get_doc("Issue POL", a.name)
                         doc.update_stock_gl_ledger(post_gl=True)
 
+
 	def remove_items_with_no_change(self):
 		"""Remove items if qty or rate is not changed"""
 		self.difference_amount = 0.0
+		self.quantity_differences = []
+		
 		def _changed(item):
 			qty, rate = get_stock_balance(item.item_code, item.warehouse,
-					self.posting_date, self.posting_time, with_valuation_rate=True)
+										self.posting_date, self.posting_time, with_valuation_rate=True)
 			if (item.qty==None or item.qty==qty) and (item.valuation_rate==None or item.valuation_rate==rate):
 				return False
 			else:
@@ -69,20 +72,56 @@ class StockReconciliation(StockController):
 
 				item.current_qty = qty
 				item.current_valuation_rate = rate
-				self.difference_amount += (flt(item.qty or qty) * flt(item.valuation_rate or rate) - (flt(qty) * flt(rate)))
+
+				quantity_diff = item.qty - qty
+				self.quantity_differences.append((item.item_code, quantity_diff, rate))
+				self.difference_amount += quantity_diff * rate
 				return True
 
 		items = filter(lambda d: _changed(d), self.items)
 
 		if not items:
 			frappe.throw(_("None of the items have any change in quantity or value."),
-				EmptyStockReconciliationItemsError)
+						EmptyStockReconciliationItemsError)
 
 		elif len(items) != len(self.items):
 			self.items = items
 			for i, item in enumerate(self.items):
 				item.idx = i + 1
-			frappe.msgprint(_("Removed items with no change in quantity or value."))
+			frappe.msgprint(_("Removed items with no change in quantity or value."))					
+
+	# def remove_items_with_no_change(self):
+	# 	"""Remove items if qty or rate is not changed"""
+	# 	self.difference_amount = 0.0
+	# 	def _changed(item):
+	# 		qty, rate = get_stock_balance(item.item_code, item.warehouse,
+	# 				self.posting_date, self.posting_time, with_valuation_rate=True)
+	# 		if (item.qty==None or item.qty==qty) and (item.valuation_rate==None or item.valuation_rate==rate):
+	# 			return False
+	# 		else:
+	# 			# set default as current rates
+	# 			if item.qty==None:
+	# 				item.qty = qty
+
+	# 			if item.valuation_rate==None:
+	# 				item.valuation_rate = rate
+
+	# 			item.current_qty = qty
+	# 			item.current_valuation_rate = rate
+	# 			self.difference_amount += (flt(item.qty or qty) * flt(item.valuation_rate or rate) - (flt(qty) * flt(rate)))
+	# 			return True
+
+	# 	items = filter(lambda d: _changed(d), self.items)
+
+	# 	if not items:
+	# 		frappe.throw(_("None of the items have any change in quantity or value."),
+	# 			EmptyStockReconciliationItemsError)
+
+	# 	elif len(items) != len(self.items):
+	# 		self.items = items
+	# 		for i, item in enumerate(self.items):
+	# 			item.idx = i + 1
+	# 		frappe.msgprint(_("Removed items with no change in quantity or value."))
 
 	def validate_data(self):
 		def _get_msg(row_num, msg):
