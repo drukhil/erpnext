@@ -73,7 +73,7 @@ class StockReconciliation(StockController):
 				item.current_qty = qty
 				item.current_valuation_rate = rate
 
-				quantity_diff = item.qty - qty
+				quantity_diff = (item.qty or 0) - (qty or 0)
 				self.quantity_differences.append((item.item_code, quantity_diff, rate))
 				self.difference_amount += quantity_diff * rate
 				return True
