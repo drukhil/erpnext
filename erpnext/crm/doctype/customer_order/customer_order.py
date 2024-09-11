@@ -31,6 +31,8 @@ class CustomerOrder(Document):
 		self.create_customer()
 		self.get_site_details()
 		#self.disallow_making_order() commented by Thukten to allow other types of sand delivery
+		# frappe.throw(self.item)
+		self.disallow_making_order()
 
 	#Disallow making orders if previous order are not delivered
 	def disallow_making_order(self):
@@ -42,10 +44,12 @@ class CustomerOrder(Document):
 						where co.customer="{}"
 						and so.status = "To Deliver and Bill"
 						and so.docstatus=1
+						and co.item = "{}"
 						and co.product_category="Sand"
 						and co.site="{}"
-						""".format(self.customer, self.site), as_dict=True):
+						""".format(self.customer, self.item, self.site), as_dict=True):
 			if a.name:
+				# frappe.throw(str(a.name))
 				frappe.throw("Making order not allowed for {} as the previous order {} is still not delivered".format(self.product_category, a.name))
 
 	def before_submit(self):
@@ -94,8 +98,8 @@ class CustomerOrder(Document):
 
 	def check_for_duplicates(self):
 		if self.site:
-	 		if frappe.db.sql("""select count(*) from `tabCustomer Order` where user = "{}" and site = "{}" 
-		 		and docstatus = 0 and name != "{}" """.format(self.user, self.site, self.name))[0][0]:
+	 		if frappe.db.sql("""select count(*) from `tabCustomer Order` where user = "{}" and site = "{}" and item="{}" 
+		 		and docstatus = 0 and name != "{}" """.format(self.user, self.site,self.item, self.name))[0][0]:
 		 		frappe.throw(_("New orders not allowed as you already have unpaid order(s). Please complete the payment/cancel the previous order(s)"))
 		else:
 			if frappe.db.sql("""select count(*) from `tabCustomer Order` where user = "{}"
