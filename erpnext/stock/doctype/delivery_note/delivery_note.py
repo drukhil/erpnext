@@ -269,6 +269,8 @@ class DeliveryNote(SellingController):
 
 	def update_stock_qty(self):
 		for a in self.items:
+			if not a.sales_uom:
+				a.sales_uom = a.stock_uom
 			if a.sales_uom == a.stock_uom:
 				a.stock_qty = a.qty
 			else:
@@ -277,35 +279,35 @@ class DeliveryNote(SellingController):
 				if a.conversion_factor > 1:
 					a.stock_qty = flt(a.qty * a.conversion_factor,2)
 
-def update_stock_qty(self):
-	for a in self.items:
-		if a.sales_uom == a.stock_uom:
-			a.stock_qty = a.qty
-		else:
-			if a.conversion_factor == 1 and  a.sales_uom != a.stock_uom:
-				frappe.throw("Conversion Factor cannot be 1 as the Stock UOM and Sales UOM are not same")
-			if a.conversion_factor > 1:
-				a.stock_qty = flt(a.qty * a.conversion_factor,2)
+# def update_stock_qty(self):
+# 	for a in self.items:
+# 		if a.sales_uom == a.stock_uom:
+# 			a.stock_qty = a.qty
+# 		else:
+# 			if a.conversion_factor == 1 and  a.sales_uom != a.stock_uom:
+# 				frappe.throw("Conversion Factor cannot be 1 as the Stock UOM and Sales UOM are not same")
+# 			if a.conversion_factor > 1:
+# 				a.stock_qty = flt(a.qty * a.conversion_factor,2)
 
-def update_stock_qty(self):
-	for a in self.items:
-		if a.sales_uom == a.stock_uom:
-			a.stock_qty = a.qty
-		else:
-			if a.conversion_factor == 1 and  a.sales_uom != a.stock_uom:
-				frappe.throw("Conversion Factor cannot be 1 as the Stock UOM and Sales UOM are not same")
-			if a.conversion_factor > 1:
-				a.stock_qty = flt(a.qty * a.conversion_factor,2)
+# def update_stock_qty(self):
+# 	for a in self.items:
+# 		if a.sales_uom == a.stock_uom:
+# 			a.stock_qty = a.qty
+# 		else:
+# 			if a.conversion_factor == 1 and  a.sales_uom != a.stock_uom:
+# 				frappe.throw("Conversion Factor cannot be 1 as the Stock UOM and Sales UOM are not same")
+# 			if a.conversion_factor > 1:
+# 				a.stock_qty = flt(a.qty * a.conversion_factor,2)
 
-def update_stock_qty(self):
-	for a in self.items:
-		if a.sales_uom == a.stock_uom:
-			a.stock_qty = a.qty
-		else:
-			if a.conversion_factor == 1 and  a.sales_uom != a.stock_uom:
-				frappe.throw("Conversion Factor cannot be 1 as the Stock UOM and Sales UOM are not same")
-			if a.conversion_factor > 1:
-				a.stock_qty = flt(a.qty * a.conversion_factor,2)
+# def update_stock_qty(self):
+# 	for a in self.items:
+# 		if a.sales_uom == a.stock_uom:
+# 			a.stock_qty = a.qty
+# 		else:
+# 			if a.conversion_factor == 1 and  a.sales_uom != a.stock_uom:
+# 				frappe.throw("Conversion Factor cannot be 1 as the Stock UOM and Sales UOM are not same")
+# 			if a.conversion_factor > 1:
+# 				a.stock_qty = flt(a.qty * a.conversion_factor,2)
 
 
 	def validate_conversion_factor(self):
