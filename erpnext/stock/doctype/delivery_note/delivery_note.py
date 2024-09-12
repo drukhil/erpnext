@@ -145,6 +145,13 @@ class DeliveryNote(SellingController):
 		if not self.installation_status: self.installation_status = 'Not Installed'
 		self.validate_conversion_factor()
 
+	def validate_conversion_factor(self):
+		for a in self.items:
+			if a.sales_uom != a.stock_uom and flt(a.stock_qty,2) != flt(a.qty * a.conversion_factor,2):
+				a.stock_qty = flt(a.qty * a.conversion_factor)
+				frappe.msgprint("Stock Quantity set to {} due conversion factor".format(flt(a.qty * a.conversion_factor,2)))
+			else:
+				frappe.msgprint("Stock Qty is after Conversion is {} {}".format(a.stock_qty, a.stock_uom))
 	#TTPL Code
 	def update_shipping_address(self):
 		if self.customer_order:
