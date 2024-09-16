@@ -20,9 +20,9 @@ from erpnext.hr.hr_custom_functions import get_officiating_employee
 def validate_workflow_states(doc):
 	approver_field = {
 			"Travel Authorization": ["supervisor",""],
-                       
                         "Travel Claim": ["supervisor",""],
 			"Leave Encashment": ["approver", "approver_name"],
+                        "Employee Separation": ["approver", "approver_name"],
 			"Salary Advance": ["advance_approver","advance_approver_name","advance_approver_designation"],
 			"Leave Application": ["leave_approver","leave_approver_name"],
 			"Employee Benefits": ["benefit_approver","benefit_approver_name"],
@@ -205,6 +205,72 @@ def approver_list(doc, employee, action):
 	#approver_list.setdefault('approver_hr', approver_hr)	
 	
 	#set Verifier
+@frappe.whitelist()
+def validate_separation_workflow(doc):
+        user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+        reports_to  = frappe.db.get_value("Employee", frappe.db.get_value("Employee", doc.employee, "reports_to"), ["user_id","employee_name","designation","name"])
+        if not reports_to:
+                frappe.throw("Set Up Reports to in Employee Master")
+
+
+        verifier_officiating = get_officiating_employee(reports_to[3])
+        verifier = frappe.get_doc("Employee", verifier_officiating[0].officiate).user_id if verifier_officiating else reports_to[0]
+        
+        subject = "Employee Separation(ERP)"
+	if doc.workflow_state == "Draft":
+                if doc.owner != frappe.session.user:
+                        frappe.throw("Only Mr/Mrs. <b> '{0}' </b>  can Save this Document".format(frappe.get_doc("User", doc.owner).full_name))
+	
+	if doc.workflow_state == "Waiting Approval":
+                # if doc.owner != frappe.session.user:
+                #         doc.workflow_state = "Draft"
+                #         frappe.throw("Only Mr/Mrs. <b> '{0}' </b>  can Apply/Reapply this Document".format(frappe.get_doc("User", doc.owner).full_name))
+                doc.workflow_state = "Waiting Approval"
+                doc.docstatus = 0
+                doc.approver = reports_to[0]
+                doc.approver_name = reports_to[1]
+                message = """Dear Sir/Madam, <br>  {0} has requested you to Approve the Employee Separation <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Employee Separation", doc.name)))
+                try:
+                        frappe.sendmail(recipients=verifier, sender=None, subject=subject, message=message)
+			frappe.sendmail(recipients= doc.owner, sender = None, subject = subject, message = "Employee Separation {0} verified".format(str(get_link_to_form("Employee Separation", doc.name))))
+                except:
+                        pass
+
+	if doc.workflow_state == "Approved":
+                
+                if verifier != frappe.session.user:
+                        doc.workflow_state = "Waiting Approval"
+                        doc.docstatus = 0
+                        frappe.throw("Only Mr/Mrs. <b> {0} </b> can approve this Documentmt".format(frappe.get_doc("User", verifier).full_name))
+                doc.workflow_state == "Approved"
+                doc.docstatus = 1
+                doc.approver = frappe.session.user
+		message = """Dear Sir/Madam, <br>  {0} has requested you to Approve the Employee Separation <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Employee Separation", doc.name)))
+                try:
+		        frappe.sendmail(recipients= doc.owner, sender = None, subject = subject, message = "Employee Separation {0} verified".format(str(get_link_to_form("Employee Separation", doc.name))))
+                except:
+                        pass
+        if doc.workflow_state == "Rejected":
+                message = """Dear Sir/Madam, <br> {0} has rejected the Employee Separation <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Employee Separation", doc.name)))
+                if verifier != frappe.session.user:
+                        doc.workflow_state = "Waiting Approval"
+                        doc.docstatus = 0
+                        frappe.throw("Only Mr/Mrs. <b> {0} </b> can reject this Documentmt".format(frappe.get_doc("User", verifier).full_name))
+                try:
+                        frappe.sendmail(recipients=doc.owner, sender=None, subject=subject, message=message)
+                except:
+                        pass
+        if doc.workflow_state == "Cancelled":
+                message = """Dear Sir/Madam, <br> {0} has Cancelled the Employee Separation <b> {1}. Check ERP System for More Info. </b> <br> Thank You""".format(frappe.get_doc("User", doc.owner).full_name, str(get_link_to_form("Employee Separation", doc.name)))
+                if "HR Manager" not in user_roles:
+                        doc.workflow_state = 'Waiting Approval'
+                        frappe.throw("Only HR Manager role can reject this document")
+
+                try:
+                        frappe.sendmail(recipients=doc.owner, sender=None, subject=subject, message=message)
+                except:
+                        pass
 
 
 @frappe.whitelist()
