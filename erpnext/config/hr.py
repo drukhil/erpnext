@@ -201,6 +201,31 @@ def get_data():
 			]
 		},
 		{
+			"label": _("Employee Exit Cycle"),
+			"items": [
+				{
+					"type": "doctype",
+					"name": "Employee Separation",
+					"description": _("Employee Separation."),
+				},
+				{
+					"type": "doctype",
+					"name": "Employee Separation Clearance",
+					"description": _("Employee Separation Clearance."),
+				},
+				{
+					"type": "doctype",
+					"name": "Employee Benefits",
+					"description": _("Employee Benefits."),
+				},
+				{
+					"type": "doctype",
+					"name": "Employee Exit Notice",
+					"description": _("Employee Exit Notice."),
+				}
+			]
+		},
+		{
 			"label": _("Payroll"),
 			"items": [
 				{
