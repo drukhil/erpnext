@@ -43,12 +43,12 @@ class EmployeeSeparationClearance(Document):
 	
 	def update_update_employee(self, cancel=False):
 		if not cancel:
-			relieving_date = frappe.db.get_value("Employee Separation",self.employee_separation_id, "separation_date")
-			reason_for_resignation =frappe.db.get_value("Employee Separation",self.employee_separation_id, "reason_for_resignation")
+			# relieving_date = frappe.db.get_value("Employee Separation",self.employee_separation_id, "separation_date")
+			# reason_for_resignation =frappe.db.get_value("Employee Separation",self.employee_separation_id, "reason_for_resignation")
 			id = frappe.get_doc("Employee",self.employee)
 			id.status = 'Left'
-			id.relieving_date = relieving_date
-			id.reason_for_resignation = reason_for_resignation
+			id.relieving_date = self.separation_date
+			id.reason_for_resignation = self.reason_for_resignation
 			id.save()
 		else:
 			id = frappe.get_doc("Employee",self.employee)
