@@ -9,7 +9,7 @@ from frappe.utils import flt, getdate
 def execute(filters=None):
 	if not filters: filters = {}
 	
-	validate_filters(filters)
+	# validate_filters(filters)
 
 	columns = get_columns()
 	item_map = get_item_details(filters)
