@@ -23,12 +23,14 @@ class EmployeeSeparationClearance(Document):
 
 	def on_submit(self):
 		self.check_signatures()
+		self.check_duplicates()
 		self.update_reference()
 		# self.notify_employee()
 		self.update_seperation_clearence_reference()
 		self.update_update_employee()
 
 	def on_cancel(self):
+		self.check_employee_benefit()
 		self.update_reference()
 		# self.notify_employee()
 		self.update_seperation_clearence_reference()
@@ -40,6 +42,11 @@ class EmployeeSeparationClearance(Document):
 			frappe.db.set_value("Employee Separation", self.employee_separation_id,"separation_clearance", self.name)
 		else:
 			frappe.db.set_value("Employee Separation", self.employee_separation_id,"separation_clearance", "")
+
+	def check_employee_benefit(self):
+		reference = frappe.db.get_value("Employee Separation", self.employee_separation_id, "separation_benefits")	
+		if reference:
+			frappe.throw('Need to cancel employee benefit')
 	
 	def update_update_employee(self, cancel=False):
 		if not cancel:
@@ -80,10 +87,10 @@ class EmployeeSeparationClearance(Document):
 
 	def check_duplicates(self):
 		duplicates = frappe.db.sql("""
-			select name from `tabEmployee Separation Clearance` where employee_separation_id = '{0}'  and name != '{1}' and docstatus != 2
-				""".format(self.employee_separation_id,self.name))
+			select name from `tabEmployee Separation Clearance` where employee = '{0}'  and name != '{1}' and docstatus != 2
+				""".format(self.employee,self.name))
 		if duplicates:
-			frappe.throw("There is already a pending Separation Clearance created for the Employee Separation '{}'".format(self.employee_separation_id))
+			frappe.throw("Separation Clearance already created for the Employee '{}'".format(self.employee))
 	
 	def check_logged_in_user_role(self):
 		#return values initialization-----------------

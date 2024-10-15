@@ -9,11 +9,16 @@ from frappe.utils import flt
 
 class EmployeeBenefits(Document):
 	def validate(self):
-		pass
+		self.check_duplicate()
+		self.check_reference()
+		
+		# pass
 
 	def on_submit(self):
-		if self.purpose == "Separation":
-			self.update_employee()
+		# if self.purpose == "Separation":
+		# 	self.update_employee()
+		self.check_duplicate()
+		self.update_seperation_benefit_reference()
 		self.post_journal()
 
 	def post_journal(self):
@@ -48,6 +53,33 @@ class EmployeeBenefits(Document):
 			})
 		je.insert()
 		self.journal = je.name
+
+	def check_duplicate(self):		
+		duplicates = frappe.db.sql("""select name from 
+				`tabEmployee Benefits` 
+				where employee = '{0}'  
+				and name != '{1}' 
+				and docstatus != 2
+			""".format(self.employee, self.name))
+		if duplicates:
+			frappe.throw("Employee Benefit already claimed for the Employee '{}'".format(self.employee))
+
+
+	def check_reference(self):
+		if self.purpose == 'Separation' and not self.separation_reference:
+			frappe.throw("Employee Separation Clearance creation should route through Employee Separation Document.",title="Cannot Save")
+
+
+	def update_seperation_benefit_reference(self):
+		reference = frappe.db.get_value("Employee Separation", self.separation_reference, "separation_benefits")
+		if not reference:
+			frappe.db.set_value("Employee Separation", self.separation_reference,"separation_benefits", self.name)
+			frappe.db.set_value("Employee Separation",self.separation_reference ,"employee_benefits_status", 'Claimed')
+		else:
+			frappe.db.set_value("Employee Separation", self.separation_reference,"separation_benefits", "")	
+			frappe.db.set_value("Employee Separation",self.separation_reference ,"employee_benefits_status", 'Not Claimed')
+				
+
 
 	def update_employee(self):
 		emp = frappe.get_doc("Employee", self.employee)

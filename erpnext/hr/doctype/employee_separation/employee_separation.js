@@ -6,6 +6,7 @@ frappe.ui.form.on('Employee Separation', {
 		cur_frm.add_fetch('employee','department','department');
 		cur_frm.add_fetch('employee','designation','designation');
 		cur_frm.add_fetch('employee','employee_subgroup','employee_grade');
+		cur_frm.add_fetch('employee','branch','branch');
 	},
 	refresh: function(frm) {
 		if(cur_frm.doc.docstatus == 1 && cur_frm.doc.employee_benefits_status == "Not Claimed" && cur_frm.doc.clearance_acquired == 1){

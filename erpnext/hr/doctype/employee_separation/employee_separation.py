@@ -12,28 +12,40 @@ from frappe.model.naming import make_autoname
 
 class EmployeeSeparation(Document):
 	def validate(self):
+		self.check_duplicate()
 		validate_separation_workflow(self)
-		# super(EmployeeSeparation, self).validate()
-		# notify_workflow_states(self)
+
 	def autoname(self):
 		abb = "EMPSEP"
 		self.name = make_autoname(str(abb) + './.YYYY./.#####.')
 	def on_submit(self):
-		pass
+		self.check_duplicate()
 		# notify_workflow_states(self)
 
 	def on_cancel(self):
-		# super(EmployeeSeparation, self).on_cancel()
-		pass
+		if self.separation_clearance:
+			frappe.throw('Need to cancel separation clearance first')
 		# notify_workflow_states(self)
+
+	def check_duplicate(self):
+		duplicates = frappe.db.sql("""select name from 
+				`tabEmployee Separation` 
+				where employee = '{0}'  
+				and name != '{1}' 
+				and docstatus != 2
+			""".format(self.employee, self.name))
+		if duplicates:
+			frappe.throw("Employee Separation already created for the Employee '{}'".format(self.employee))
+
   
 @frappe.whitelist()
 def make_employee_benefit(source_name, target_doc=None, skip_item_mapping=False):
 	def update_item(source, target, source_parent):
-		target.employee_separation_id = source.name
+		target.separation_reference = source.name
 		target.grade = source.employee_grade
 		target.division = frappe.db.get_value("Employee",source.employee,"division")
 		target.separation_date = source.separation_date
+		
 	mapper = {
 		"Employee Separation": {
 			"doctype": "Employee Benefits",
@@ -55,13 +67,14 @@ def make_separation_clearance(source_name, target_doc=None, skip_item_mapping=Fa
 		# target.purpose = "Separation"
 		target_doc.employee_separation_id = source_doc.name
 		target_doc.cid = frappe.db.get_value("Employee",source_doc.employee,"passport_number")
-		target_doc.phone_number = frappe.db.get_value("Employee",source_doc.employee,"cell_number")
+		target_doc.phone_number = frappe.db.get_value("Employee",source_doc.employee,"phone_number")
 		target_doc.grade = source_doc.employee_grade
 		target_doc.division = frappe.db.get_value("Employee",source_doc.employee,"division")
 		target_doc.approver = None
 		target_doc.approver_name = None
 		target_doc.approver_designation = None
 		target_doc.employee = source_doc.employee
+		target_doc.branch = frappe.db.get_value("Employee",source_doc.employee,"branch")
 		target_doc.document_no = source_doc.name
 	mapper = {
 		"Employee Separation": {
