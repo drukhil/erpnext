@@ -22,7 +22,7 @@ class EmployeeSeparationClearance(Document):
 	# 	return msg
 
 	def on_submit(self):
-		self.check_signatures()
+		# self.check_signatures()
 		self.check_duplicates()
 		self.update_reference()
 		# self.notify_employee()
@@ -52,11 +52,15 @@ class EmployeeSeparationClearance(Document):
 		if not cancel:
 			# relieving_date = frappe.db.get_value("Employee Separation",self.employee_separation_id, "separation_date")
 			# reason_for_resignation =frappe.db.get_value("Employee Separation",self.employee_separation_id, "reason_for_resignation")
-			id = frappe.get_doc("Employee",self.employee)
-			id.status = 'Left'
-			id.relieving_date = self.separation_date
-			id.reason_for_resignation = self.reason_for_resignation
-			id.save()
+			employee_status = frappe.db.get_value('Employee', self.employee,'status')
+			if employee_status =="Left":
+				frappe.msgprint("Employee detail already updated as left before submitting clearance")
+			else:
+				id = frappe.get_doc("Employee",self.employee)
+				id.status = 'Left'
+				id.relieving_date = self.separation_date
+				id.reason_for_resignation = self.reason_for_resignation
+				id.save()
 		else:
 			id = frappe.get_doc("Employee",self.employee)
 			id.status = 'Active'
@@ -85,7 +89,7 @@ class EmployeeSeparationClearance(Document):
 		if not self.employee_separation_id:
 			frappe.throw("Employee Separation Clearance creation should route through Employee Separation Document.",title="Cannot Save")
 
-	def check_duplicates(self):
+	def check_duplicates(self):		
 		duplicates = frappe.db.sql("""
 			select name from `tabEmployee Separation Clearance` where employee = '{0}'  and name != '{1}' and docstatus != 2
 				""".format(self.employee,self.name))
