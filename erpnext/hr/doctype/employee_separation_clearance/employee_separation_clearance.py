@@ -22,7 +22,7 @@ class EmployeeSeparationClearance(Document):
 	# 	return msg
 
 	def on_submit(self):
-		# self.check_signatures()
+		self.check_signatures()
 		self.check_duplicates()
 		self.update_reference()
 		# self.notify_employee()
