@@ -35,25 +35,40 @@ class BulkAssetTransfer(Document):
 			check_valid_asset_transfer(a.asset_code, self.posting_date)
 
 	def update_asset(self):
-		if not self.custodian or not self.custodian_cost_center or not self.custodian_branch:
-			frappe.throw("The custodian doesn't have Cost Center and Branch defined in Employee Master")
+		if self.purpose=='Custodian':
+			if not self.custodian or not self.custodian_cost_center or not self.custodian_branch:
+				frappe.throw("The custodian doesn't have Cost Center and Branch defined in Employee Master")
 
 		for a in self.items:
 			doc = frappe.get_doc("Asset", a.asset_code)
-			doc.db_set("issued_to", self.custodian)
-			doc.db_set("employee_name", self.custodian_name)
+			if self.purpose=='Custodian':
+				doc.db_set("issued_to", self.custodian)
+				doc.db_set("employee_name", self.custodian_name)
 
-			if a.cost_center != self.custodian_cost_center:
-				doc.db_set("cost_center", self.custodian_cost_center)
-				doc.db_set("branch", self.custodian_branch)
-				equipment = frappe.db.get_value("Equipment", {"asset_code": a.asset_code, "docstatus": 1}, "name")
-				if equipment:
-					equip = frappe.get_doc("Equipment", equipment)
-					equip.branch = self.custodian_branch
-					equip.save()
-					#save_equipment(equipment, self.custodian_branch, self.posting_date, self.name, "Submit")
-					#doc.db_set("branch", self.custodian_branch)
-				make_asset_transfer_gl(self, a.asset_code, self.posting_date, a.cost_center, self.custodian_cost_center)
+				if a.cost_center != self.custodian_cost_center:
+					doc.db_set("cost_center", self.custodian_cost_center)
+					doc.db_set("branch", self.custodian_branch)
+					equipment = frappe.db.get_value("Equipment", {"asset_code": a.asset_code, "docstatus": 1}, "name")
+					if equipment:
+						equip = frappe.get_doc("Equipment", equipment)
+						equip.branch = self.custodian_branch
+						equip.save()
+					make_asset_transfer_gl(self, a.asset_code, self.posting_date, a.cost_center, self.custodian_cost_center)
+			else:
+				if self.cost_center != self.target_cost_center:
+					branch = frappe.db.get_value("Cost Center",self.target_cost_center,'branch')
+					doc.db_set("issued_to", '')
+					doc.db_set("employee_name", '')
+					doc.db_set("cost_center", self.target_cost_center)
+					doc.db_set("branch", branch)
+					equipment = frappe.db.get_value("Equipment", {"asset_code": a.asset_code, "docstatus": 1}, "name")
+					if equipment:
+						equip = frappe.get_doc("Equipment", equipment)
+						equip.branch = branch
+						equip.save()
+					make_asset_transfer_gl(self, a.asset_code, self.posting_date, a.cost_center, self.target_cost_center)
+				else:
+					frappe.throw("Current Cost Center and Target Cost Center cannot br same")
 
 	def get_assets(self):
 		if not self.purpose:
