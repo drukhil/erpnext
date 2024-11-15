@@ -301,9 +301,9 @@ def verify_mr_workflow(doc):
                         frappe.throw("Only Mr/Mrs. <b> '{0}' </b>  can Save this Document".format(frappe.get_doc("User", doc.owner).full_name))
 	
 	if doc.workflow_state == "Waiting Approval":
-                if doc.owner != frappe.session.user:
-                        doc.workflow_state = "Draft"
-                        frappe.throw("Only Mr/Mrs. <b> '{0}' </b>  can Apply/Reapply this Document".format(frappe.get_doc("User", doc.owner).full_name))
+                # if doc.owner != frappe.session.user:
+                #         doc.workflow_state = "Draft"
+                #         frappe.throw("Only Mr/Mrs. <b> '{0}' </b>  can Apply/Reapply this Document".format(frappe.get_doc("User", doc.owner).full_name))
                 if doc.title1 =="Material Request":
                         doc.workflow_state = "Waiting Approval"
                 else:
