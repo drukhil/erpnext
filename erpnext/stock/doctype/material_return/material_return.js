@@ -28,6 +28,21 @@ frappe.ui.form.on('Material Return', {
 			}, __("View"));
 		}
 	},
+
+	// Added by Karma - Only this one
+	// start
+	setup: function(frm) {
+		frm.get_docfield("items").allow_bulk_edit = 1;	
+		frm.get_field('items').grid.editable_fields = [
+			{fieldname: 'item_code', columns: 2},
+			{fieldname: 'warehouse', columns: 2},
+			{fieldname: 'qty', columns: 2},
+			{fieldname: 'valuation_rate', columns: 2},
+			{fieldname: 'expense_account', columns:2},			
+			{fieldname: 'cost_center', columns: 2},
+		];
+	}
+	// end
 });
 
 frappe.ui.form.on("Material Return Item", {
