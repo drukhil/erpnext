@@ -14,6 +14,26 @@ cur_frm.add_fetch("to_warehouse", "email_id1", "email_id1")
 
 frappe.provide("erpnext.stock");
 
+// Added by Karma - Only this one
+	// start
+frappe.ui.form.on('Stock Entry', {
+		
+	setup: function(frm) {
+		frm.get_docfield("items").allow_bulk_edit = 1;	
+		frm.get_field('items').grid.editable_fields = [
+			{fieldname: 'item_code', columns: 2},
+			{fieldname: 'qty', columns: 2},
+			{fieldname: 'valuation_rate', columns: 2},
+			{fieldname: 's_warehouse', columns: 2},	
+			{fieldname: 'expense_account', columns:2},			
+			{fieldname: 'cost_center', columns: 2},
+		];
+	}
+	
+});
+// end
+
+
 erpnext.stock.StockEntry = erpnext.stock.StockController.extend({
 	setup: function() {
 		var me = this;
@@ -619,6 +639,8 @@ frappe.ui.form.on("Stock Entry", "refresh", function(frm) {
                 filters: {'branch': frm.doc.branch}
         }
     });
+
+	
 })
 
 frappe.ui.form.on("Stock Entry", "items_on_form_rendered", function(frm, grid_row, cdt, cdn) {
@@ -627,6 +649,8 @@ frappe.ui.form.on("Stock Entry", "items_on_form_rendered", function(frm, grid_ro
                         row.grid_form.fields_dict.cost_center.set_value(frm.doc.user_cost_center)
                         row.grid_form.fields_dict.cost_center.refresh()
                 }
+
+				
         })
 
 cur_frm.fields_dict['items'].grid.get_field('cost_center').get_query = function(frm, cdt, cdn) {
@@ -645,5 +669,8 @@ cur_frm.fields_dict['items'].grid.get_field('uom').get_query = function(frm, cdt
                 filters: {'item_code': d.item_code}
         }
 }
+
+
+
 
 
