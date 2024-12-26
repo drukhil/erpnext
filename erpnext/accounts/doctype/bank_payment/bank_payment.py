@@ -948,8 +948,6 @@ class BankPayment(Document):
 		cond = ""
 		if not self.fiscal_year:
 			frappe.throw(_("Please select Fiscal Year"))
-		elif not self.month:
-			frappe.throw(_("Please select Month"))
 
 		cond = self.get_conditions()
 		return frappe.db.sql("""SELECT "Bulk Leave Encashment" transaction_type, t1.name transaction_id, 

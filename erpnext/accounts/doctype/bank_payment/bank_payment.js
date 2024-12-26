@@ -36,6 +36,7 @@ frappe.ui.form.on('Bank Payment', {
 		});
 	},
 	onload: function(frm){
+		frm.get_docfield("items").allow_bulk_edit = 1;
 		enable_disable(frm);
 		create_custom_buttons(frm);
 		// cur_frm.set_query("paid_from", function(){
@@ -69,6 +70,8 @@ frappe.ui.form.on('Bank Payment', {
 	refresh: function(frm) {
 		enable_disable(frm);
 		create_custom_buttons(frm);
+		frm.get_docfield("items").allow_bulk_edit = 1;
+
 	},
 	onload_post_render: function(frm) {
 		if(frm.doc.docstatus == 0){
