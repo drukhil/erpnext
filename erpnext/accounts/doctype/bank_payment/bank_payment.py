@@ -970,7 +970,7 @@ class BankPayment(Document):
 					AND IFNULL(t2.payable_amount,0) > 0
 					AND NOT EXISTS(select 1
 						FROM `tabBank Payment Item` bpi, `tabBank Payment` bp
-						WHERE bpi.transaction_type = 'Salary Slip'
+						WHERE bpi.transaction_type = 'Bulk Leave Encashment'
 						AND bp.name=bpi.parent
 						AND bp.transaction_type not in ('Employee Loan Payment')
 						AND bpi.transaction_id = t1.name
