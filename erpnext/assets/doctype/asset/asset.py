@@ -5,7 +5,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-from frappe.utils.data import get_first_day, get_last_day, add_days
+from frappe.utils.data import get_first_day, get_last_day, add_days, date_diff
 from frappe.utils import flt, add_months, cint, nowdate, getdate, get_last_day
 from frappe.model.document import Document
 from erpnext.accounts.doctype.purchase_invoice.purchase_invoice import get_fixed_asset_account
@@ -121,9 +121,12 @@ class Asset(Document):
 
 			number_of_pending_depreciations = cint(self.total_number_of_depreciations) - \
 				cint(self.number_of_depreciations_booked)
+			if str(self.purchase_date).split("-")[2] != "01":
+				number_of_pending_depreciations += 1
 			current_value = flt(self.gross_purchase_amount) - (flt(self.opening_accumulated_depreciation) + flt(self.expected_value_after_useful_life))
 			if number_of_pending_depreciations and current_value > 0:
 				for n in xrange(number_of_pending_depreciations):
+					# frappe.msgprint(str(n))
 					#frappe.throw("THHH " + str(self.number_of_depreciations_booked))
 					schedule_date = get_last_day(add_months(self.next_depreciation_date,
 						n * cint(self.frequency_of_depreciation)))
@@ -136,8 +139,7 @@ class Asset(Document):
 						num_of_days = get_number_of_days(self.purchase_date, schedule_date) + 1
 					else:
 						num_of_days = get_number_of_days(last_schedule_date, schedule_date) 
-
-					depreciation_amount = self.get_depreciation_amount(value_after_depreciation, num_of_days)
+					depreciation_amount = self.get_depreciation_amount(value_after_depreciation, schedule_date, num_of_days)
 					income_tax_amount = self.get_income_tax_depreciation_amount(income_accumulated_depreciation, flt(self.asset_depreciation_percent), num_of_days)
 
 					accumulated_depreciation += flt(depreciation_amount)
@@ -145,45 +147,56 @@ class Asset(Document):
 					income_accumulated_depreciation += income_tax_amount
 				
 					val = flt(self.residual_value) + flt(accumulated_depreciation) + flt(self.expected_value_after_useful_life)
-	
-					if val < self.gross_purchase_amount:
-						self.append("schedules", {
-							"schedule_date": schedule_date,
-							"depreciation_amount": depreciation_amount,
-							"depreciation_income_tax": income_tax_amount,
-							"accumulated_depreciation_amount": accumulated_depreciation,
-							"accumulated_depreciation_income_tax": income_accumulated_depreciation
-						})
-					else:
-						if dep_done == 0:
+					if depreciation_amount > 0 and depreciation_amount:
+						if val < self.gross_purchase_amount:
 							self.append("schedules", {
 								"schedule_date": schedule_date,
-								"depreciation_amount": flt(self.gross_purchase_amount) - flt(val) + flt(depreciation_amount),
+								"depreciation_amount": depreciation_amount,
 								"depreciation_income_tax": income_tax_amount,
-								"accumulated_depreciation_amount": flt(self.gross_purchase_amount) - flt(self.residual_value) - flt(self.expected_value_after_useful_life),
+								"accumulated_depreciation_amount": accumulated_depreciation,
 								"accumulated_depreciation_income_tax": income_accumulated_depreciation
 							})
-							dep_done = 1
-			
-						if dep_done == 1 and income_tax_amount == 0:
-							break
 						else:
-							self.append("schedules", {
-								"schedule_date": schedule_date,
-								"depreciation_amount": 0,
-								"depreciation_income_tax": income_tax_amount,
-								"accumulated_depreciation_amount": flt(self.gross_purchase_amount)  - flt(self.residual_value) - flt(self.expected_value_after_useful_life),
-								"accumulated_depreciation_income_tax": income_accumulated_depreciation
-							})
+							if dep_done == 0:
+								self.append("schedules", {
+									"schedule_date": schedule_date,
+									"depreciation_amount": flt(self.gross_purchase_amount) - flt(val) + flt(depreciation_amount),
+									"depreciation_income_tax": income_tax_amount,
+									"accumulated_depreciation_amount": flt(self.gross_purchase_amount) - flt(self.residual_value) - flt(self.expected_value_after_useful_life),
+									"accumulated_depreciation_income_tax": income_accumulated_depreciation
+								})
+								dep_done = 1
+				
+							# if dep_done == 1 and income_tax_amount == 0:
+							# 	break
+							# else:
+							# 	self.append("schedules", {
+							# 		"schedule_date": schedule_date,
+							# 		"depreciation_amount": 0,
+							# 		"depreciation_income_tax": income_tax_amount,
+							# 		"accumulated_depreciation_amount": flt(self.gross_purchase_amount)  - flt(self.residual_value) - flt(self.expected_value_after_useful_life),
+							# 		"accumulated_depreciation_income_tax": income_accumulated_depreciation
+							# 	})
 					
 
-	def get_depreciation_amount(self, depreciable_value, num_days=1):
+	# def get_depreciation_amount(self, depreciable_value, num_days=1):
+	# 	if self.depreciation_method == "Straight Line":
+	# 		depreciation_amount = ((flt(self.gross_purchase_amount) - flt(self.residual_value)) * 12 * flt(num_days))/(flt(self.total_number_of_depreciations) * 365.25)
+	# 	else:
+	# 		depreciation_amount = 0.0
+
+	# 	return flt(depreciation_amount, 2)
+
+	def get_depreciation_amount(self, depreciable_value, schedule_date, num_days=1):
+		dep_per_year = flt(self.gross_purchase_amount) / (flt(self.total_number_of_depreciations) / 12)
+		days_in_year = date_diff(str(schedule_date).split("-")[0]+"-12-31", str(schedule_date).split("-")[0]+"-01-01") + 1
+
 		if self.depreciation_method == "Straight Line":
-			depreciation_amount = ((flt(self.gross_purchase_amount) - flt(self.residual_value)) * 12 * flt(num_days))/(flt(self.total_number_of_depreciations) * 365.25)
+			depreciation_amount = (flt(dep_per_year) / cint(days_in_year)) * cint(num_days)
 		else:
 			depreciation_amount = 0.0
 
-		return flt(depreciation_amount, 2)
+		return flt(depreciation_amount)
 
 	def validate_expected_value_after_useful_life(self):
 		if self.depreciation_method == "Double Declining Balance":
